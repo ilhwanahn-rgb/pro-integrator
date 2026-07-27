@@ -382,10 +382,10 @@
     <div id="toast" class="toast bg-slate-800"><i id="toast-icon" class="fa-solid fa-circle-check text-xl"></i> <span id="toast-msg">메시지</span></div>
 
     <script>
-        // 구글 시트 URL 설정 (기본값 설정)
-        let SHARED_PROD_URL = localStorage.getItem('GS_PROD_URL') || "https://docs.google.com/spreadsheets/d/e/2PACX-1vQTdp-wPWsANapOUF_ZvT8HzCbnaqxyiL86rxNfZEqA6ir9m5AczfkDYh2LLBVrYuGSxGiS62i51wRh/pub?gid=1999060895&single=true&output=csv";
-        let SHARED_DOWN_URL = localStorage.getItem('GS_DOWN_URL') || "https://docs.google.com/spreadsheets/d/e/2PACX-1vQTdp-wPWsANapOUF_ZvT8HzCbnaqxyiL86rxNfZEqA6ir9m5AczfkDYh2LLBVrYuGSxGiS62i51wRh/pub?gid=1618063531&single=true&output=csv";
-        let SHARED_PACK_URL = localStorage.getItem('GS_PACK_URL') || "https://docs.google.com/spreadsheets/d/e/2PACX-1vQTdp-wPWsANapOUF_ZvT8HzCbnaqxyiL86rxNfZEqA6ir9m5AczfkDYh2LLBVrYuGSxGiS62i51wRh/pub?gid=882319401&single=true&output=csv";
+        // 구글 시트 URL 설정 (기본값 설정 - 지정해 주신 주소 100% 반영)
+        let SHARED_PROD_URL = localStorage.getItem('GS_PROD_URL') || "https://docs.google.com/spreadsheets/d/e/2PACX-1vQTdp-wPWsANap0UF_ZvT8HzCbnaqxyiL86rxNfZEqA6ir9m5AczfkDYh2LLBVrYuGSxGiS62i51wRh/pub?gid=1999060895&single=true&output=csv";
+        let SHARED_DOWN_URL = localStorage.getItem('GS_DOWN_URL') || "https://docs.google.com/spreadsheets/d/e/2PACX-1vQTdp-wPWsANap0UF_ZvT8HzCbnaqxyiL86rxNfZEqA6ir9m5AczfkDYh2LLBVrYuGSxGiS62i51wRh/pub?gid=1618063531&single=true&output=csv";
+        let SHARED_PACK_URL = localStorage.getItem('GS_PACK_URL') || "https://docs.google.com/spreadsheets/d/e/2PACX-1vQTdp-wPWsANap0UF_ZvT8HzCbnaqxyiL86rxNfZEqA6ir9m5AczfkDYh2LLBVrYuGSxGiS62i51wRh/pub?gid=433609624&single=true&output=csv";
 
         const MACHINE_ORDER = ['PCD-0-2', 'PCD-0-3', 'PCD-1', 'PCD-5', 'PCD-2-2', 'PCD-3', 'PCD-4'];
         const EXCLUDED_EQUIPS = ['미분류', 'PCD-W11', 'PCD-W8']; 
