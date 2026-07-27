@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PRO-INTEGRATOR | Ultimate Master v22.1</title>
+    <title>PRO-INTEGRATOR | Ultimate Master v22.2</title>
     
     <script>
         if (window.navigator.userAgent.indexOf('MSIE ') > 0 || window.navigator.userAgent.indexOf('Trident/') > 0) {
@@ -69,7 +69,6 @@
         body.split-mode-960 header p { display: none !important; }
         body.split-mode-960 .target-input { width: 55px !important; padding: 0.15rem 0.3rem !important; font-size: 11px !important; }
 
-        /* 1. KPI 카드 5개를 세로 스택이 아닌 한 줄(5열)로 가로 배치 */
         body.split-mode-960 .kpi-container { 
             display: grid !important;
             grid-template-columns: repeat(5, minmax(0, 1fr)) !important; 
@@ -92,7 +91,6 @@
         body.split-mode-960 .kpi-card .p-2.5 { padding: 0.35rem !important; border-radius: 0.5rem !important; }
         body.split-mode-960 .kpi-card .fa-lg, body.split-mode-960 .kpi-card .text-lg { font-size: 0.9rem !important; }
 
-        /* 2. 메인 차트와 도넛 차트를 세로 스택이 아닌 좌우 가로(7:5 비율)로 배치 */
         body.split-mode-960 .chart-grid { 
             display: grid !important;
             grid-template-columns: 7fr 5fr !important; 
@@ -109,7 +107,6 @@
         body.split-mode-960 .chart-grid .h-\[220px\] { height: 135px !important; }
         body.split-mode-960 #shape-legend { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; gap: 0.2rem !important; font-size: 10px !important; margin-top: 0.25rem !important; }
 
-        /* 3. 통합 자산 제어 레지스트리 표 한눈에 보기 컴팩트화 */
         body.split-mode-960 table { border-spacing: 0 2px !important; }
         body.split-mode-960 th { font-size: 10px !important; padding: 0.35rem 0.5rem !important; }
         body.split-mode-960 td { font-size: 12px !important; padding: 0.35rem 0.5rem !important; border-radius: 6px !important; }
@@ -149,7 +146,7 @@
                 <div>
                     <h1 class="text-2xl lg:text-3xl font-black tracking-tighter text-slate-900 uppercase flex items-center gap-3">
                         <span class="w-2.5 h-7 bg-indigo-600 rounded-full shadow-[0_0_15px_rgba(79,70,229,0.5)]"></span>
-                        PRO-INTEGRATOR <span class="text-indigo-600 font-light ml-1 text-lg lg:text-xl">v22.1</span>
+                        PRO-INTEGRATOR <span class="text-indigo-600 font-light ml-1 text-lg lg:text-xl">v22.2</span>
                     </h1>
                     <p class="text-slate-500 font-bold text-[11px] uppercase tracking-[0.2em] mt-1.5 ml-5 flex items-center gap-2">
                         <span id="status-led" class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
@@ -259,14 +256,27 @@
                         <div class="flex items-baseline gap-1.5"><h4 id="kpi-down" class="text-2xl lg:text-3xl font-black text-slate-800 font-mono kpi-val">0</h4><span class="text-xs font-bold text-slate-500">MIN</span></div>
                     </div>
                     
-                    <!-- 🌟 비가동 시간 TOP 3 리스트 영역 -->
+                    <!-- 비가동 시간 TOP 3 리스트 영역 -->
                     <div id="kpi-down-top3" class="mt-2.5 pt-2 border-t border-slate-100 flex flex-col gap-1">
                         <div class="text-center text-slate-400 text-[10px] font-bold py-1">분석 중...</div>
                     </div>
                 </div>
 
                 <!-- KPI 4: OEE 종합설비효율 -->
-                <div id="card-oee" class="col-span-12 sm:col-span-6 lg:col-span-2.5 bg-white p-5 rounded-3xl border border-slate-200 shadow-sm flex flex-col justify-between transition-all duration-500 kpi-card">
+                <div id="card-oee" class="col-span-12 sm:col-span-6 lg:col-span-2 bg-white p-5 rounded-3xl border border-slate-200 shadow-sm flex flex-col justify-between transition-all duration-500 kpi-card">
+                    <div>
+                        <div class="flex justify-between items-start mb-2">
+                            <div id="icon-oee" class="p-2.5 rounded-xl bg-emerald-50 text-emerald-500 transition-colors duration-500"><i class="fa-solid fa-gear text-lg"></i></div>
+                            <span id="badge-oee" class="text-[10px] font-black px-2 py-0.5 rounded-md hidden bg-rose-100 text-rose-600 animate-pulse">EMERGENCY</span>
+                        </div>
+                        <p class="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-0.5 kpi-title">OEE [종합설비효율]</p>
+                        <div class="flex items-baseline gap-1.5"><h4 id="kpi-oee" class="text-2xl lg:text-3xl font-black text-slate-800 font-mono kpi-val">0.0</h4><span class="text-xs font-bold text-slate-500">%</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 차트 영역 (7:5 복합 차트 및 도넛 차트) -->
+            <div class="grid grid-cols-12 gap-4 mb-6 chart-grid">
                 <!-- 생산실적, 포장량 및 불가동 현황 (복합 차트) -->
                 <div class="col-span-12 lg:col-span-8 bg-white p-6 lg:p-8 rounded-[2rem] shadow-sm border border-slate-200">
                     <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
@@ -284,19 +294,20 @@
                     <div class="h-[320px] relative w-full"><canvas id="mainChart"></canvas></div>
                 </div>
 
-                <!-- 작업 형상별 분포 (도넛 차트) -->
+                <!-- 강종 및 작업 형상별 분포 (도넛 차트 - 탄소강, 합금강, STS 원형/이형/정육각/정사각 세분화) -->
                 <div class="col-span-12 lg:col-span-4 bg-white p-6 lg:p-8 rounded-[2rem] shadow-sm border border-slate-200 flex flex-col justify-between">
                     <div class="flex items-center justify-between mb-2">
-                        <h3 class="text-lg lg:text-xl font-black text-slate-800 flex items-center gap-2"><i class="fa-solid fa-chart-pie text-indigo-500"></i> 작업 형상별 분포</h3>
-                        <span class="text-xs font-bold text-slate-400">당월 누적</span>
+                        <h3 class="text-lg lg:text-xl font-black text-slate-800 flex items-center gap-2"><i class="fa-solid fa-chart-pie text-indigo-500"></i> 강종 · 형상별 분포</h3>
+                        <span class="text-xs font-bold text-slate-400">탄소강/합금강/STS</span>
                     </div>
-                    <div class="h-[220px] relative w-full flex items-center justify-center">
+                    <div class="h-[210px] relative w-full flex items-center justify-center">
                         <canvas id="shapeDoughnutChart"></canvas>
                     </div>
-                    <div id="shape-legend" class="grid grid-cols-2 gap-2 mt-2 text-xs font-bold text-slate-600"></div>
+                    <div id="shape-legend" class="grid grid-cols-2 gap-1.5 mt-2 max-h-[110px] overflow-y-auto no-scrollbar font-bold text-slate-600"></div>
                 </div>
             </div>
 
+            <!-- 통합 자산 제어 레지스트리 표 -->
             <div class="bg-white rounded-[2rem] shadow-sm border border-slate-200 overflow-hidden mb-10">
                 <div class="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
                     <h3 class="text-lg font-black text-slate-800 flex items-center gap-2"><i class="fa-solid fa-microchip text-indigo-500"></i> 통합 자산 제어 레지스트리</h3>
@@ -404,19 +415,20 @@
         </main>
     </div>
 
+    <!-- PRO-Bot 챗봇 창 -->
     <div id="pro-bot-window" class="chat-bot-window">
         <div class="chat-header">
             <div class="flex items-center gap-3">
                 <i class="fa-solid fa-robot text-xl text-amber-400"></i>
                 <div>
                     <h3 class="font-black text-sm">PRO-Bot</h3>
-                    <p class="text-[9px] text-slate-300 font-bold">Smart AI Assistant v22.1</p>
+                    <p class="text-[9px] text-slate-300 font-bold">Smart AI Assistant v22.2</p>
                 </div>
             </div>
             <i class="fa-solid fa-xmark text-lg cursor-pointer hover:text-rose-400" onclick="toggleBot()"></i>
         </div>
         <div class="chat-body" id="chat-body">
-            <div class="msg-bot">안녕하세요! PRO-Bot입니다.<br>생산/포장/비가동 데이터에 대해 질의해보세요.<br><br><span class="text-[10px] font-normal text-slate-500">예: 비가동 시간 가장 많은 항목은? / A조 생산량 / 포장 실적 / 최고 실적 조는?</span></div>
+            <div class="msg-bot">안녕하세요! PRO-Bot입니다.<br>생산/포장/비가동 데이터에 대해 질의해보세요.<br><br><span class="text-[10px] font-normal text-slate-500">예: 비가동 시간 가장 많은 항목은? / A조 생산량 / 포장 실적 / STS 정육각 생산량은?</span></div>
         </div>
         <div class="chat-input-area">
             <input type="text" id="chat-input" class="gs-input m-0" placeholder="질문을 입력하세요..." onkeypress="handleChatEnter(event)">
@@ -457,6 +469,7 @@
 
     <div id="toast" class="toast bg-slate-800"><i id="toast-icon" class="fa-solid fa-circle-check text-xl"></i> <span id="toast-msg">메시지</span></div>
 
+    <!-- 스크립트 로직 -->
     <script>
         // 구글 시트 URL 고정 설정
         let SHARED_PROD_URL = localStorage.getItem('GS_PROD_URL') || "https://docs.google.com/spreadsheets/d/e/2PACX-1vQTdp-wPWsANap0UF_ZvT8HzCbnaqxyiL86rxNfZEqA6ir9m5AczfkDYh2LLBVrYuGSxGiS62i51wRh/pub?gid=1999060895&single=true&output=csv";
@@ -466,19 +479,20 @@
         const MACHINE_ORDER = ['PCD-0-2', 'PCD-0-3', 'PCD-1', 'PCD-5', 'PCD-2-2', 'PCD-3', 'PCD-4'];
         const EXCLUDED_EQUIPS = ['미분류', 'PCD-W11', 'PCD-W8']; 
 
-        // 내장 샘플 데이터셋
+        // 샘플 데이터셋 (강종 + 작업 형상 세분화: 탄소강, 합금강, STS × 원형, 정육각, 정사각, 이형)
         const SAMPLE_PROD_DATA = [
-            { date: "2026-07-01", equipment: "PCD-4", team: "A", isCircle: true, shapeRaw: "원형", shift: "1근", amount: 48500, speed: 180, wire: 3.5 },
-            { date: "2026-07-01", equipment: "PCD-2-2", team: "B", isCircle: false, shapeRaw: "정육각", shift: "2근", amount: 22100, speed: 150, wire: 4.0 },
-            { date: "2026-07-01", equipment: "PCD-5", team: "C", isCircle: true, shapeRaw: "원형", shift: "1근", amount: 18400, speed: 165, wire: 2.8 },
-            { date: "2026-07-02", equipment: "PCD-1", team: "A", isCircle: true, shapeRaw: "원형", shift: "1근", amount: 31200, speed: 175, wire: 3.0 },
-            { date: "2026-07-02", equipment: "PCD-3", team: "B", isCircle: false, shapeRaw: "이형", shift: "2근", amount: 15400, speed: 140, wire: 5.2 },
-            { date: "2026-07-03", equipment: "PCD-4", team: "C", isCircle: true, shapeRaw: "원형", shift: "2근", amount: 51200, speed: 185, wire: 3.5 }
+            { date: "2026-07-01", equipment: "PCD-4", team: "A", isCircle: true, shapeRaw: "탄소강 원형", shift: "1근", amount: 48500, speed: 180, wire: 3.5 },
+            { date: "2026-07-01", equipment: "PCD-2-2", team: "B", isCircle: false, shapeRaw: "STS 정육각", shift: "2근", amount: 22100, speed: 150, wire: 4.0 },
+            { date: "2026-07-01", equipment: "PCD-5", team: "C", isCircle: true, shapeRaw: "합금강 원형", shift: "1근", amount: 18400, speed: 165, wire: 2.8 },
+            { date: "2026-07-02", equipment: "PCD-1", team: "A", isCircle: true, shapeRaw: "STS 원형", shift: "1근", amount: 31200, speed: 175, wire: 3.0 },
+            { date: "2026-07-02", equipment: "PCD-3", team: "B", isCircle: false, shapeRaw: "탄소강 이형", shift: "2근", amount: 15400, speed: 140, wire: 5.2 },
+            { date: "2026-07-03", equipment: "PCD-4", team: "C", isCircle: true, shapeRaw: "합금강 원형", shift: "2근", amount: 51200, speed: 185, wire: 3.5 },
+            { date: "2026-07-03", equipment: "PCD-0-2", team: "A", isCircle: false, shapeRaw: "STS 정사각", shift: "1근", amount: 18200, speed: 155, wire: 4.2 }
         ];
 
         const SAMPLE_DOWN_DATA = [
-            { date: "2026-07-01", equipment: "PCD-3", team: "A", isCircle: true, shapeRaw: "원형", shift: "1근", minutes: 120, reason: "CD Cutting M/C 고장" },
-            { date: "2026-07-02", equipment: "PCD-1", team: "B", isCircle: true, shapeRaw: "원형", shift: "2근", minutes: 45, reason: "전원부 점검" }
+            { date: "2026-07-01", equipment: "PCD-3", team: "A", isCircle: true, shapeRaw: "탄소강 원형", shift: "1근", minutes: 120, reason: "CD Cutting M/C 고장" },
+            { date: "2026-07-02", equipment: "PCD-1", team: "B", isCircle: true, shapeRaw: "STS 원형", shift: "2근", minutes: 45, reason: "전원부 점검" }
         ];
 
         const SAMPLE_PACK_DATA = [
@@ -501,7 +515,7 @@
         
         let analyticsMonth = 'LATEST'; 
         let analyticsGroupBy = 'TEAM';
-        let screenMode = '1920'; // '1920' or '960'
+        let screenMode = '1920';
 
         function updateTime() {
             const now = new Date();
@@ -512,7 +526,6 @@
         }
         setInterval(updateTime, 1000); updateTime();
 
-        // 🌟 1920 Full vs 960 Split 화면 모드 설정
         function setScreenMode(mode) {
             screenMode = mode;
             const body = document.getElementById('app-body');
@@ -536,7 +549,6 @@
             }, 100);
         }
 
-        // 화면 크기가 1100px 미만으로 줄어들면 자동 960 Split 모드로 전환
         window.addEventListener('resize', () => {
             if (window.innerWidth < 1150 && screenMode !== '960') {
                 setScreenMode('960');
@@ -644,7 +656,16 @@
                 let date = normalizeDate(getVal(row, ['작업일자', '일자', '날짜', '생산일', '포장일', 'DATE']));
                 let equip = String(getVal(row, ['작업설비', '설비', '호기', '기계', 'EQUIPMENT']) || '미분류').trim();
                 let team = String(getVal(row, ['작업조', '조명', 'TEAM', '조']) || '').trim().replace('조','');
+                
+                // 🌟 강종 및 작업 형상 세분화 파싱 (탄소강/합금강/STS + 원형/정육각/정사각/이형)
+                let steelType = String(getVal(row, ['강종', '재질', '강종구분', 'STEEL', 'MATERIAL']) || '').trim();
                 let shapeRaw = String(getVal(row, ['형상', '품종', '모양', 'SHAPE']) || '원형').trim();
+                
+                let combinedShape = shapeRaw;
+                if (steelType && !shapeRaw.includes(steelType)) {
+                    combinedShape = `${steelType} ${shapeRaw}`;
+                }
+
                 let isCircle = shapeRaw.includes('원형') && !shapeRaw.includes('비원형');
                 let shiftVal = String(getVal(row, ['주야간', '주야', '근무', '구분', 'SHIFT']) || '').trim();
 
@@ -652,10 +673,10 @@
 
                 if (dataType === 'PROD') {
                     if (EXCLUDED_EQUIPS.includes(equip.toUpperCase().trim())) continue;
-                    parsed.push({ date, equipment: equip, team, isCircle, shapeRaw, shift: shiftVal, amount: safeNum(getVal(row, ['작업량', '생산량', '중량', '실적', '수량'])), speed: safeNum(getVal(row, ['선속', '속도', 'RPM', '신선선속'])), wire: safeNum(getVal(row, ['작업선경', '선경', '두께', 'WIRE'])) });
+                    parsed.push({ date, equipment: equip, team, isCircle, shapeRaw: combinedShape, shift: shiftVal, amount: safeNum(getVal(row, ['작업량', '생산량', '중량', '실적', '수량'])), speed: safeNum(getVal(row, ['선속', '속도', 'RPM', '신선선속'])), wire: safeNum(getVal(row, ['작업선경', '선경', '두께', 'WIRE'])) });
                 } else if (dataType === 'DOWN') {
                     if (EXCLUDED_EQUIPS.includes(equip.toUpperCase().trim())) continue;
-                    parsed.push({ date, equipment: equip, team, isCircle, shapeRaw, shift: shiftVal, minutes: safeNum(getVal(row, ['세부불가동', '불가동시간', '정지시간', '시간'])), reason: String(getVal(row, ['불가동명', '사유', '원인', '내역']) || '기타 고장') });
+                    parsed.push({ date, equipment: equip, team, isCircle, shapeRaw: combinedShape, shift: shiftVal, minutes: safeNum(getVal(row, ['세부불가동', '불가동시간', '정지시간', '시간'])), reason: String(getVal(row, ['불가동명', '사유', '원인', '내역']) || '기타 고장') });
                 } else if (dataType === 'PACK') {
                     parsed.push({ date, equipment: equip, team, shift: shiftVal, amount: safeNum(getVal(row, ['포장량', '포장중량', '실적', '작업량', '수량'])) });
                 }
@@ -727,7 +748,6 @@
             const safeDown = Array.isArray(downData) ? downData : [];
             const safePack = Array.isArray(packData) ? packData : [];
 
-            // 1월~6월 포함 전체 데이터에 존재하는 월(YYYY-MM) 목록 동적 추출
             const allDates = [...safeProd.map(d=>d.date), ...safeDown.map(d=>d.date), ...safePack.map(d=>d.date)].filter(d => d && d.length >= 7 && d.includes('-')).sort();
             const availableMonths = [...new Set(allDates.map(d => d.substring(0, 7)))].sort().reverse();
 
@@ -735,7 +755,7 @@
             if (availableMonths.length > 0) {
                 monthSel.innerHTML = `<option value="ALL_PERIOD">전체 기간 누계</option>` + availableMonths.map(m => `<option value="${m}">${m}월 분석</option>`).join('');
                 if (selectedMonth === 'LATEST' || !['ALL_PERIOD', ...availableMonths].includes(selectedMonth)) {
-                    selectedMonth = availableMonths[0]; // 기본값: 최신 월
+                    selectedMonth = availableMonths[0]; 
                 }
                 monthSel.value = selectedMonth;
             } else {
@@ -784,7 +804,6 @@
 
             document.getElementById('kpi-down').innerText = totDown.toLocaleString();
 
-            // 🌟 비가동 시간 사유 TOP 3 집계 및 동적 출력
             const reasonMap = {};
             fDown.forEach(d => {
                 const r = (d.reason || '기타 고장').trim();
@@ -905,14 +924,16 @@
             if(!window.Chart) return;
             const shapeMap = {};
             fProd.forEach(p => {
-                let s = p.shapeRaw || '원형';
+                let s = p.shapeRaw || '탄소강 원형';
                 if(!shapeMap[s]) shapeMap[s] = 0;
                 shapeMap[s] += p.amount;
             });
 
-            const labels = Object.keys(shapeMap);
-            const data = Object.values(shapeMap).map(v => (v/1000).toFixed(1));
-            const colors = ['#4f46e5', '#f59e0b', '#10b981', '#f43f5e', '#8b5cf6', '#06b6d4'];
+            // 내림차순 정렬
+            const sortedEntries = Object.entries(shapeMap).sort((a,b) => b[1] - a[1]);
+            const labels = sortedEntries.map(e => e[0]);
+            const data = sortedEntries.map(e => (e[1]/1000).toFixed(1));
+            const colors = ['#4f46e5', '#f59e0b', '#10b981', '#06b6d4', '#f43f5e', '#8b5cf6', '#ec4899', '#6366f1', '#14b8a6', '#eab308'];
 
             if(doughnutChartInstance) doughnutChartInstance.destroy();
             const ctx = document.getElementById('shapeDoughnutChart').getContext('2d');
@@ -924,13 +945,41 @@
 
             doughnutChartInstance = new Chart(ctx, {
                 type: 'doughnut',
-                data: { labels: labels, datasets: [{ data: data, backgroundColor: colors.slice(0, labels.length) }] },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+                data: { 
+                    labels: labels, 
+                    datasets: [{ 
+                        data: data, 
+                        backgroundColor: colors.slice(0, labels.length),
+                        borderWidth: 2,
+                        borderColor: '#ffffff'
+                    }] 
+                },
+                options: { 
+                    responsive: true, 
+                    maintainAspectRatio: false, 
+                    plugins: { 
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return ` ${context.label}: ${context.raw} TON`;
+                                }
+                            }
+                        }
+                    },
+                    cutout: '65%'
+                }
             });
 
             let legendHtml = '';
             labels.forEach((l, i) => {
-                legendHtml += `<div class="flex items-center justify-between"><div class="flex items-center gap-1.5"><div class="w-3 h-3 rounded-full" style="background-color:${colors[i%colors.length]}"></div><span class="truncate max-w-[80px]">${l}</span></div><span class="font-mono font-black">${data[i]}T</span></div>`;
+                legendHtml += `<div class="flex items-center justify-between bg-slate-50 p-1.5 rounded-lg border border-slate-100">
+                    <div class="flex items-center gap-1.5 min-w-0">
+                        <div class="w-2.5 h-2.5 rounded-full shrink-0" style="background-color:${colors[i%colors.length]}"></div>
+                        <span class="truncate text-[11px] font-bold text-slate-700" title="${l}">${l}</span>
+                    </div>
+                    <span class="font-mono font-black text-indigo-600 text-[11px] shrink-0 ml-1">${data[i]}T</span>
+                </div>`;
             });
             document.getElementById('shape-legend').innerHTML = legendHtml;
         }
@@ -1052,24 +1101,20 @@
             body.appendChild(div); body.scrollTop = body.scrollHeight;
         }
 
-        // 🌟 PRO-Bot 지능형 자연어 질의 분석기 (개선됨)
         function processQuery(query) {
             if (!prodData || prodData.length === 0) return "현재 로드된 데이터가 없습니다. 먼저 데이터 연동을 확인해주세요.";
             const txt = query.toUpperCase().replace(/\s/g, '');
             
-            // 1. 특정 작업조 감지
             let targetTeam = null; 
             if (txt.includes('A조')) targetTeam = 'A'; 
             else if (txt.includes('B조')) targetTeam = 'B'; 
             else if (txt.includes('C조')) targetTeam = 'C';
 
-            // 2. 특정 설비 감지
             let targetEquip = null;
             MACHINE_ORDER.forEach(e => {
                 if (txt.includes(e.replace(/-/g, '')) || txt.includes(e)) targetEquip = e;
             });
 
-            // 3. 비가동 사유 / 최다 항목 관련 질의
             if (txt.includes('비가공') || txt.includes('비가동') || txt.includes('정지') || txt.includes('고장') || txt.includes('사유') || txt.includes('항목')) {
                 if (txt.includes('항목') || txt.includes('사유') || txt.includes('이유') || txt.includes('원인') || txt.includes('가장많') || txt.includes('최대') || txt.includes('많은')) {
                     let filtered = downData;
@@ -1078,7 +1123,6 @@
 
                     if (filtered.length === 0) return `조건에 해당하는 비가동 내역이 없습니다.`;
 
-                    // 사유별 집계
                     const reasonMap = {};
                     filtered.forEach(d => {
                         const r = d.reason || '기타 고장';
@@ -1098,7 +1142,6 @@
                     }
                 }
 
-                // 일반 비가동 누계 질문
                 let filtered = downData; 
                 if(targetTeam) filtered = filtered.filter(d => (d.team || '').includes(targetTeam));
                 if(targetEquip) filtered = filtered.filter(d => (d.equipment || '').includes(targetEquip));
@@ -1107,7 +1150,6 @@
                 return `${prefix}총 비가동 누적 시간은 **${totalDown.toLocaleString()} 분** 입니다.`;
             }
 
-            // 4. CD 포장 실적 질문
             if (txt.includes('포장')) {
                 let filtered = packData;
                 if (targetTeam) filtered = filtered.filter(p => (p.team || '').includes(targetTeam));
@@ -1117,7 +1159,6 @@
                 return `${prefix}누적 **CD 포장 실적량**은 총 **${totPack.toLocaleString(undefined, {minimumFractionDigits: 1, maximumFractionDigits: 1})} TON** 입니다.`;
             }
 
-            // 5. 최고/최대 생산량 질문
             if (txt.includes('최대') || txt.includes('최고') || txt.includes('1위') || txt.includes('가장높')) {
                 if (txt.includes('조')) {
                     const teamAmt = { 'A':0, 'B':0, 'C':0 }; 
@@ -1141,7 +1182,6 @@
                 }
             }
 
-            // 6. 기본 생산 실적 질의
             let filtered = prodData; 
             if(targetTeam) filtered = filtered.filter(p => (p.team || '').includes(targetTeam));
             if(targetEquip) filtered = filtered.filter(p => (p.equipment || '').includes(targetEquip));
