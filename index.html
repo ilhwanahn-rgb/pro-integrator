@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PRO-INTEGRATOR | Ultimate Master v22.2</title>
+    <title>PRO-INTEGRATOR | Cyber Industrial Master v23.1</title>
     
     <script>
         if (window.navigator.userAgent.indexOf('MSIE ') > 0 || window.navigator.userAgent.indexOf('Trident/') > 0) {
@@ -20,120 +20,153 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap');
-        body { font-family: 'Malgun Gothic', '맑은 고딕', 'Inter', sans-serif; background-color: #f8fafc; margin: 0; padding: 0; overflow-x: hidden; }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=JetBrains+Mono:wght@500;700;800&display=swap');
+        
+        :root {
+            --bg-dark: #090d16;
+            --card-bg: rgba(17, 24, 39, 0.75);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --neon-indigo: #6366f1;
+            --neon-cyan: #06b6d4;
+            --neon-emerald: #10b981;
+            --neon-amber: #f59e0b;
+            --neon-rose: #f43f5e;
+        }
+
+        body { 
+            font-family: 'Inter', 'Malgun Gothic', '맑은 고딕', sans-serif; 
+            background-color: var(--bg-dark); 
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.12) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(6, 182, 212, 0.08) 0px, transparent 50%),
+                linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+            background-size: 100% 100%, 100% 100%, 32px 32px, 32px 32px;
+            color: #f3f4f6; 
+            margin: 0; 
+            padding: 0; 
+            overflow-x: hidden; 
+        }
+
+        .font-mono-num { font-family: 'JetBrains Mono', monospace; }
+
+        .glass-panel {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            backdrop-filter: blur(16px);
+            border-radius: 1.25rem;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .glass-panel:hover {
+            border-color: rgba(255, 255, 255, 0.16);
+            box-shadow: 0 15px 30px -5px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-        table { width: 100%; border-collapse: separate; border-spacing: 0 6px; }
-        th { color: #94a3b8; font-weight: 900; text-transform: uppercase; font-size: 14px; padding: 0.8rem 1rem; letter-spacing: 0.05em; text-align: left; }
-        td { background: #ffffff; padding: 0.8rem 1rem; border-top: 1px solid #f1f5f9; border-bottom: 1px solid #f1f5f9; font-size: 16px; font-weight: bold; }
-        td:first-child { border-left: 1px solid #f1f5f9; border-top-left-radius: 12px; border-bottom-left-radius: 12px; }
-        td:last-child { border-right: 1px solid #f1f5f9; border-top-right-radius: 12px; border-bottom-right-radius: 12px; }
+        table { width: 100%; border-collapse: separate; border-spacing: 0 4px; }
+        th { color: #6b7280; font-weight: 800; text-transform: uppercase; font-size: 11px; padding: 0.6rem 0.85rem; letter-spacing: 0.08em; text-align: left; }
+        td { background: rgba(31, 41, 55, 0.4); padding: 0.65rem 0.85rem; border-top: 1px solid rgba(255,255,255,0.04); border-bottom: 1px solid rgba(255,255,255,0.04); font-size: 13px; font-weight: 700; color: #e5e7eb; }
+        td:first-child { border-left: 1px solid rgba(255,255,255,0.04); border-top-left-radius: 10px; border-bottom-left-radius: 10px; }
+        td:last-child { border-right: 1px solid rgba(255,255,255,0.04); border-top-right-radius: 10px; border-bottom-right-radius: 10px; }
         
-        .target-input { background: #ffffff; border: 1px solid #e2e8f0; color: #0f172a; font-family: 'Inter', monospace; padding: 0.3rem 0.5rem; border-radius: 8px; width: 75px; text-align: right; font-weight: 900; outline: none; font-size: 14px; }
-        .toast { position: fixed; bottom: -100px; right: 40px; padding: 20px 30px; border-radius: 20px; color: white; font-weight: 900; font-size: 16px; z-index: 100; transition: bottom 0.4s ease-in-out; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); display: flex; align-items: center; gap: 12px; }
+        tr:hover td { background: rgba(55, 65, 81, 0.6); color: #ffffff; }
+
+        .target-input { background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255,255,255,0.12); color: #06b6d4; font-family: 'JetBrains Mono', monospace; padding: 0.2rem 0.4rem; border-radius: 6px; width: 62px; text-align: right; font-weight: 800; outline: none; font-size: 12px; transition: all 0.2s; }
+        .target-input:focus { border-color: var(--neon-cyan); box-shadow: 0 0 10px rgba(6, 182, 212, 0.3); }
+
+        .toast { position: fixed; bottom: -100px; right: 30px; padding: 14px 24px; border-radius: 14px; color: white; font-weight: 800; font-size: 14px; z-index: 1000; transition: bottom 0.35s cubic-bezier(0.16, 1, 0.3, 1); box-shadow: 0 20px 30px rgba(0,0,0,0.5); display: flex; align-items: center; gap: 10px; border: 1px solid rgba(255,255,255,0.1); }
         
-        /* OEE 비상 경고등 비주얼 */
         @keyframes emergencyBlink {
             0% { box-shadow: inset 0 0 0 rgba(244, 63, 94, 0); background-color: rgba(244, 63, 94, 0); }
-            50% { box-shadow: inset 0 0 100px rgba(244, 63, 94, 0.3); background-color: rgba(244, 63, 94, 0.05); }
+            50% { box-shadow: inset 0 0 80px rgba(244, 63, 94, 0.25); background-color: rgba(244, 63, 94, 0.08); }
             100% { box-shadow: inset 0 0 0 rgba(244, 63, 94, 0); background-color: rgba(244, 63, 94, 0); }
         }
         .emergency-active { display: block !important; animation: emergencyBlink 1.5s infinite; }
         
-        /* PRO-Bot AI 챗봇 스타일 */
-        .chat-bot-window { display: none; position: fixed; bottom: 30px; right: 40px; width: 380px; height: 550px; background: #ffffff; border-radius: 1.5rem; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); z-index: 999; flex-direction: column; overflow: hidden; border: 1px solid #e2e8f0; }
-        .chat-header { background: #0f172a; padding: 15px 20px; color: white; display: flex; justify-content: space-between; align-items: center; }
-        .chat-body { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; background: #f8fafc; }
-        .chat-input-area { padding: 15px; background: white; border-top: 1px solid #e2e8f0; display: flex; gap: 10px; }
-        .msg-bot { background: #e0e7ff; color: #1e40af; padding: 12px 16px; border-radius: 0 16px 16px 16px; max-width: 90%; align-self: flex-start; font-weight: 700; font-size: 13px; line-height: 1.6; }
-        .msg-user { background: #0f172a; color: white; padding: 12px 16px; border-radius: 16px 0 16px 16px; max-width: 85%; align-self: flex-end; font-weight: 700; font-size: 13px; line-height: 1.5; }
-        .gs-input { width: 100%; padding: 12px 15px; border-radius: 12px; border: 2px solid #e2e8f0; font-size: 13px; font-family: monospace; outline: none; transition: all 0.3s; }
-        
+        .chat-bot-window { display: none; position: fixed; bottom: 25px; right: 30px; width: 380px; height: 520px; background: #111827; border-radius: 1.25rem; box-shadow: 0 25px 60px rgba(0,0,0,0.7); z-index: 999; flex-direction: column; overflow: hidden; border: 1px solid rgba(255,255,255,0.12); }
+        .chat-header { background: #0f172a; padding: 12px 18px; color: white; display: flex; justify-content: space-between; align-items: center; border-b: 1px solid rgba(255,255,255,0.08); }
+        .chat-body { flex: 1; padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; background: #0b0f19; }
+        .chat-input-area { padding: 12px; background: #111827; border-top: 1px solid rgba(255,255,255,0.08); display: flex; gap: 8px; }
+        .msg-bot { background: rgba(99, 102, 241, 0.15); color: #a5b4fc; border: 1px solid rgba(99, 102, 241, 0.25); padding: 10px 14px; border-radius: 0 14px 14px 14px; max-width: 90%; align-self: flex-start; font-weight: 600; font-size: 12px; line-height: 1.5; }
+        .msg-user { background: var(--neon-indigo); color: white; padding: 10px 14px; border-radius: 14px 0 14px 14px; max-width: 85%; align-self: flex-end; font-weight: 700; font-size: 12px; line-height: 1.4; }
+        .gs-input { width: 100%; padding: 10px 12px; border-radius: 10px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.12); color: white; font-size: 12px; font-family: monospace; outline: none; transition: all 0.25s; }
+        .gs-input:focus { border-color: var(--neon-indigo); box-shadow: 0 0 10px rgba(99, 102, 241, 0.3); }
+
         .tab-content { display: none; }
-        .tab-content.active { display: block; animation: fadeIn 0.4s ease-in-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .nav-icon { cursor: pointer; padding: 10px; border-radius: 1rem; transition: all 0.3s; color: #64748b; }
-        .nav-icon:hover { background: rgba(255,255,255,0.1); color: #fff; }
-        .nav-icon.active { background: #4f46e5; color: #fff; box-shadow: 0 0 15px rgba(79,70,229,0.4); }
+        .tab-content.active { display: block; animation: fadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1); }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .nav-icon { cursor: pointer; padding: 10px; border-radius: 0.85rem; transition: all 0.25s; color: #9ca3af; }
+        .nav-icon:hover { background: rgba(255,255,255,0.08); color: #fff; }
+        .nav-icon.active { background: var(--neon-indigo); color: #fff; box-shadow: 0 0 20px rgba(99, 102, 241, 0.5); }
 
-        .weather-widget { background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%); border: 1px solid #e2e8f0; border-radius: 2rem; padding: 1.25rem; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05); }
-        .modal-bg { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(10px); z-index: 950; justify-content: center; align-items: center; }
+        .modal-bg { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(5, 8, 15, 0.85); backdrop-filter: blur(12px); z-index: 950; justify-content: center; align-items: center; }
 
-        /* 📱 960 x 1080 (절반 분할 화면 모드) 한눈에 보기 스마트 컴팩트 스타일 */
-        body.split-mode-960 aside { width: 3.5rem !important; }
-        body.split-mode-960 main { padding: 0.75rem 0.85rem !important; }
-        body.split-mode-960 header { margin-bottom: 0.6rem !important; gap: 0.5rem !important; }
-        body.split-mode-960 header h1 { font-size: 1.15rem !important; }
+        /* 📱 960 x 1080 분할 화면 모드 특화 스타일 */
+        body.split-mode-960 main { padding: 0.5rem 0.65rem !important; }
+        body.split-mode-960 header { margin-bottom: 0.5rem !important; gap: 0.4rem !important; }
+        body.split-mode-960 header h1 { font-size: 1.1rem !important; }
         body.split-mode-960 header p { display: none !important; }
-        body.split-mode-960 .target-input { width: 55px !important; padding: 0.15rem 0.3rem !important; font-size: 11px !important; }
+        body.split-mode-960 .target-input { width: 50px !important; padding: 0.1rem 0.25rem !important; font-size: 11px !important; }
 
         body.split-mode-960 .kpi-container { 
             display: grid !important;
             grid-template-columns: repeat(5, minmax(0, 1fr)) !important; 
-            gap: 0.5rem !important;
-            margin-bottom: 0.6rem !important;
+            gap: 0.4rem !important;
+            margin-bottom: 0.5rem !important;
         }
         body.split-mode-960 .kpi-container > div { 
             grid-column: span 1 / span 1 !important; 
-            padding: 0.65rem 0.75rem !important; 
-            border-radius: 1rem !important;
-            min-height: 110px !important;
-            display: flex !important;
-            flex-direction: column !important;
-            justify-content: space-between !important;
+            padding: 0.55rem 0.65rem !important; 
+            border-radius: 0.85rem !important;
+            min-height: 100px !important;
         }
-        body.split-mode-960 .kpi-title { font-size: 10px !important; margin-bottom: 1px !important; white-space: nowrap !important; }
-        body.split-mode-960 .kpi-val { font-size: 1.35rem !important; line-height: 1.1 !important; }
-        body.split-mode-960 #kpi-down-top3 { font-size: 9px !important; padding-top: 0.25rem !important; }
-        body.split-mode-960 .weather-widget { padding: 0.5rem 0.65rem !important; }
-        body.split-mode-960 .kpi-card .p-2.5 { padding: 0.35rem !important; border-radius: 0.5rem !important; }
-        body.split-mode-960 .kpi-card .fa-lg, body.split-mode-960 .kpi-card .text-lg { font-size: 0.9rem !important; }
+        body.split-mode-960 .kpi-title { font-size: 9px !important; margin-bottom: 1px !important; white-space: nowrap !important; }
+        body.split-mode-960 .kpi-val { font-size: 1.25rem !important; line-height: 1.1 !important; }
+        body.split-mode-960 #kpi-down-top3 { font-size: 8.5px !important; padding-top: 0.2rem !important; }
 
         body.split-mode-960 .chart-grid { 
             display: grid !important;
             grid-template-columns: 7fr 5fr !important; 
-            gap: 0.6rem !important;
-            margin-bottom: 0.6rem !important;
+            gap: 0.5rem !important;
+            margin-bottom: 0.5rem !important;
         }
         body.split-mode-960 .chart-grid > div { 
             grid-column: span 1 / span 1 !important; 
-            padding: 0.75rem 0.85rem !important; 
-            border-radius: 1.25rem !important; 
+            padding: 0.6rem 0.75rem !important; 
+            border-radius: 1rem !important; 
         }
-        body.split-mode-960 .chart-grid h3 { font-size: 0.9rem !important; }
-        body.split-mode-960 .chart-grid .h-\[320px\] { height: 210px !important; }
-        body.split-mode-960 .chart-grid .h-\[220px\] { height: 135px !important; }
-        body.split-mode-960 #shape-legend { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; gap: 0.2rem !important; font-size: 10px !important; margin-top: 0.25rem !important; }
+        body.split-mode-960 .chart-grid h3 { font-size: 0.85rem !important; }
+        body.split-mode-960 .chart-grid .h-\[300px\] { height: 195px !important; }
+        body.split-mode-960 .chart-grid .h-\[200px\] { height: 125px !important; }
 
-        body.split-mode-960 table { border-spacing: 0 2px !important; }
-        body.split-mode-960 th { font-size: 10px !important; padding: 0.35rem 0.5rem !important; }
-        body.split-mode-960 td { font-size: 12px !important; padding: 0.35rem 0.5rem !important; border-radius: 6px !important; }
-        body.split-mode-960 td.text-xl, body.split-mode-960 td.text-2xl { font-size: 13px !important; }
-        body.split-mode-960 td .text-xl, body.split-mode-960 td .text-2xl { font-size: 13px !important; }
-        body.split-mode-960 .bg-white.rounded-\[2rem\] { border-radius: 1.25rem !important; margin-bottom: 1.5rem !important; }
-        body.split-mode-960 .bg-white.rounded-\[2rem\] .p-5 { padding: 0.6rem 0.85rem !important; }
+        body.split-mode-960 table { border-spacing: 0 1px !important; }
+        body.split-mode-960 th { font-size: 9.5px !important; padding: 0.25rem 0.4rem !important; }
+        body.split-mode-960 td { font-size: 11px !important; padding: 0.25rem 0.4rem !important; }
     </style>
 </head>
 <body id="app-body" class="split-mode-auto">
-    <div id="emergency-overlay" class="fixed inset-0 z-[900] pointer-events-none hidden border-[12px] border-transparent transition-all duration-300"></div>
+    <div id="emergency-overlay" class="fixed inset-0 z-[900] pointer-events-none hidden border-[10px] border-rose-500/50 transition-all duration-300"></div>
 
     <div class="flex min-h-screen">
         <!-- 좌측 사이드바 탭 메뉴 -->
-        <aside class="w-16 lg:w-20 bg-[#0f172a] border-r border-slate-800 flex flex-col items-center py-5 gap-5 sticky top-0 h-screen shadow-2xl z-40 flex-shrink-0">
-            <div class="w-10 h-10 lg:w-12 lg:h-12 bg-indigo-600 rounded-2xl flex items-center justify-center shadow-[0_0_20px_rgba(79,70,229,0.4)] mb-1">
-                <i class="fa-solid fa-layer-group text-white text-lg lg:text-xl"></i>
+        <aside class="w-16 lg:w-20 bg-[#0b0f19] border-r border-slate-800/80 flex flex-col items-center py-5 gap-5 sticky top-0 h-screen shadow-2xl z-40 flex-shrink-0">
+            <div class="w-10 h-10 lg:w-11 lg:h-11 bg-gradient-to-tr from-indigo-600 to-cyan-500 rounded-xl flex items-center justify-center shadow-[0_0_18px_rgba(99,102,241,0.5)] mb-1">
+                <i class="fa-solid fa-industry text-white text-base lg:text-lg"></i>
             </div>
             <nav class="flex flex-col gap-3 text-lg lg:text-xl w-full px-2 items-center h-full pb-4">
                 <div class="nav-icon active" onclick="switchTab('main')" id="nav-main" title="메인 대시보드"><i class="fa-solid fa-chart-line"></i></div>
                 <div class="nav-icon" onclick="switchTab('analytics')" id="nav-analytics" title="CD 생산성 분석"><i class="fa-solid fa-chart-pie"></i></div>
-                <div class="w-6 h-[1px] bg-slate-700 my-1"></div>
+                <div class="w-6 h-[1px] bg-slate-800 my-1"></div>
                 <div class="nav-icon hover:text-emerald-400" onclick="fetchGoogleSheetsData()" title="데이터 강제 동기화"><i class="fa-solid fa-arrows-rotate"></i></div>
-                <div class="nav-icon hover:text-amber-400" onclick="openModal()" title="구글 시트 연동 설정"><i class="fa-solid fa-gear"></i></div>
+                <div class="nav-icon hover:text-amber-400" onclick="openModal()" title="구글 시트 연동 설정"><i class="fa-solid fa-sliders"></i></div>
                 
                 <div class="nav-icon mt-auto mb-2 text-amber-400 hover:text-amber-300 animate-bounce" onclick="toggleBot()" title="PRO-Bot (AI 챗봇)">
-                    <i class="fa-solid fa-robot text-2xl lg:text-3xl drop-shadow-[0_0_10px_rgba(251,191,36,0.6)]"></i>
+                    <i class="fa-solid fa-robot text-2xl lg:text-3xl drop-shadow-[0_0_12px_rgba(251,191,36,0.6)]"></i>
                 </div>
             </nav>
         </aside>
@@ -141,177 +174,201 @@
         <!-- ================================================================= -->
         <!-- TAB 1: 메인 대시보드 (통합 관제) -->
         <!-- ================================================================= -->
-        <main class="flex-1 p-3 lg:p-6 overflow-y-auto h-screen bg-slate-50 relative z-10 tab-content active" id="tab-main">
-            <header class="flex flex-col xl:flex-row justify-between items-start xl:items-end gap-4 mb-6">
+        <main class="flex-1 p-3 lg:p-5 overflow-y-auto h-screen relative z-10 tab-content active" id="tab-main">
+            <!-- Header Toolbar -->
+            <header class="flex flex-col xl:flex-row justify-between items-start xl:items-end gap-3 mb-4">
                 <div>
-                    <h1 class="text-2xl lg:text-3xl font-black tracking-tighter text-slate-900 uppercase flex items-center gap-3">
-                        <span class="w-2.5 h-7 bg-indigo-600 rounded-full shadow-[0_0_15px_rgba(79,70,229,0.5)]"></span>
-                        PRO-INTEGRATOR <span class="text-indigo-600 font-light ml-1 text-lg lg:text-xl">v22.2</span>
+                    <h1 class="text-xl lg:text-2xl font-black tracking-tight text-white uppercase flex items-center gap-2.5">
+                        <span class="w-2 h-6 bg-indigo-500 rounded-full shadow-[0_0_12px_#6366f1]"></span>
+                        PRO-INTEGRATOR <span class="text-cyan-400 font-light ml-0.5 text-base lg:text-lg">v23.1</span>
                     </h1>
-                    <p class="text-slate-500 font-bold text-[11px] uppercase tracking-[0.2em] mt-1.5 ml-5 flex items-center gap-2">
-                        <span id="status-led" class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                        <span id="status-text">Cloud & Local Multi-Sync Active</span>
+                    <p class="text-slate-400 font-bold text-[10px] uppercase tracking-[0.2em] mt-1 ml-4 flex items-center gap-2">
+                        <span id="status-led" class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                        <span id="status-text">Live Sync Active</span>
                     </p>
                 </div>
 
-                <div class="flex flex-wrap items-center gap-2.5 bg-white p-2 rounded-2xl border border-slate-200 shadow-sm">
-                    <!-- 화면 해상도 2가지 모드 전환 (1920 Full vs 960 Split) -->
-                    <div class="flex bg-slate-100 p-1 rounded-lg mr-1" id="screen-mode-container">
-                        <button id="btn-mode-1920" onclick="setScreenMode('1920')" class="px-2.5 py-1 text-[11px] font-black rounded text-indigo-600 bg-white shadow-sm border border-slate-200 transition-all flex items-center gap-1">
+                <div class="flex flex-wrap items-center gap-2 glass-panel p-2">
+                    <!-- 화면 해상도 모드 (1920 Full vs 960 Split) -->
+                    <div class="flex bg-slate-900/60 p-0.5 rounded-lg border border-slate-800" id="screen-mode-container">
+                        <button id="btn-mode-1920" onclick="setScreenMode('1920')" class="px-2 py-0.5 text-[10px] font-extrabold rounded text-cyan-400 bg-slate-800 shadow border border-slate-700 transition-all flex items-center gap-1">
                             <i class="fa-solid fa-desktop"></i> 1920 Full
                         </button>
-                        <button id="btn-mode-960" onclick="setScreenMode('960')" class="px-2.5 py-1 text-[11px] font-black rounded text-slate-400 transition-all flex items-center gap-1">
+                        <button id="btn-mode-960" onclick="setScreenMode('960')" class="px-2 py-0.5 text-[10px] font-extrabold rounded text-slate-400 transition-all flex items-center gap-1">
                             <i class="fa-solid fa-columns"></i> 960 Split
                         </button>
                     </div>
 
-                    <div class="flex gap-3 border-r border-slate-200 pr-3 pl-1">
+                    <div class="flex gap-2.5 border-r border-slate-800 pr-2.5 pl-1">
                         <div class="flex flex-col">
-                            <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-0.5">운영계획량(월)</span>
+                            <span class="text-[8.5px] font-extrabold text-slate-400 uppercase tracking-widest">운영계획(월)</span>
                             <div class="flex items-center gap-1">
-                                <input type="number" id="inp-monthly" class="target-input text-indigo-600" value="4170" onchange="updateTargets()">
-                                <span class="text-[9px] font-black text-slate-400">TON</span>
+                                <input type="number" id="inp-monthly" class="target-input text-cyan-400" value="4170" onchange="updateTargets()">
+                                <span class="text-[8.5px] font-bold text-slate-500">TON</span>
                             </div>
                         </div>
                         <div class="flex flex-col">
-                            <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-0.5">일일목표(일)</span>
+                            <span class="text-[8.5px] font-extrabold text-slate-400 uppercase tracking-widest">일일목표(일)</span>
                             <div class="flex items-center gap-1">
-                                <input type="number" id="inp-daily" class="target-input text-amber-500" value="119" onchange="updateTargets()">
-                                <span class="text-[9px] font-black text-slate-400">TON</span>
+                                <input type="number" id="inp-daily" class="target-input text-amber-400" value="119" onchange="updateTargets()">
+                                <span class="text-[8.5px] font-bold text-slate-500">TON</span>
                             </div>
                         </div>
                     </div>
 
                     <div class="flex items-center gap-1.5 px-1">
-                        <i class="fa-solid fa-calendar-days text-indigo-500 text-sm"></i>
-                        <select id="month-select" class="bg-slate-50 border border-slate-200 text-xs font-black text-slate-700 py-1 px-2 rounded-lg outline-none cursor-pointer" onchange="onMonthChange()">
+                        <i class="fa-solid fa-calendar-days text-indigo-400 text-xs"></i>
+                        <select id="month-select" class="bg-slate-900/80 border border-slate-800 text-[11px] font-bold text-slate-200 py-0.5 px-2 rounded-md outline-none cursor-pointer" onchange="onMonthChange()">
                             <option value="LATEST">월 선택 로딩 중...</option>
                         </select>
-                        <select id="date-select" class="bg-slate-50 border border-slate-200 text-xs font-black text-slate-700 py-1 px-2 rounded-lg outline-none cursor-pointer" onchange="onDateChange()">
+                        <select id="date-select" class="bg-slate-900/80 border border-slate-800 text-[11px] font-bold text-slate-200 py-0.5 px-2 rounded-md outline-none cursor-pointer" onchange="onDateChange()">
                             <option value="ALL">당월 누계 분석</option>
                         </select>
-                        <div class="flex bg-slate-100 p-0.5 rounded-lg ml-1" id="view-mode-container">
-                            <button id="btn-daily" onclick="setViewMode('DAILY')" class="px-2 py-1 text-[11px] font-black rounded text-indigo-600 bg-white shadow-sm border border-slate-200 transition-all">일간</button>
-                            <button id="btn-weekly" onclick="setViewMode('WEEKLY')" class="px-2 py-1 text-[11px] font-black rounded text-slate-400 transition-all">주간</button>
+                        <div class="flex bg-slate-900/60 p-0.5 rounded-md border border-slate-800" id="view-mode-container">
+                            <button id="btn-daily" onclick="setViewMode('DAILY')" class="px-1.5 py-0.5 text-[10px] font-bold rounded text-indigo-400 bg-slate-800 border border-slate-700 transition-all">일간</button>
+                            <button id="btn-weekly" onclick="setViewMode('WEEKLY')" class="px-1.5 py-0.5 text-[10px] font-bold rounded text-slate-400 transition-all">주간</button>
                         </div>
                     </div>
 
-                    <div class="flex items-center gap-1.5 px-1 border-l border-slate-200 pl-2">
-                        <i class="fa-solid fa-cloud-sun text-amber-500 text-sm"></i>
-                        <div class="flex bg-slate-100 p-0.5 rounded-lg">
-                            <button id="btn-shift-all" onclick="setShiftMode('ALL')" class="px-2 py-1 text-[11px] font-black rounded text-indigo-600 bg-white shadow-sm border border-slate-200 transition-all">전체</button>
-                            <button id="btn-shift-day" onclick="setShiftMode('1근')" class="px-2 py-1 text-[11px] font-black rounded text-slate-400 transition-all">1근</button>
-                            <button id="btn-shift-night" onclick="setShiftMode('2근')" class="px-2 py-1 text-[11px] font-black rounded text-slate-400 transition-all">2근</button>
+                    <div class="flex items-center gap-1 px-1 border-l border-slate-800 pl-2">
+                        <i class="fa-solid fa-clock text-amber-400 text-xs"></i>
+                        <div class="flex bg-slate-900/60 p-0.5 rounded-md border border-slate-800">
+                            <button id="btn-shift-all" onclick="setShiftMode('ALL')" class="px-1.5 py-0.5 text-[10px] font-bold rounded text-cyan-400 bg-slate-800 border border-slate-700 transition-all">전체</button>
+                            <button id="btn-shift-day" onclick="setShiftMode('1근')" class="px-1.5 py-0.5 text-[10px] font-bold rounded text-slate-400 transition-all">1근</button>
+                            <button id="btn-shift-night" onclick="setShiftMode('2근')" class="px-1.5 py-0.5 text-[10px] font-bold rounded text-slate-400 transition-all">2근</button>
                         </div>
                     </div>
                 </div>
             </header>
 
-            <div class="grid grid-cols-12 gap-4 mb-6 kpi-container">
-                <!-- 날씨 & 시계 위젯 -->
-                <div class="col-span-12 sm:col-span-6 lg:col-span-2 weather-widget flex flex-col justify-between kpi-card">
-                    <div class="flex items-center gap-2 text-slate-500 font-black text-[10px] uppercase tracking-widest"><i class="fa-regular fa-calendar"></i> TODAY</div>
-                    <div class="my-1">
-                        <p class="text-[9px] text-slate-400 font-bold mb-0.5">현재시간</p>
-                        <div class="text-lg font-black text-slate-800 font-mono tracking-tighter" id="current-time">00:00:00 <span class="text-[10px] text-slate-400">AM</span></div>
+            <!-- KPI Cards Grid (5-column Row) -->
+            <div class="grid grid-cols-12 gap-3 mb-4 kpi-container">
+                <!-- 날씨 & 시계 위젯 (2 cols) -->
+                <div class="col-span-12 sm:col-span-6 lg:col-span-2 glass-panel p-3.5 flex flex-col justify-between kpi-card">
+                    <div class="flex items-center gap-1.5 text-slate-400 font-extrabold text-[9.5px] uppercase tracking-widest"><i class="fa-regular fa-calendar text-cyan-400"></i> TODAY</div>
+                    <div class="my-0.5">
+                        <p class="text-[9px] text-slate-500 font-bold mb-0.5">현재시간</p>
+                        <div class="text-base lg:text-lg font-black text-white font-mono-num tracking-tight" id="current-time">00:00:00 <span class="text-[9px] text-slate-500">AM</span></div>
                     </div>
-                    <div class="flex justify-between items-end border-t border-slate-100 pt-1.5">
+                    <div class="flex justify-between items-end border-t border-slate-800 pt-1">
                         <div>
-                            <p class="text-[9px] font-black text-blue-500 uppercase tracking-widest">포항 공장</p>
-                            <div class="flex items-center gap-1"><i class="fa-solid fa-cloud-sun text-slate-400 text-sm"></i><span class="text-sm font-black text-slate-700">27°</span></div>
+                            <p class="text-[8.5px] font-bold text-cyan-400 uppercase tracking-widest">포항 공장</p>
+                            <div class="flex items-center gap-1"><i class="fa-solid fa-cloud-sun text-amber-400 text-xs"></i><span class="text-xs font-black text-slate-200">27°C</span></div>
                         </div>
                     </div>
                 </div>
 
-                <!-- KPI 1: 당월 생산 실적 -->
-                <div class="col-span-12 sm:col-span-6 lg:col-span-2.5 bg-white p-5 rounded-3xl border border-slate-200 shadow-sm flex flex-col justify-center kpi-card">
-                    <div class="flex justify-between items-start mb-2">
-                        <div class="p-2.5 rounded-xl bg-indigo-50 text-indigo-600"><i class="fa-solid fa-industry text-lg"></i></div>
-                        <span id="kpi-reach" class="text-[11px] font-black px-2.5 py-0.5 rounded-lg border bg-indigo-50 text-indigo-600 border-indigo-100">달성률 0%</span>
+                <!-- KPI 1: 당월 생산 실적 (2.5 cols) -->
+                <div class="col-span-12 sm:col-span-6 lg:col-span-2 lg:w-[105%] glass-panel p-3.5 flex flex-col justify-between kpi-card">
+                    <div class="flex justify-between items-start mb-1">
+                        <div class="p-2 rounded-lg bg-indigo-500/10 border border-indigo-500/20 text-indigo-400"><i class="fa-solid fa-industry text-sm"></i></div>
+                        <span id="kpi-reach" class="text-[9.5px] font-extrabold px-2 py-0.5 rounded-md border bg-indigo-500/10 text-indigo-300 border-indigo-500/30">달성률 0%</span>
                     </div>
-                    <p class="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-0.5 kpi-title">당월 생산 실적</p>
-                    <div class="flex items-baseline gap-1.5"><h4 id="kpi-tons" class="text-2xl lg:text-3xl font-black text-slate-800 font-mono kpi-val">0</h4><span class="text-xs font-bold text-slate-500">TON</span></div>
-                </div>
-
-                <!-- KPI 2: CD 포장 실적량 -->
-                <div class="col-span-12 sm:col-span-6 lg:col-span-2.5 bg-white p-5 rounded-3xl border border-slate-200 shadow-sm flex flex-col justify-between kpi-card">
                     <div>
-                        <div class="flex justify-between items-start mb-2">
-                            <div class="p-2.5 rounded-xl bg-blue-50 text-blue-600"><i class="fa-solid fa-box-open text-lg"></i></div>
-                            <span id="kpi-pack-ratio" class="text-[11px] font-black px-2.5 py-0.5 rounded-lg border bg-blue-50 text-blue-600 border-blue-100">포장률 0%</span>
-                        </div>
-                        <p class="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-0.5 kpi-title">CD 포장 실적량</p>
-                        <div class="flex items-baseline gap-1.5"><h4 id="kpi-pack-tons" class="text-2xl lg:text-3xl font-black text-slate-800 font-mono kpi-val">0</h4><span class="text-xs font-bold text-slate-500">TON</span></div>
+                        <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest mb-0.5 kpi-title">당월 생산 실적</p>
+                        <div class="flex items-baseline gap-1"><h4 id="kpi-tons" class="text-xl lg:text-2xl font-black text-white font-mono-num kpi-val">0</h4><span class="text-[10px] font-bold text-slate-400">TON</span></div>
                     </div>
                 </div>
 
-                <!-- KPI 3: 총 불가동시간 및 비가동 TOP 3 -->
-                <div class="col-span-12 sm:col-span-6 lg:col-span-2.5 bg-white p-5 rounded-3xl border border-slate-200 shadow-sm flex flex-col justify-between kpi-card">
+                <!-- KPI 2: CD 포장 실적량 (2.5 cols) -->
+                <div class="col-span-12 sm:col-span-6 lg:col-span-2 lg:w-[105%] glass-panel p-3.5 flex flex-col justify-between kpi-card">
+                    <div class="flex justify-between items-start mb-1">
+                        <div class="p-2 rounded-lg bg-cyan-500/10 border border-cyan-500/20 text-cyan-400"><i class="fa-solid fa-box-open text-sm"></i></div>
+                        <span id="kpi-pack-ratio" class="text-[9.5px] font-extrabold px-2 py-0.5 rounded-md border bg-cyan-500/10 text-cyan-300 border-cyan-500/30">포장률 0%</span>
+                    </div>
                     <div>
-                        <div class="flex justify-between items-start mb-1.5">
-                            <div class="p-2.5 rounded-xl bg-rose-50 text-rose-500"><i class="fa-solid fa-clock text-lg"></i></div>
-                            <span class="text-[10px] font-black px-2 py-0.5 rounded-md bg-rose-50 text-rose-600 border border-rose-100 uppercase tracking-wider">TOP 3 사유</span>
+                        <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest mb-0.5 kpi-title">CD 포장 실적량</p>
+                        <div class="flex items-baseline gap-1"><h4 id="kpi-pack-tons" class="text-xl lg:text-2xl font-black text-white font-mono-num kpi-val">0</h4><span class="text-[10px] font-bold text-slate-400">TON</span></div>
+                    </div>
+                </div>
+
+                <!-- KPI 3: 총 불가동시간 및 비가동 TOP 3 (3 cols) -->
+                <div class="col-span-12 sm:col-span-6 lg:col-span-3 glass-panel p-3.5 flex flex-col justify-between kpi-card">
+                    <div>
+                        <div class="flex justify-between items-start mb-1">
+                            <div class="p-2 rounded-lg bg-rose-500/10 border border-rose-500/20 text-rose-400"><i class="fa-solid fa-clock text-sm"></i></div>
+                            <span class="text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-rose-500/10 text-rose-400 border border-rose-500/20 uppercase">TOP 3 사유</span>
                         </div>
-                        <p class="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-0.5 kpi-title">총 불가동시간</p>
-                        <div class="flex items-baseline gap-1.5"><h4 id="kpi-down" class="text-2xl lg:text-3xl font-black text-slate-800 font-mono kpi-val">0</h4><span class="text-xs font-bold text-slate-500">MIN</span></div>
+                        <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest mb-0.5 kpi-title">총 불가동시간</p>
+                        <div class="flex items-baseline gap-1"><h4 id="kpi-down" class="text-xl lg:text-2xl font-black text-rose-400 font-mono-num kpi-val">0</h4><span class="text-[10px] font-bold text-slate-400">MIN</span></div>
                     </div>
                     
-                    <!-- 비가동 시간 TOP 3 리스트 영역 -->
-                    <div id="kpi-down-top3" class="mt-2.5 pt-2 border-t border-slate-100 flex flex-col gap-1">
-                        <div class="text-center text-slate-400 text-[10px] font-bold py-1">분석 중...</div>
+                    <div id="kpi-down-top3" class="mt-1.5 pt-1.5 border-t border-slate-800 flex flex-col gap-0.5">
+                        <div class="text-center text-slate-500 text-[9.5px] font-bold py-0.5">분석 중...</div>
                     </div>
                 </div>
 
-                <!-- KPI 4: OEE 종합설비효율 -->
-                <div id="card-oee" class="col-span-12 sm:col-span-6 lg:col-span-2 bg-white p-5 rounded-3xl border border-slate-200 shadow-sm flex flex-col justify-between transition-all duration-500 kpi-card">
+                <!-- KPI 4: OEE 종합설비효율 (2 cols) -->
+                <div id="card-oee" class="col-span-12 sm:col-span-6 lg:col-span-2 glass-panel p-3.5 flex flex-col justify-between transition-all duration-300 kpi-card">
                     <div>
-                        <div class="flex justify-between items-start mb-2">
-                            <div id="icon-oee" class="p-2.5 rounded-xl bg-emerald-50 text-emerald-500 transition-colors duration-500"><i class="fa-solid fa-gear text-lg"></i></div>
-                            <span id="badge-oee" class="text-[10px] font-black px-2 py-0.5 rounded-md hidden bg-rose-100 text-rose-600 animate-pulse">EMERGENCY</span>
+                        <div class="flex justify-between items-start mb-1">
+                            <div id="icon-oee" class="p-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400"><i class="fa-solid fa-gears text-sm"></i></div>
+                            <span id="badge-oee" class="text-[8.5px] font-extrabold px-1.5 py-0.5 rounded hidden bg-rose-500 text-white animate-pulse">EMERGENCY</span>
                         </div>
-                        <p class="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-0.5 kpi-title">OEE [종합설비효율]</p>
-                        <div class="flex items-baseline gap-1.5"><h4 id="kpi-oee" class="text-2xl lg:text-3xl font-black text-slate-800 font-mono kpi-val">0.0</h4><span class="text-xs font-bold text-slate-500">%</span></div>
+                        <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest mb-0.5 kpi-title">OEE [종합설비효율]</p>
+                        <div class="flex items-baseline gap-1"><h4 id="kpi-oee" class="text-xl lg:text-2xl font-black text-emerald-400 font-mono-num kpi-val">0.0</h4><span class="text-[10px] font-bold text-slate-400">%</span></div>
                     </div>
                 </div>
             </div>
 
-            <!-- 차트 영역 (7:5 복합 차트 및 도넛 차트) -->
-            <div class="grid grid-cols-12 gap-4 mb-6 chart-grid">
+            <!-- Charts Section (Main Trend Chart + 3 Production Breakdown Doughnuts) -->
+            <div class="grid grid-cols-12 gap-3 mb-4 chart-grid">
                 <!-- 생산실적, 포장량 및 불가동 현황 (복합 차트) -->
-                <div class="col-span-12 lg:col-span-8 bg-white p-6 lg:p-8 rounded-[2rem] shadow-sm border border-slate-200">
-                    <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
-                        <h3 class="text-lg lg:text-xl font-black text-slate-800 flex items-center gap-2">
-                            <i class="fa-solid fa-chart-simple text-indigo-500"></i> 생산실적 · 포장량 및 불가동 현황
-                            <span id="chart-badge" class="text-[11px] bg-indigo-50 text-indigo-600 font-black px-2.5 py-0.5 rounded-full border border-indigo-100">일간 집계</span>
+                <div class="col-span-12 lg:col-span-7 glass-panel p-4 flex flex-col justify-between">
+                    <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+                        <h3 class="text-sm lg:text-base font-black text-white flex items-center gap-2">
+                            <i class="fa-solid fa-chart-line text-indigo-400"></i> 생산실적 · 포장량 및 불가동 현황
+                            <span id="chart-badge" class="text-[9.5px] bg-indigo-500/10 text-indigo-300 font-extrabold px-2 py-0.5 rounded-full border border-indigo-500/20">일간 집계</span>
                         </h3>
-                        <div class="flex items-center gap-3 text-xs font-bold text-slate-600 bg-slate-50 px-3 py-1.5 rounded-xl">
-                            <span class="flex items-center gap-1"><span class="w-3 h-1 bg-indigo-600 rounded"></span> 생산량</span>
-                            <span class="flex items-center gap-1"><span class="w-3 h-1 bg-sky-500 rounded"></span> 포장량</span>
-                            <span class="flex items-center gap-1"><span class="w-3 h-3 bg-rose-400 rounded-sm"></span> 불가동</span>
-                            <span class="flex items-center gap-1"><span class="w-3 h-[1px] border-b-2 border-dashed border-amber-500"></span> 목표</span>
+                        <div class="flex items-center gap-2.5 text-[10px] font-bold text-slate-400 bg-slate-900/60 px-2.5 py-1 rounded-lg border border-slate-800">
+                            <span class="flex items-center gap-1"><span class="w-2.5 h-1 bg-indigo-500 rounded"></span> 생산량</span>
+                            <span class="flex items-center gap-1"><span class="w-2.5 h-1 bg-cyan-400 rounded"></span> 포장량</span>
+                            <span class="flex items-center gap-1"><span class="w-2.5 h-2 bg-rose-500/70 rounded-xs"></span> 불가동</span>
+                            <span class="flex items-center gap-1"><span class="w-2.5 h-[1px] border-b-2 border-dashed border-amber-400"></span> 목표</span>
                         </div>
                     </div>
-                    <div class="h-[320px] relative w-full"><canvas id="mainChart"></canvas></div>
+                    <div class="h-[260px] relative w-full"><canvas id="mainChart"></canvas></div>
                 </div>
 
-                <!-- 강종 및 작업 형상별 분포 (도넛 차트 - 탄소강, 합금강, STS 원형/이형/정육각/정사각 세분화) -->
-                <div class="col-span-12 lg:col-span-4 bg-white p-6 lg:p-8 rounded-[2rem] shadow-sm border border-slate-200 flex flex-col justify-between">
-                    <div class="flex items-center justify-between mb-2">
-                        <h3 class="text-lg lg:text-xl font-black text-slate-800 flex items-center gap-2"><i class="fa-solid fa-chart-pie text-indigo-500"></i> 강종 · 형상별 분포</h3>
-                        <span class="text-xs font-bold text-slate-400">탄소강/합금강/STS</span>
+                <!-- 생산 비율 3종 종합 분석 3D 도넛 차트 (01.강종종류별 / 02.제품형상별 / 03.열처리비율) -->
+                <div class="col-span-12 lg:col-span-5 glass-panel p-3.5 flex flex-col justify-between">
+                    <div class="flex items-center justify-between mb-1.5 border-b border-slate-800/80 pb-1.5">
+                        <h3 class="text-xs lg:text-sm font-black text-white flex items-center gap-1.5">
+                            <i class="fa-solid fa-chart-pie text-cyan-400"></i> 생산 비율 3종 종합 분석
+                        </h3>
+                        <span class="text-[9px] font-extrabold text-slate-400 uppercase tracking-widest">Real-time Ratio</span>
                     </div>
-                    <div class="h-[210px] relative w-full flex items-center justify-center">
-                        <canvas id="shapeDoughnutChart"></canvas>
+
+                    <div class="grid grid-cols-3 gap-2 items-center">
+                        <!-- 01. 강종별 (탄소강, 합금강, 쾌삭강, STS강) -->
+                        <div class="flex flex-col items-center bg-slate-900/40 p-2 rounded-xl border border-slate-800/60">
+                            <p class="text-[9.5px] font-extrabold text-indigo-400 mb-1"><i class="fa-solid fa-layer-group text-[9px] mb-0.5"></i> 강종종류별</p>
+                            <div class="h-[120px] w-full relative flex items-center justify-center"><canvas id="chartSteelType"></canvas></div>
+                            <div id="legend-steel" class="w-full mt-1 font-bold text-[9px] space-y-0.5 max-h-[60px] overflow-y-auto no-scrollbar"></div>
+                        </div>
+
+                        <!-- 02. 형상별 (원형, 정육각, 이형, 사각) -->
+                        <div class="flex flex-col items-center bg-slate-900/40 p-2 rounded-xl border border-slate-800/60">
+                            <p class="text-[9.5px] font-extrabold text-cyan-400 mb-1"><i class="fa-solid fa-draw-polygon text-[9px] mb-0.5"></i> 제품형상별</p>
+                            <div class="h-[120px] w-full relative flex items-center justify-center"><canvas id="chartProductShape"></canvas></div>
+                            <div id="legend-shape" class="w-full mt-1 font-bold text-[9px] space-y-0.5 max-h-[60px] overflow-y-auto no-scrollbar"></div>
+                        </div>
+
+                        <!-- 03. 열처리 비율 (열처리재, 비열처리재) -->
+                        <div class="flex flex-col items-center bg-slate-900/40 p-2 rounded-xl border border-slate-800/60">
+                            <p class="text-[9.5px] font-extrabold text-amber-400 mb-1"><i class="fa-solid fa-fire text-[9px] mb-0.5"></i> 열처리비율</p>
+                            <div class="h-[120px] w-full relative flex items-center justify-center"><canvas id="chartHeatTreat"></canvas></div>
+                            <div id="legend-heat" class="w-full mt-1 font-bold text-[9px] space-y-0.5 max-h-[60px] overflow-y-auto no-scrollbar"></div>
+                        </div>
                     </div>
-                    <div id="shape-legend" class="grid grid-cols-2 gap-1.5 mt-2 max-h-[110px] overflow-y-auto no-scrollbar font-bold text-slate-600"></div>
                 </div>
             </div>
 
             <!-- 통합 자산 제어 레지스트리 표 -->
-            <div class="bg-white rounded-[2rem] shadow-sm border border-slate-200 overflow-hidden mb-10">
-                <div class="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
-                    <h3 class="text-lg font-black text-slate-800 flex items-center gap-2"><i class="fa-solid fa-microchip text-indigo-500"></i> 통합 자산 제어 레지스트리</h3>
-                    <span class="text-xs font-black text-slate-400 uppercase tracking-widest">Real-time Asset Monitoring</span>
+            <div class="glass-panel overflow-hidden mb-6">
+                <div class="p-3 border-b border-slate-800 flex items-center justify-between bg-slate-900/40">
+                    <h3 class="text-xs lg:text-sm font-black text-white flex items-center gap-2"><i class="fa-solid fa-microchip text-indigo-400"></i> 통합 자산 제어 레지스트리</h3>
+                    <span class="text-[9px] font-extrabold text-slate-500 uppercase tracking-widest">Real-time Equipment Integrity Monitoring</span>
                 </div>
                 <div class="overflow-x-auto p-2">
                     <table>
@@ -321,8 +378,8 @@
                                 <th class="text-right">누적 실적 (TON)</th>
                                 <th class="text-center">작업선경 범위 (mm)</th>
                                 <th class="text-right">평균 선속 (m/min)</th>
-                                <th class="text-right text-rose-500">불가동 (min)</th>
-                                <th class="w-1/4 uppercase text-emerald-600 text-center">OEE [종합설비효율]</th>
+                                <th class="text-right text-rose-400">불가동 (min)</th>
+                                <th class="w-1/4 uppercase text-emerald-400 text-center">OEE [종합설비효율]</th>
                             </tr>
                         </thead>
                         <tbody id="registry-body"></tbody>
@@ -334,67 +391,67 @@
         <!-- ================================================================= -->
         <!-- TAB 2: CD 생산성 분석 (Deep Analytics) -->
         <!-- ================================================================= -->
-        <main class="flex-1 p-3 lg:p-6 overflow-y-auto h-screen bg-slate-50 relative z-10 tab-content" id="tab-analytics">
-            <header class="flex flex-col xl:flex-row justify-between items-start xl:items-end gap-4 mb-6">
+        <main class="flex-1 p-3 lg:p-5 overflow-y-auto h-screen relative z-10 tab-content" id="tab-analytics">
+            <header class="flex flex-col xl:flex-row justify-between items-start xl:items-end gap-3 mb-4">
                 <div>
-                    <h1 class="text-2xl lg:text-3xl font-black tracking-tighter text-slate-900 uppercase flex items-center gap-3">
-                        <span class="w-2.5 h-7 bg-rose-500 rounded-full shadow-[0_0_15px_rgba(244,63,94,0.5)]"></span>
-                        CD 생산성 분석 <span class="text-rose-500 font-light ml-1 text-lg lg:text-xl">DEEP DIVE</span>
+                    <h1 class="text-xl lg:text-2xl font-black tracking-tight text-white uppercase flex items-center gap-2.5">
+                        <span class="w-2 h-6 bg-rose-500 rounded-full shadow-[0_0_12px_#f43f5e]"></span>
+                        CD 생산성 분석 <span class="text-rose-400 font-light ml-0.5 text-base lg:text-lg">DEEP DIVE</span>
                     </h1>
-                    <p class="text-slate-500 font-bold text-xs mt-1.5 ml-5">순수 가동시간(Net Work Time) 기반 생산성(UPH: TON/Hr) 분석</p>
+                    <p class="text-slate-400 font-bold text-[10px] mt-1 ml-4">순수 가동시간(Net Work Time) 기반 UPH(TON/Hr) 정밀 분석</p>
                 </div>
 
-                <div class="flex flex-wrap items-center gap-2.5 bg-white p-2 rounded-2xl border border-slate-200 shadow-sm">
-                    <div class="flex items-center gap-2 px-2">
-                        <i class="fa-solid fa-calendar-check text-rose-500 text-base"></i>
-                        <select id="analytics-month-select" class="bg-slate-50 border border-slate-200 text-xs font-black text-slate-700 py-1 px-2 rounded-lg outline-none cursor-pointer" onchange="onAnalyticsMonthChange()">
+                <div class="flex flex-wrap items-center gap-2 glass-panel p-2">
+                    <div class="flex items-center gap-1.5 px-2">
+                        <i class="fa-solid fa-calendar-check text-rose-400 text-xs"></i>
+                        <select id="analytics-month-select" class="bg-slate-900/80 border border-slate-800 text-xs font-bold text-slate-200 py-0.5 px-2 rounded-md outline-none cursor-pointer" onchange="onAnalyticsMonthChange()">
                             <option value="LATEST">월별 선택 로딩 중...</option>
                         </select>
                     </div>
 
-                    <div id="analytics-machine-container" class="flex items-center gap-2 px-2 border-l border-slate-200" style="display: none;">
-                        <i class="fa-solid fa-microchip text-slate-400 text-base"></i>
-                        <select id="analytics-machine-select" class="bg-slate-50 border border-slate-200 text-xs font-black text-slate-700 py-1 px-2 rounded-lg outline-none cursor-pointer" onchange="updateAnalytics()">
+                    <div id="analytics-machine-container" class="flex items-center gap-1.5 px-2 border-l border-slate-800" style="display: none;">
+                        <i class="fa-solid fa-microchip text-slate-400 text-xs"></i>
+                        <select id="analytics-machine-select" class="bg-slate-900/80 border border-slate-800 text-xs font-bold text-slate-200 py-0.5 px-2 rounded-md outline-none cursor-pointer" onchange="updateAnalytics()">
                         </select>
                     </div>
 
-                    <div class="flex bg-slate-100 p-1 rounded-lg ml-1">
-                        <button id="btn-aly-team" onclick="setAnalyticsGroup('TEAM')" class="px-3 py-1 text-xs font-black rounded bg-white shadow-sm text-rose-600 border border-slate-200 transition-all">작업조별 (전체)</button>
-                        <button id="btn-aly-machine" onclick="setAnalyticsGroup('MACHINE')" class="px-3 py-1 text-xs font-black rounded text-slate-400 transition-all">호기별 (특정)</button>
+                    <div class="flex bg-slate-900/60 p-0.5 rounded-md border border-slate-800 ml-1">
+                        <button id="btn-aly-team" onclick="setAnalyticsGroup('TEAM')" class="px-2.5 py-1 text-xs font-bold rounded bg-slate-800 text-rose-400 border border-slate-700 transition-all">작업조별 (전체)</button>
+                        <button id="btn-aly-machine" onclick="setAnalyticsGroup('MACHINE')" class="px-2.5 py-1 text-xs font-bold rounded text-slate-400 transition-all">호기별 (특정)</button>
                     </div>
                 </div>
             </header>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                <div class="bg-white p-5 rounded-3xl shadow-sm border border-slate-200">
-                    <div class="flex items-center justify-between mb-2">
-                        <div class="p-2.5 rounded-xl bg-indigo-50 text-indigo-600"><i class="fa-regular fa-circle text-xl"></i></div>
-                        <span class="px-2.5 py-0.5 bg-slate-100 text-slate-600 font-black rounded-full text-xs">순수가동 기준 평균</span>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
+                <div class="glass-panel p-4">
+                    <div class="flex items-center justify-between mb-1">
+                        <div class="p-2 rounded-lg bg-indigo-500/10 text-indigo-400"><i class="fa-regular fa-circle text-base"></i></div>
+                        <span class="px-2 py-0.5 bg-slate-800 text-slate-300 font-extrabold rounded-md text-[10px]">순수가동 기준 평균</span>
                     </div>
-                    <p class="text-xs font-black text-slate-400 uppercase mb-0.5">원형 작업 생산성 (UPH)</p>
-                    <div class="flex items-baseline gap-1.5"><h4 id="aly-circle-uph" class="text-3xl font-black text-slate-800 font-mono">0.0</h4><span class="text-sm font-bold text-slate-500">TON/Hr</span></div>
+                    <p class="text-[10px] font-extrabold text-slate-400 uppercase mb-0.5">원형 작업 생산성 (UPH)</p>
+                    <div class="flex items-baseline gap-1"><h4 id="aly-circle-uph" class="text-2xl font-black text-white font-mono-num">0.0</h4><span class="text-xs font-bold text-slate-400">TON/Hr</span></div>
                 </div>
-                <div class="bg-white p-5 rounded-3xl shadow-sm border border-slate-200">
-                    <div class="flex items-center justify-between mb-2">
-                        <div class="p-2.5 rounded-xl bg-amber-50 text-amber-500"><i class="fa-solid fa-draw-polygon text-xl"></i></div>
-                        <span class="px-2.5 py-0.5 bg-slate-100 text-slate-600 font-black rounded-full text-xs">순수가동 기준 평균</span>
+                <div class="glass-panel p-4">
+                    <div class="flex items-center justify-between mb-1">
+                        <div class="p-2 rounded-lg bg-amber-500/10 text-amber-400"><i class="fa-solid fa-draw-polygon text-base"></i></div>
+                        <span class="px-2 py-0.5 bg-slate-800 text-slate-300 font-extrabold rounded-md text-[10px]">순수가동 기준 평균</span>
                     </div>
-                    <p class="text-xs font-black text-slate-400 uppercase mb-0.5">비원형 작업 생산성 (UPH)</p>
-                    <div class="flex items-baseline gap-1.5"><h4 id="aly-noncircle-uph" class="text-3xl font-black text-slate-800 font-mono">0.0</h4><span class="text-sm font-bold text-slate-500">TON/Hr</span></div>
+                    <p class="text-[10px] font-extrabold text-slate-400 uppercase mb-0.5">비원형 작업 생산성 (UPH)</p>
+                    <div class="flex items-baseline gap-1"><h4 id="aly-noncircle-uph" class="text-2xl font-black text-white font-mono-num">0.0</h4><span class="text-xs font-bold text-slate-400">TON/Hr</span></div>
                 </div>
             </div>
 
-            <div class="bg-white p-6 lg:p-8 rounded-[2rem] shadow-sm border border-slate-200 mb-6">
-                <div class="flex justify-between items-center mb-4">
-                    <h3 class="text-lg lg:text-xl font-black text-slate-800 flex items-center gap-2"><i class="fa-solid fa-users-rays text-indigo-500"></i> <span id="aly-chart-title">작업조별 UPH 생산성 비교</span></h3>
+            <div class="glass-panel p-4 mb-4">
+                <div class="flex justify-between items-center mb-3">
+                    <h3 class="text-sm lg:text-base font-black text-white flex items-center gap-2"><i class="fa-solid fa-users-rays text-rose-400"></i> <span id="aly-chart-title">작업조별 UPH 생산성 비교</span></h3>
                 </div>
-                <div class="h-[320px] w-full"><canvas id="analyticsChart"></canvas></div>
+                <div class="h-[250px] w-full"><canvas id="analyticsChart"></canvas></div>
             </div>
 
-            <div class="bg-white rounded-[2rem] shadow-sm border border-slate-200 overflow-hidden mb-10">
-                <div class="p-5 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
-                    <h3 class="text-lg font-black text-slate-800"><i class="fa-solid fa-table-list text-indigo-500"></i> 세부 가동시간 및 UPH 산출 레지스트리</h3>
-                    <span class="text-xs font-bold text-slate-400">UPH = 총생산량(TON) / 순수가동시간(Hr)</span>
+            <div class="glass-panel overflow-hidden mb-6">
+                <div class="p-3 border-b border-slate-800 bg-slate-900/40 flex justify-between items-center">
+                    <h3 class="text-xs lg:text-sm font-black text-white flex items-center gap-2"><i class="fa-solid fa-table-list text-indigo-400"></i> 세부 가동시간 및 UPH 산출 레지스트리</h3>
+                    <span class="text-[9.5px] font-bold text-slate-500">UPH = 총생산량(TON) / 순수가동시간(Hr)</span>
                 </div>
                 <div class="overflow-x-auto p-2">
                     <table>
@@ -403,9 +460,9 @@
                                 <th id="aly-table-header">분류</th>
                                 <th>작업 형상</th>
                                 <th class="text-right">총 생산량(TON)</th>
-                                <th class="text-right text-rose-500">총 비가동(MIN)</th>
-                                <th class="text-right text-emerald-600">순수 가동시간(MIN)</th>
-                                <th class="text-right text-indigo-600">생산성 (UPH: TON/Hr)</th>
+                                <th class="text-right text-rose-400">총 비가동(MIN)</th>
+                                <th class="text-right text-emerald-400">순수 가동시간(MIN)</th>
+                                <th class="text-right text-indigo-400">생산성 (UPH: TON/Hr)</th>
                             </tr>
                         </thead>
                         <tbody id="analytics-body"></tbody>
@@ -418,56 +475,56 @@
     <!-- PRO-Bot 챗봇 창 -->
     <div id="pro-bot-window" class="chat-bot-window">
         <div class="chat-header">
-            <div class="flex items-center gap-3">
-                <i class="fa-solid fa-robot text-xl text-amber-400"></i>
+            <div class="flex items-center gap-2.5">
+                <i class="fa-solid fa-robot text-lg text-amber-400"></i>
                 <div>
-                    <h3 class="font-black text-sm">PRO-Bot</h3>
-                    <p class="text-[9px] text-slate-300 font-bold">Smart AI Assistant v22.2</p>
+                    <h3 class="font-black text-xs text-white">PRO-Bot Assistant</h3>
+                    <p class="text-[8.5px] text-slate-400 font-bold">Smart Manufacturing Intelligence v23.1</p>
                 </div>
             </div>
-            <i class="fa-solid fa-xmark text-lg cursor-pointer hover:text-rose-400" onclick="toggleBot()"></i>
+            <i class="fa-solid fa-xmark text-base cursor-pointer hover:text-rose-400" onclick="toggleBot()"></i>
         </div>
         <div class="chat-body" id="chat-body">
-            <div class="msg-bot">안녕하세요! PRO-Bot입니다.<br>생산/포장/비가동 데이터에 대해 질의해보세요.<br><br><span class="text-[10px] font-normal text-slate-500">예: 비가동 시간 가장 많은 항목은? / A조 생산량 / 포장 실적 / STS 정육각 생산량은?</span></div>
+            <div class="msg-bot">안녕하세요! PRO-Bot입니다.<br>생산실적, 포장량, 비가동 사유에 대해 물어보세요.<br><br><span class="text-[9.5px] font-normal text-slate-400">예: 비가동 시간 제일 긴 항목 / A조 생산량 / 포장 실적 / PCD-4 비가동 시간</span></div>
         </div>
         <div class="chat-input-area">
             <input type="text" id="chat-input" class="gs-input m-0" placeholder="질문을 입력하세요..." onkeypress="handleChatEnter(event)">
-            <button onclick="sendChat()" class="bg-indigo-600 text-white px-3.5 rounded-xl hover:bg-indigo-700 transition-all"><i class="fa-solid fa-paper-plane text-xs"></i></button>
+            <button onclick="sendChat()" class="bg-indigo-600 text-white px-3 rounded-lg hover:bg-indigo-500 transition-all"><i class="fa-solid fa-paper-plane text-xs"></i></button>
         </div>
     </div>
 
     <!-- 구글 시트 연동 설정 모달 -->
     <div id="sync-modal" class="modal-bg">
-        <div class="bg-white rounded-[2.5rem] w-full max-w-2xl overflow-hidden shadow-2xl border border-slate-200">
-            <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+        <div class="glass-panel w-full max-w-xl overflow-hidden border border-slate-700/80">
+            <div class="p-5 border-b border-slate-800 flex justify-between items-center bg-slate-900/60">
                 <div class="flex items-center gap-3">
-                    <div class="bg-indigo-600 p-3 rounded-2xl text-white"><i class="fa-solid fa-gear text-xl"></i></div>
-                    <div><h3 class="text-xl font-black text-slate-900">클라우드 데이터 연동 설정</h3><p class="text-xs text-slate-500 font-bold">Google Sheets CSV 웹 게시 링크 지정</p></div>
+                    <div class="bg-indigo-600 p-2.5 rounded-xl text-white"><i class="fa-solid fa-sliders text-lg"></i></div>
+                    <div><h3 class="text-base font-black text-white">클라우드 데이터 연동 설정</h3><p class="text-[10px] text-slate-400 font-bold">Google Sheets Published CSV URL</p></div>
                 </div>
-                <i class="fa-solid fa-xmark text-xl text-slate-400 cursor-pointer hover:text-rose-500" onclick="closeModal()"></i>
+                <i class="fa-solid fa-xmark text-lg text-slate-400 cursor-pointer hover:text-rose-400" onclick="closeModal()"></i>
             </div>
-            <div class="p-6 space-y-4">
+            <div class="p-5 space-y-3">
                 <div>
-                    <label class="block text-xs font-black text-slate-500 uppercase tracking-widest mb-1.5">01. 생산실적 CSV URL</label>
+                    <label class="block text-[10px] font-extrabold text-slate-400 uppercase tracking-widest mb-1">01. 생산실적 CSV URL</label>
                     <input type="text" id="modal-url-prod" class="gs-input" placeholder="https://docs.google.com/.../pub?output=csv">
                 </div>
                 <div>
-                    <label class="block text-xs font-black text-slate-500 uppercase tracking-widest mb-1.5">02. 불가동현황 CSV URL</label>
+                    <label class="block text-[10px] font-extrabold text-slate-400 uppercase tracking-widest mb-1">02. 불가동현황 CSV URL</label>
                     <input type="text" id="modal-url-down" class="gs-input" placeholder="https://docs.google.com/.../pub?output=csv">
                 </div>
                 <div>
-                    <label class="block text-xs font-black text-slate-500 uppercase tracking-widest mb-1.5">03. CD 포장실적 CSV URL (Pack Sheet)</label>
+                    <label class="block text-[10px] font-extrabold text-slate-400 uppercase tracking-widest mb-1">03. CD 포장실적 CSV URL (Pack Sheet)</label>
                     <input type="text" id="modal-url-pack" class="gs-input" placeholder="https://docs.google.com/.../pub?output=csv">
                 </div>
             </div>
-            <div class="p-5 bg-slate-50 border-t border-slate-100 flex justify-end gap-2">
-                <button onclick="closeModal()" class="px-5 py-2.5 rounded-xl text-xs font-black text-slate-500 hover:bg-slate-200">취소</button>
-                <button onclick="saveModalUrls()" class="px-6 py-2.5 rounded-xl text-xs font-black bg-indigo-600 text-white hover:bg-indigo-700 shadow-md">저장 및 동기화</button>
+            <div class="p-4 bg-slate-900/60 border-t border-slate-800 flex justify-end gap-2">
+                <button onclick="closeModal()" class="px-4 py-2 rounded-lg text-xs font-bold text-slate-400 hover:bg-slate-800">취소</button>
+                <button onclick="saveModalUrls()" class="px-5 py-2 rounded-lg text-xs font-bold bg-indigo-600 text-white hover:bg-indigo-500 shadow-md">저장 및 동기화</button>
             </div>
         </div>
     </div>
 
-    <div id="toast" class="toast bg-slate-800"><i id="toast-icon" class="fa-solid fa-circle-check text-xl"></i> <span id="toast-msg">메시지</span></div>
+    <div id="toast" class="toast bg-slate-900"><i id="toast-icon" class="fa-solid fa-circle-check text-lg"></i> <span id="toast-msg">메시지</span></div>
 
     <!-- 스크립트 로직 -->
     <script>
@@ -479,20 +536,20 @@
         const MACHINE_ORDER = ['PCD-0-2', 'PCD-0-3', 'PCD-1', 'PCD-5', 'PCD-2-2', 'PCD-3', 'PCD-4'];
         const EXCLUDED_EQUIPS = ['미분류', 'PCD-W11', 'PCD-W8']; 
 
-        // 샘플 데이터셋 (강종 + 작업 형상 세분화: 탄소강, 합금강, STS × 원형, 정육각, 정사각, 이형)
+        // 샘플 데이터셋 (4대 강종, 4대 형상, 2대 열처리비율 포함)
         const SAMPLE_PROD_DATA = [
-            { date: "2026-07-01", equipment: "PCD-4", team: "A", isCircle: true, shapeRaw: "탄소강 원형", shift: "1근", amount: 48500, speed: 180, wire: 3.5 },
-            { date: "2026-07-01", equipment: "PCD-2-2", team: "B", isCircle: false, shapeRaw: "STS 정육각", shift: "2근", amount: 22100, speed: 150, wire: 4.0 },
-            { date: "2026-07-01", equipment: "PCD-5", team: "C", isCircle: true, shapeRaw: "합금강 원형", shift: "1근", amount: 18400, speed: 165, wire: 2.8 },
-            { date: "2026-07-02", equipment: "PCD-1", team: "A", isCircle: true, shapeRaw: "STS 원형", shift: "1근", amount: 31200, speed: 175, wire: 3.0 },
-            { date: "2026-07-02", equipment: "PCD-3", team: "B", isCircle: false, shapeRaw: "탄소강 이형", shift: "2근", amount: 15400, speed: 140, wire: 5.2 },
-            { date: "2026-07-03", equipment: "PCD-4", team: "C", isCircle: true, shapeRaw: "합금강 원형", shift: "2근", amount: 51200, speed: 185, wire: 3.5 },
-            { date: "2026-07-03", equipment: "PCD-0-2", team: "A", isCircle: false, shapeRaw: "STS 정사각", shift: "1근", amount: 18200, speed: 155, wire: 4.2 }
+            { date: "2026-07-01", equipment: "PCD-4", team: "A", isCircle: true, steelType: "탄소강", shapeRaw: "원형", heatTreat: "비열처리재", shift: "1근", amount: 48500, speed: 180, wire: 3.5 },
+            { date: "2026-07-01", equipment: "PCD-2-2", team: "B", isCircle: false, steelType: "STS강", shapeRaw: "정육각", heatTreat: "열처리재", shift: "2근", amount: 22100, speed: 150, wire: 4.0 },
+            { date: "2026-07-01", equipment: "PCD-5", team: "C", isCircle: true, steelType: "합금강", shapeRaw: "원형", heatTreat: "비열처리재", shift: "1근", amount: 18400, speed: 165, wire: 2.8 },
+            { date: "2026-07-02", equipment: "PCD-1", team: "A", isCircle: true, steelType: "STS강", shapeRaw: "원형", heatTreat: "열처리재", shift: "1근", amount: 31200, speed: 175, wire: 3.0 },
+            { date: "2026-07-02", equipment: "PCD-3", team: "B", isCircle: false, steelType: "쾌삭강", shapeRaw: "이형", heatTreat: "비열처리재", shift: "2근", amount: 15400, speed: 140, wire: 5.2 },
+            { date: "2026-07-03", equipment: "PCD-4", team: "C", isCircle: true, steelType: "합금강", shapeRaw: "원형", heatTreat: "열처리재", shift: "2근", amount: 51200, speed: 185, wire: 3.5 },
+            { date: "2026-07-03", equipment: "PCD-0-2", team: "A", isCircle: false, steelType: "탄소강", shapeRaw: "사각", heatTreat: "비열처리재", shift: "1근", amount: 18200, speed: 155, wire: 4.2 }
         ];
 
         const SAMPLE_DOWN_DATA = [
-            { date: "2026-07-01", equipment: "PCD-3", team: "A", isCircle: true, shapeRaw: "탄소강 원형", shift: "1근", minutes: 120, reason: "CD Cutting M/C 고장" },
-            { date: "2026-07-02", equipment: "PCD-1", team: "B", isCircle: true, shapeRaw: "STS 원형", shift: "2근", minutes: 45, reason: "전원부 점검" }
+            { date: "2026-07-01", equipment: "PCD-3", team: "A", isCircle: true, shift: "1근", minutes: 120, reason: "CD Cutting M/C 고장" },
+            { date: "2026-07-02", equipment: "PCD-1", team: "B", isCircle: true, shift: "2근", minutes: 45, reason: "전원부 점검" }
         ];
 
         const SAMPLE_PACK_DATA = [
@@ -510,7 +567,9 @@
         let monthlyTarget = 4170; let dailyTarget = 119;
         
         let chartInstance = null;
-        let doughnutChartInstance = null;
+        let chartSteelInstance = null;
+        let chartShapeInstance = null;
+        let chartHeatInstance = null;
         let analyticsChartInstance = null;
         
         let analyticsMonth = 'LATEST'; 
@@ -522,7 +581,7 @@
             let h = now.getHours(); const m = String(now.getMinutes()).padStart(2, '0'); const s = String(now.getSeconds()).padStart(2, '0');
             const ampm = h >= 12 ? 'PM' : 'AM'; h = h % 12; h = h ? h : 12;
             const tEl = document.getElementById('current-time');
-            if(tEl) tEl.innerHTML = `${String(h).padStart(2, '0')}:${m}:${s} <span class="text-[10px] text-slate-400">${ampm}</span>`;
+            if(tEl) tEl.innerHTML = `${String(h).padStart(2, '0')}:${m}:${s} <span class="text-[9px] text-slate-500">${ampm}</span>`;
         }
         setInterval(updateTime, 1000); updateTime();
 
@@ -534,17 +593,19 @@
 
             if (mode === '960') {
                 body.classList.add('split-mode-960');
-                btn960.className = "px-2.5 py-1 text-[11px] font-black rounded text-indigo-600 bg-white shadow-sm border border-slate-200 transition-all flex items-center gap-1";
-                btn1920.className = "px-2.5 py-1 text-[11px] font-black rounded text-slate-400 transition-all flex items-center gap-1";
+                btn960.className = "px-2 py-0.5 text-[10px] font-extrabold rounded text-cyan-400 bg-slate-800 shadow border border-slate-700 transition-all flex items-center gap-1";
+                btn1920.className = "px-2 py-0.5 text-[10px] font-extrabold rounded text-slate-400 transition-all flex items-center gap-1";
             } else {
                 body.classList.remove('split-mode-960');
-                btn1920.className = "px-2.5 py-1 text-[11px] font-black rounded text-indigo-600 bg-white shadow-sm border border-slate-200 transition-all flex items-center gap-1";
-                btn960.className = "px-2.5 py-1 text-[11px] font-black rounded text-slate-400 transition-all flex items-center gap-1";
+                btn1920.className = "px-2 py-0.5 text-[10px] font-extrabold rounded text-cyan-400 bg-slate-800 shadow border border-slate-700 transition-all flex items-center gap-1";
+                btn960.className = "px-2 py-0.5 text-[10px] font-extrabold rounded text-slate-400 transition-all flex items-center gap-1";
             }
             
             setTimeout(() => {
                 if (chartInstance) chartInstance.resize();
-                if (doughnutChartInstance) doughnutChartInstance.resize();
+                if (chartSteelInstance) chartSteelInstance.resize();
+                if (chartShapeInstance) chartShapeInstance.resize();
+                if (chartHeatInstance) chartHeatInstance.resize();
                 if (analyticsChartInstance) analyticsChartInstance.resize();
             }, 100);
         }
@@ -598,16 +659,16 @@
         function showToast(msg, type = 'success') {
             const toast = document.getElementById('toast');
             document.getElementById('toast-msg').innerText = msg;
-            toast.className = `toast ${type === 'danger' ? 'bg-rose-500' : 'bg-slate-800'}`;
-            document.getElementById('toast-icon').className = `fa-solid ${type === 'danger' ? 'fa-triangle-exclamation' : 'fa-circle-check'} text-xl`;
-            toast.style.bottom = '40px';
+            toast.className = `toast ${type === 'danger' ? 'bg-rose-900 border-rose-500/50' : 'bg-slate-900 border-slate-700'}`;
+            document.getElementById('toast-icon').className = `fa-solid ${type === 'danger' ? 'fa-triangle-exclamation text-rose-400' : 'fa-circle-check text-emerald-400'} text-lg`;
+            toast.style.bottom = '30px';
             setTimeout(() => { toast.style.bottom = '-100px'; }, 3000);
         }
 
         function updateLed(status, text) {
             const led = document.getElementById('status-led');
             document.getElementById('status-text').innerText = text;
-            led.className = `w-2.5 h-2.5 rounded-full ${status === 'synced' ? 'bg-emerald-500 shadow-[0_0_10px_#10b981]' : status === 'offline' ? 'bg-slate-500' : status === 'connecting' ? 'bg-amber-500 animate-pulse' : 'bg-rose-500 shadow-[0_0_10px_#f43f5e]'}`;
+            led.className = `w-2 h-2 rounded-full ${status === 'synced' ? 'bg-emerald-400 shadow-[0_0_8px_#10b981]' : status === 'offline' ? 'bg-slate-500' : status === 'connecting' ? 'bg-amber-400 animate-pulse' : 'bg-rose-500 shadow-[0_0_8px_#f43f5e]'}`;
         }
 
         function getSafeCsvUrl(url) {
@@ -657,26 +718,46 @@
                 let equip = String(getVal(row, ['작업설비', '설비', '호기', '기계', 'EQUIPMENT']) || '미분류').trim();
                 let team = String(getVal(row, ['작업조', '조명', 'TEAM', '조']) || '').trim().replace('조','');
                 
-                // 🌟 강종 및 작업 형상 세분화 파싱 (탄소강/합금강/STS + 원형/정육각/정사각/이형)
-                let steelType = String(getVal(row, ['강종', '재질', '강종구분', 'STEEL', 'MATERIAL']) || '').trim();
-                let shapeRaw = String(getVal(row, ['형상', '품종', '모양', 'SHAPE']) || '원형').trim();
-                
-                let combinedShape = shapeRaw;
-                if (steelType && !shapeRaw.includes(steelType)) {
-                    combinedShape = `${steelType} ${shapeRaw}`;
-                }
+                // 강종 분류 (탄소강, 합금강, 쾌삭강, STS강)
+                let rawSteel = String(getVal(row, ['강종', '재질', '강종구분', 'STEEL', 'MATERIAL', '품명', '강종명']) || '').trim().toUpperCase();
+                let steelType = "탄소강";
+                if (rawSteel.includes("STS") || rawSteel.includes("스텐") || rawSteel.includes("304") || rawSteel.includes("316") || rawSteel.includes("STAINLESS")) steelType = "STS강";
+                else if (rawSteel.includes("합금") || rawSteel.includes("SCM") || rawSteel.includes("SNCM") || rawSteel.includes("ALLOY")) steelType = "합금강";
+                else if (rawSteel.includes("쾌삭") || rawSteel.includes("SUM") || rawSteel.includes("FREE")) steelType = "쾌삭강";
+                else if (rawSteel.includes("탄소") || rawSteel.includes("S10C") || rawSteel.includes("S20C") || rawSteel.includes("S45C") || rawSteel.includes("SAE")) steelType = "탄소강";
+                else steelType = "탄소강";
 
-                let isCircle = shapeRaw.includes('원형') && !shapeRaw.includes('비원형');
+                // 제품 형상 분류 (원형, 정육각, 이형, 사각)
+                let rawShape = String(getVal(row, ['형상', '품종', '모양', 'SHAPE', '단면', '제품형상']) || '원형').trim().toUpperCase();
+                let shapeRaw = "원형";
+                if (rawShape.includes("육각") || rawShape.includes("HEX") || rawShape.includes("6각")) shapeRaw = "정육각";
+                else if (rawShape.includes("사각") || rawShape.includes("SQUARE") || rawShape.includes("4각")) shapeRaw = "사각";
+                else if (rawShape.includes("이형") || rawShape.includes("SPECIAL") || rawShape.includes("프로파일")) shapeRaw = "이형";
+                else if (rawShape.includes("원") || rawShape.includes("ROUND")) shapeRaw = "원형";
+                else shapeRaw = "원형";
+
+                let isCircle = shapeRaw === "원형";
+
+                // 열처리 구분 (열처리재, 비열처리재)
+                let rawHeat = String(getVal(row, ['열처리', '열처리여부', 'ANNEAL', 'HEAT', '열처리구분', '열처리유무']) || '').trim().toUpperCase();
+                let heatTreat = (rawHeat.includes("열처리") && !rawHeat.includes("비열처리")) || rawHeat.includes("Y") || rawHeat.includes("QT") || rawHeat.includes("ANNEAL") || rawHeat.includes("열처리재") ? "열처리재" : "비열처리재";
+                if (rawHeat.includes("비열처리") || rawHeat.includes("N") || rawHeat.includes("OFF")) heatTreat = "비열처리재";
+
                 let shiftVal = String(getVal(row, ['주야간', '주야', '근무', '구분', 'SHIFT']) || '').trim();
 
                 if (!date) continue;
 
                 if (dataType === 'PROD') {
                     if (EXCLUDED_EQUIPS.includes(equip.toUpperCase().trim())) continue;
-                    parsed.push({ date, equipment: equip, team, isCircle, shapeRaw: combinedShape, shift: shiftVal, amount: safeNum(getVal(row, ['작업량', '생산량', '중량', '실적', '수량'])), speed: safeNum(getVal(row, ['선속', '속도', 'RPM', '신선선속'])), wire: safeNum(getVal(row, ['작업선경', '선경', '두께', 'WIRE'])) });
+                    parsed.push({ 
+                        date, equipment: equip, team, isCircle, steelType, shapeRaw, heatTreat, shift: shiftVal, 
+                        amount: safeNum(getVal(row, ['작업량', '생산량', '중량', '실적', '수량'])), 
+                        speed: safeNum(getVal(row, ['선속', '속도', 'RPM', '신선선속'])), 
+                        wire: safeNum(getVal(row, ['작업선경', '선경', '두께', 'WIRE'])) 
+                    });
                 } else if (dataType === 'DOWN') {
                     if (EXCLUDED_EQUIPS.includes(equip.toUpperCase().trim())) continue;
-                    parsed.push({ date, equipment: equip, team, isCircle, shapeRaw: combinedShape, shift: shiftVal, minutes: safeNum(getVal(row, ['세부불가동', '불가동시간', '정지시간', '시간'])), reason: String(getVal(row, ['불가동명', '사유', '원인', '내역']) || '기타 고장') });
+                    parsed.push({ date, equipment: equip, team, isCircle, shift: shiftVal, minutes: safeNum(getVal(row, ['세부불가동', '불가동시간', '정지시간', '시간'])), reason: String(getVal(row, ['불가동명', '사유', '원인', '내역']) || '기타 고장') });
                 } else if (dataType === 'PACK') {
                     parsed.push({ date, equipment: equip, team, shift: shiftVal, amount: safeNum(getVal(row, ['포장량', '포장중량', '실적', '작업량', '수량'])) });
                 }
@@ -730,14 +811,14 @@
         function updateTargets() { monthlyTarget = parseFloat(document.getElementById('inp-monthly').value)||0; dailyTarget = parseFloat(document.getElementById('inp-daily').value)||0; updateDashboard(); }
         function onMonthChange() { selectedMonth = document.getElementById('month-select').value; selectedDate = 'ALL'; updateDashboard(); }
         function onDateChange() { selectedDate = document.getElementById('date-select').value; document.getElementById('view-mode-container').style.display = selectedDate === 'ALL' ? 'flex' : 'none'; updateDashboard(); }
-        function setViewMode(mode) { viewMode = mode; document.getElementById('btn-daily').className = `px-2 py-1 text-[11px] font-black rounded transition-all ${mode === 'DAILY' ? 'text-indigo-600 bg-white shadow-sm border border-slate-200' : 'text-slate-400'}`; document.getElementById('btn-weekly').className = `px-2 py-1 text-[11px] font-black rounded transition-all ${mode === 'WEEKLY' ? 'text-indigo-600 bg-white shadow-sm border border-slate-200' : 'text-slate-400'}`; updateDashboard(); }
+        function setViewMode(mode) { viewMode = mode; document.getElementById('btn-daily').className = `px-1.5 py-0.5 text-[10px] font-bold rounded transition-all ${mode === 'DAILY' ? 'text-indigo-400 bg-slate-800 border border-slate-700' : 'text-slate-400'}`; document.getElementById('btn-weekly').className = `px-1.5 py-0.5 text-[10px] font-bold rounded transition-all ${mode === 'WEEKLY' ? 'text-indigo-400 bg-slate-800 border border-slate-700' : 'text-slate-400'}`; updateDashboard(); }
         function setShiftMode(mode) { 
             shiftMode = mode; 
             ['all', 'day', 'night'].forEach(m => { 
                 const btn = document.getElementById(`btn-shift-${m}`); 
                 if (btn) { 
                     const isActive = (mode === 'ALL' && m === 'all') || (mode === '1근' && m === 'day') || (mode === '2근' && m === 'night'); 
-                    btn.className = `px-2 py-1 text-[11px] font-black rounded transition-all ${isActive ? 'text-indigo-600 bg-white shadow-sm border border-slate-200' : 'text-slate-400'}`; 
+                    btn.className = `px-1.5 py-0.5 text-[10px] font-bold rounded transition-all ${isActive ? 'text-cyan-400 bg-slate-800 border border-slate-700' : 'text-slate-400'}`; 
                 } 
             }); 
             updateDashboard(); 
@@ -796,10 +877,10 @@
 
             const activeMonthlyTarget = shiftMode === 'ALL' ? monthlyTarget : monthlyTarget / 2;
 
-            document.getElementById('kpi-tons').innerText = (totKg/1000).toFixed(0).toLocaleString();
+            document.getElementById('kpi-tons').innerText = Math.round(totKg/1000).toLocaleString();
             document.getElementById('kpi-reach').innerText = `달성률 ${activeMonthlyTarget > 0 ? ((totKg/1000/activeMonthlyTarget)*100).toFixed(1) : 0}%`;
             
-            document.getElementById('kpi-pack-tons').innerText = (totPackKg/1000).toFixed(0).toLocaleString();
+            document.getElementById('kpi-pack-tons').innerText = Math.round(totPackKg/1000).toLocaleString();
             document.getElementById('kpi-pack-ratio').innerText = `포장률 ${totKg > 0 ? ((totPackKg/totKg)*100).toFixed(1) : 0}%`;
 
             document.getElementById('kpi-down').innerText = totDown.toLocaleString();
@@ -816,19 +897,19 @@
             const sortedTop3 = Object.values(reasonMap).sort((a,b) => b.min - a.min).slice(0, 3);
             let top3Html = '';
             if (sortedTop3.length > 0) {
-                const rankBadges = ['bg-rose-500 text-white', 'bg-amber-500 text-white', 'bg-slate-400 text-white'];
+                const rankBadges = ['bg-rose-500 text-white', 'bg-amber-500 text-black', 'bg-slate-700 text-slate-300'];
                 sortedTop3.forEach((item, idx) => {
                     const dispText = item.equip ? `${item.equip} - ${item.reason}` : item.reason;
-                    top3Html += `<div class="flex items-center justify-between text-[11px] font-bold text-slate-600">
-                        <div class="flex items-center gap-1.5 truncate max-w-[70%]" title="${dispText}">
-                            <span class="text-[9px] font-black px-1.5 py-0.2 rounded shrink-0 ${rankBadges[idx]}">${idx+1}위</span>
-                            <span class="truncate text-slate-700 font-semibold">${dispText}</span>
+                    top3Html += `<div class="flex items-center justify-between text-[10px] font-bold text-slate-300">
+                        <div class="flex items-center gap-1 truncate max-w-[70%]" title="${dispText}">
+                            <span class="text-[8.5px] font-black px-1 rounded shrink-0 ${rankBadges[idx]}">${idx+1}위</span>
+                            <span class="truncate text-slate-300 font-semibold">${dispText}</span>
                         </div>
-                        <span class="font-mono font-black text-rose-600 text-xs shrink-0">${item.min.toLocaleString()}<span class="text-[9px] font-normal text-slate-400 ml-0.5">분</span></span>
+                        <span class="font-mono-num font-black text-rose-400 text-xs shrink-0">${item.min.toLocaleString()}<span class="text-[8.5px] font-normal text-slate-500 ml-0.5">분</span></span>
                     </div>`;
                 });
             } else {
-                top3Html = `<div class="text-center text-slate-400 text-[10px] py-1 font-bold">비가동 발생 내역 없음</div>`;
+                top3Html = `<div class="text-center text-slate-500 text-[9.5px] py-0.5 font-bold">비가동 발생 내역 없음</div>`;
             }
             document.getElementById('kpi-down-top3').innerHTML = top3Html;
 
@@ -851,26 +932,26 @@
 
             const avgOee = mList.length > 0 ? (mList.reduce((a,c)=>a+parseFloat(c.oee), 0) / mList.length).toFixed(1) : "0.0";
             
-            const oeeVal = document.getElementById('kpi-oee'); const oeeCard = document.getElementById('card-oee'); const oeeIcon = document.getElementById('icon-oee'); const oeeBadge = document.getElementById('badge-oee'); const overlay = document.getElementById('emergency-overlay');
+            const oeeVal = document.getElementById('kpi-oee'); const oeeIcon = document.getElementById('icon-oee'); const oeeBadge = document.getElementById('badge-oee'); const overlay = document.getElementById('emergency-overlay');
             oeeVal.innerText = avgOee;
             if (mList.length > 0 && parseFloat(avgOee) < 80) {
-                overlay.classList.add('emergency-active'); oeeCard.classList.add('ring-4', 'ring-rose-500', 'bg-rose-50/20'); oeeVal.classList.add('text-rose-600'); oeeIcon.classList.replace('bg-emerald-50', 'bg-rose-500'); oeeIcon.classList.replace('text-emerald-500', 'text-white'); oeeBadge.classList.remove('hidden');
+                overlay.classList.add('emergency-active'); oeeVal.classList.add('text-rose-400'); oeeIcon.classList.replace('bg-emerald-500/10', 'bg-rose-500'); oeeIcon.classList.replace('text-emerald-400', 'text-white'); oeeBadge.classList.remove('hidden');
             } else {
-                overlay.classList.remove('emergency-active'); oeeCard.classList.remove('ring-4', 'ring-rose-500', 'bg-rose-50/20'); oeeVal.classList.remove('text-rose-600'); oeeIcon.classList.add('text-slate-800'); oeeIcon.classList.replace('bg-rose-500', 'bg-emerald-50'); oeeIcon.classList.replace('text-white', 'text-emerald-500'); oeeBadge.classList.add('hidden');
+                overlay.classList.remove('emergency-active'); oeeVal.classList.remove('text-rose-400'); oeeIcon.classList.replace('bg-rose-500', 'bg-emerald-500/10'); oeeIcon.classList.replace('text-white', 'text-emerald-400'); oeeBadge.classList.add('hidden');
             }
 
             let tHtml = '';
             mList.forEach(m => {
-                tHtml += `<tr class="group hover:bg-slate-50 transition-all">
-                    <td class="font-black text-slate-700 border-l-4 border-l-transparent group-hover:border-l-indigo-500 pl-3 uppercase text-base lg:text-lg">${m.name}</td>
-                    <td class="text-right font-black text-xl lg:text-2xl text-indigo-600">${Math.round(m.amt/1000).toLocaleString()}</td>
-                    <td class="text-center font-bold text-amber-500 text-lg lg:text-xl">${m.wr}</td>
-                    <td class="text-right font-bold text-slate-600 text-lg lg:text-xl">${m.avgSpd}</td>
-                    <td class="text-right font-bold text-rose-500 text-lg lg:text-xl">${m.down.toLocaleString()}</td>
-                    <td class="px-3">
-                        <div class="flex items-center gap-2 justify-end">
-                            <div class="flex-1 bg-slate-100 h-3 rounded-full overflow-hidden shadow-inner"><div class="h-full rounded-full ${parseFloat(m.oee) < 85 ? 'bg-rose-500' : 'bg-emerald-500'}" style="width: ${m.oee}%"></div></div>
-                            <span class="font-black text-lg lg:text-xl w-14 text-right ${parseFloat(m.oee) < 85 ? 'text-rose-500' : 'text-emerald-500'}">${m.oee}%</span>
+                tHtml += `<tr class="group hover:bg-slate-800/50 transition-all">
+                    <td class="font-black text-slate-200 border-l-2 border-l-transparent group-hover:border-l-indigo-500 pl-3 uppercase text-xs lg:text-sm">${m.name}</td>
+                    <td class="text-right font-mono-num font-black text-sm lg:text-base text-indigo-400">${Math.round(m.amt/1000).toLocaleString()}</td>
+                    <td class="text-center font-bold text-amber-400 text-xs lg:text-sm">${m.wr}</td>
+                    <td class="text-right font-bold text-slate-300 text-xs lg:text-sm">${m.avgSpd}</td>
+                    <td class="text-right font-bold text-rose-400 text-xs lg:text-sm">${m.down.toLocaleString()}</td>
+                    <td class="px-2">
+                        <div class="flex items-center gap-1.5 justify-end">
+                            <div class="flex-1 bg-slate-800 h-2 rounded-full overflow-hidden border border-slate-700/50"><div class="h-full rounded-full ${parseFloat(m.oee) < 85 ? 'bg-rose-500' : 'bg-emerald-400'}" style="width: ${m.oee}%"></div></div>
+                            <span class="font-mono-num font-extrabold text-xs lg:text-sm w-12 text-right ${parseFloat(m.oee) < 85 ? 'text-rose-400' : 'text-emerald-400'}">${m.oee}%</span>
                         </div>
                     </td>
                 </tr>`;
@@ -878,7 +959,7 @@
             document.getElementById('registry-body').innerHTML = tHtml;
 
             renderMainChart(cProd, cDown, cPack);
-            renderShapeDoughnut(fProd);
+            renderRatioDoughnuts(fProd);
         }
 
         function renderMainChart(cProd, cDown, cPack) {
@@ -910,84 +991,128 @@
                 data: { 
                     labels: labels, 
                     datasets: [ 
-                        { type: 'line', label: '생산량 (TON)', data: pData, borderColor: '#4f46e5', borderWidth: 3, pointRadius: 4, fill: false, yAxisID: 'y' }, 
-                        { type: 'line', label: '포장량 (TON)', data: pkData, borderColor: '#0ea5e9', borderWidth: 2.5, borderDash: [2, 2], pointRadius: 3, fill: false, yAxisID: 'y' }, 
-                        { type: 'bar', label: '불가동 (MIN)', data: dData, backgroundColor: '#fb7185', borderRadius: 4, yAxisID: 'y1' }, 
-                        { type: 'line', label: '목표 (TON)', data: tData, borderColor: '#f59e0b', borderWidth: 2, borderDash: [5, 5], pointRadius: 0, fill: false, yAxisID: 'y' } 
+                        { type: 'line', label: '생산량 (TON)', data: pData, borderColor: '#6366f1', borderWidth: 3, pointRadius: 3, fill: false, yAxisID: 'y' }, 
+                        { type: 'line', label: '포장량 (TON)', data: pkData, borderColor: '#06b6d4', borderWidth: 2, borderDash: [2, 2], pointRadius: 2.5, fill: false, yAxisID: 'y' }, 
+                        { type: 'bar', label: '불가동 (MIN)', data: dData, backgroundColor: 'rgba(244, 63, 94, 0.65)', borderRadius: 4, yAxisID: 'y1' }, 
+                        { type: 'line', label: '목표 (TON)', data: tData, borderColor: '#f59e0b', borderWidth: 2, borderDash: [4, 4], pointRadius: 0, fill: false, yAxisID: 'y' } 
                     ] 
-                },
-                options: { responsive: true, maintainAspectRatio: false, scales: { x: { grid: { display: false } }, y: { beginAtZero: true }, y1: { position: 'right', beginAtZero: true, grid: { drawOnChartArea: false } } } }
-            });
-        }
-
-        function renderShapeDoughnut(fProd) {
-            if(!window.Chart) return;
-            const shapeMap = {};
-            fProd.forEach(p => {
-                let s = p.shapeRaw || '탄소강 원형';
-                if(!shapeMap[s]) shapeMap[s] = 0;
-                shapeMap[s] += p.amount;
-            });
-
-            // 내림차순 정렬
-            const sortedEntries = Object.entries(shapeMap).sort((a,b) => b[1] - a[1]);
-            const labels = sortedEntries.map(e => e[0]);
-            const data = sortedEntries.map(e => (e[1]/1000).toFixed(1));
-            const colors = ['#4f46e5', '#f59e0b', '#10b981', '#06b6d4', '#f43f5e', '#8b5cf6', '#ec4899', '#6366f1', '#14b8a6', '#eab308'];
-
-            if(doughnutChartInstance) doughnutChartInstance.destroy();
-            const ctx = document.getElementById('shapeDoughnutChart').getContext('2d');
-
-            if(labels.length === 0) {
-                document.getElementById('shape-legend').innerHTML = '<div class="col-span-2 text-center text-slate-400">데이터 없음</div>';
-                return;
-            }
-
-            doughnutChartInstance = new Chart(ctx, {
-                type: 'doughnut',
-                data: { 
-                    labels: labels, 
-                    datasets: [{ 
-                        data: data, 
-                        backgroundColor: colors.slice(0, labels.length),
-                        borderWidth: 2,
-                        borderColor: '#ffffff'
-                    }] 
                 },
                 options: { 
                     responsive: true, 
                     maintainAspectRatio: false, 
-                    plugins: { 
-                        legend: { display: false },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    return ` ${context.label}: ${context.raw} TON`;
-                                }
-                            }
-                        }
+                    scales: { 
+                        x: { grid: { display: false }, ticks: { color: '#9ca3af', font: { size: 10 } } }, 
+                        y: { beginAtZero: true, ticks: { color: '#9ca3af', font: { size: 10 } }, grid: { color: 'rgba(255,255,255,0.05)' } }, 
+                        y1: { position: 'right', beginAtZero: true, ticks: { color: '#f43f5e', font: { size: 10 } }, grid: { drawOnChartArea: false } } 
                     },
-                    cutout: '65%'
+                    plugins: { legend: { display: false } }
                 }
             });
+        }
 
-            let legendHtml = '';
-            labels.forEach((l, i) => {
-                legendHtml += `<div class="flex items-center justify-between bg-slate-50 p-1.5 rounded-lg border border-slate-100">
-                    <div class="flex items-center gap-1.5 min-w-0">
-                        <div class="w-2.5 h-2.5 rounded-full shrink-0" style="background-color:${colors[i%colors.length]}"></div>
-                        <span class="truncate text-[11px] font-bold text-slate-700" title="${l}">${l}</span>
-                    </div>
-                    <span class="font-mono font-black text-indigo-600 text-[11px] shrink-0 ml-1">${data[i]}T</span>
-                </div>`;
+        // 3D/도넛 그래프 3종 전용 렌더링 함수 (01.강종종류별 / 02.제품형상별 / 03.열처리비율)
+        function renderRatioDoughnuts(fProd) {
+            if(!window.Chart) return;
+
+            // Safely destroy existing charts before recreating
+            ['chartSteelType', 'chartProductShape', 'chartHeatTreat'].forEach(id => {
+                const existing = Chart.getChart(id);
+                if (existing) existing.destroy();
             });
-            document.getElementById('shape-legend').innerHTML = legendHtml;
+
+            // 01. 강종별 (탄소강, 합금강, 쾌삭강, STS강)
+            const steelMap = { "탄소강": 0, "합금강": 0, "쾌삭강": 0, "STS강": 0 };
+            // 02. 제품형상별 (원형, 정육각, 이형, 사각)
+            const shapeMap = { "원형": 0, "정육각": 0, "이형": 0, "사각": 0 };
+            // 03. 열처리비율 (열처리재, 비열처리재)
+            const heatMap = { "열처리재": 0, "비열처리재": 0 };
+
+            fProd.forEach(p => {
+                let st = p.steelType || "탄소강";
+                let sh = p.shapeRaw || "원형";
+                let ht = p.heatTreat || "비열처리재";
+
+                if (steelMap[st] !== undefined) steelMap[st] += p.amount; else steelMap["탄소강"] += p.amount;
+                if (shapeMap[sh] !== undefined) shapeMap[sh] += p.amount; else shapeMap["원형"] += p.amount;
+                if (heatMap[ht] !== undefined) heatMap[ht] += p.amount; else heatMap["비열처리재"] += p.amount;
+            });
+
+            // 헬퍼: 도넛 그래프 생성기
+            const createSingleDoughnut = (canvasId, dataMap, colors) => {
+                const canvas = document.getElementById(canvasId);
+                if (!canvas) return null;
+                const ctx = canvas.getContext('2d');
+                const labels = Object.keys(dataMap);
+                const dataValues = Object.values(dataMap).map(v => (v/1000).toFixed(1));
+
+                return new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            data: dataValues,
+                            backgroundColor: colors,
+                            borderWidth: 2,
+                            borderColor: '#0b0f19',
+                            hoverOffset: 6
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return ` ${context.label}: ${context.raw} TON`;
+                                    }
+                                }
+                            }
+                        },
+                        cutout: '60%',
+                        animation: { animateRotate: true, animateScale: true }
+                    }
+                });
+            };
+
+            const populateLegend = (legendId, dataMap, colors) => {
+                const legendEl = document.getElementById(legendId);
+                if (!legendEl) return;
+                const total = Object.values(dataMap).reduce((a,b)=>a+b, 0);
+                let legHtml = '';
+                Object.entries(dataMap).forEach(([k, v], idx) => {
+                    const ton = (v/1000).toFixed(1);
+                    const pct = total > 0 ? ((v/total)*100).toFixed(0) : 0;
+                    legHtml += `<div class="flex items-center justify-between text-[8.5px] font-bold text-slate-300 bg-slate-900/60 p-0.5 px-1 rounded border border-slate-800">
+                        <div class="flex items-center gap-1 truncate">
+                            <span class="w-2 h-2 rounded-full shrink-0 shadow-[0_0_6px_currentColor]" style="background:${colors[idx]}; color:${colors[idx]}"></span>
+                            <span class="truncate text-slate-300">${k}</span>
+                        </div>
+                        <span class="font-mono-num text-cyan-400 font-extrabold shrink-0 ml-1">${ton}T (${pct}%)</span>
+                    </div>`;
+                });
+                legendEl.innerHTML = legHtml;
+            };
+
+            const steelColors = ['#6366f1', '#06b6d4', '#10b981', '#f59e0b'];
+            const shapeColors = ['#06b6d4', '#f59e0b', '#8b5cf6', '#ec4899'];
+            const heatColors = ['#f59e0b', '#64748b'];
+
+            chartSteelInstance = createSingleDoughnut('chartSteelType', steelMap, steelColors);
+            populateLegend('legend-steel', steelMap, steelColors);
+
+            chartShapeInstance = createSingleDoughnut('chartProductShape', shapeMap, shapeColors);
+            populateLegend('legend-shape', shapeMap, shapeColors);
+
+            chartHeatInstance = createSingleDoughnut('chartHeatTreat', heatMap, heatColors);
+            populateLegend('legend-heat', heatMap, heatColors);
         }
 
         function setAnalyticsGroup(group) {
             analyticsGroupBy = group;
-            document.getElementById('btn-aly-team').className = `px-3 py-1.5 text-xs font-black rounded transition-all ${group === 'TEAM' ? 'bg-white shadow-sm text-rose-600 border border-slate-200' : 'text-slate-400'}`;
-            document.getElementById('btn-aly-machine').className = `px-3 py-1.5 text-xs font-black rounded transition-all ${group === 'MACHINE' ? 'bg-white shadow-sm text-rose-600 border border-slate-200' : 'text-slate-400'}`;
+            document.getElementById('btn-aly-team').className = `px-2.5 py-1 text-xs font-bold rounded transition-all ${group === 'TEAM' ? 'bg-slate-800 text-rose-400 border border-slate-700' : 'text-slate-400'}`;
+            document.getElementById('btn-aly-machine').className = `px-2.5 py-1 text-xs font-bold rounded transition-all ${group === 'MACHINE' ? 'bg-slate-800 text-rose-400 border border-slate-700' : 'text-slate-400'}`;
             document.getElementById('analytics-machine-container').style.display = group === 'MACHINE' ? 'flex' : 'none';
             updateAnalytics();
         }
@@ -1061,16 +1186,18 @@
             document.getElementById('aly-noncircle-uph').innerText = totNonMin > 0 ? ((totNonAmt/1000)/(totNonMin/60)).toFixed(1) : "0.0";
 
             let tHtml = ''; const sortedRes = [...res].sort((a,b) => a.group.localeCompare(b.group));
-            document.getElementById('aly-table-header').innerHTML = `작업조 <span class="text-[10px] font-bold text-rose-500 bg-rose-50 border border-rose-100 px-1.5 py-0.5 rounded ml-1">${analyticsGroupBy === 'TEAM' ? '전체 설비' : selMachine.value}</span>`;
+            document.getElementById('aly-table-header').innerHTML = `작업조 <span class="text-[9px] font-bold text-rose-400 bg-rose-500/10 border border-rose-500/20 px-1.5 py-0.5 rounded ml-1">${analyticsGroupBy === 'TEAM' ? '전체 설비' : selMachine.value}</span>`;
+
+            const teamBadges = { 'A': 'bg-indigo-500/20 text-indigo-300 border-indigo-500/30', 'B': 'bg-amber-500/20 text-amber-300 border-amber-500/30', 'C': 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30' };
 
             sortedRes.forEach(m => {
-                tHtml += `<tr class="hover:bg-slate-50">
-                    <td class="font-black text-slate-700 border-l-4 border-l-rose-500 pl-3 text-base lg:text-lg">${m.group}조</td>
-                    <td class="text-center font-bold text-slate-600 text-base lg:text-lg">${m.shape}</td>
-                    <td class="text-right font-black text-lg lg:text-xl text-slate-800">${m.amtTon}</td>
-                    <td class="text-right font-bold text-rose-500 text-lg lg:text-xl">${m.down}</td>
-                    <td class="text-right font-bold text-emerald-600 text-lg lg:text-xl">${m.netWorkMin}</td>
-                    <td class="text-right font-black text-indigo-600 text-xl lg:text-2xl">${m.uph}</td>
+                tHtml += `<tr class="hover:bg-slate-800/50">
+                    <td class="font-black border-l-2 border-l-rose-500 pl-3 text-sm lg:text-base"><span class="px-2 py-0.5 rounded border text-xs ${teamBadges[m.group]}">${m.group}조</span></td>
+                    <td class="text-center font-bold text-slate-300 text-xs lg:text-sm">${m.shape}</td>
+                    <td class="text-right font-mono-num font-black text-sm lg:text-base text-slate-100">${m.amtTon}</td>
+                    <td class="text-right font-mono-num font-bold text-rose-400 text-sm lg:text-base">${m.down}</td>
+                    <td class="text-right font-mono-num font-bold text-emerald-400 text-sm lg:text-base">${m.netWorkMin}</td>
+                    <td class="text-right font-mono-num font-black text-indigo-400 text-base lg:text-lg">${m.uph}</td>
                 </tr>`;
             }); document.getElementById('analytics-body').innerHTML = tHtml;
 
@@ -1083,8 +1210,16 @@
 
             analyticsChartInstance = new Chart(ctx, {
                 type: 'bar',
-                data: { labels: ['A조', 'B조', 'C조'], datasets: [ { label: '원형 UPH (TON/Hr)', data: dataCircle, backgroundColor: '#4f46e5', borderRadius: 6 }, { label: '비원형 UPH (TON/Hr)', data: dataNon, backgroundColor: '#f59e0b', borderRadius: 6 } ] },
-                options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, title: { display: true, text: 'TON / Hour' } } } }
+                data: { labels: ['A조', 'B조', 'C조'], datasets: [ { label: '원형 UPH (TON/Hr)', data: dataCircle, backgroundColor: '#6366f1', borderRadius: 4 }, { label: '비원형 UPH (TON/Hr)', data: dataNon, backgroundColor: '#f59e0b', borderRadius: 4 } ] },
+                options: { 
+                    responsive: true, 
+                    maintainAspectRatio: false, 
+                    scales: { 
+                        x: { ticks: { color: '#9ca3af' } },
+                        y: { beginAtZero: true, ticks: { color: '#9ca3af' }, grid: { color: 'rgba(255,255,255,0.05)' }, title: { display: true, text: 'TON / Hour', color: '#6b7280' } } 
+                    },
+                    plugins: { legend: { labels: { color: '#d1d5db' } } }
+                }
             });
         }
 
