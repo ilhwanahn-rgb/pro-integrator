@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PRO-INTEGRATOR | Tableau Executive Edition v27.0</title>
+    <title>PRO-INTEGRATOR | Tableau Executive Edition v27.1</title>
     
     <script>
         if (window.navigator.userAgent.indexOf('MSIE ') > 0 || window.navigator.userAgent.indexOf('Trident/') > 0) {
@@ -193,7 +193,7 @@
                 <div>
                     <h1 class="text-xl lg:text-2xl font-black tracking-tight text-slate-900 uppercase flex items-center gap-2.5">
                         <span class="w-2.5 h-6 bg-sky-600 rounded"></span>
-                        PRO-INTEGRATOR <span class="text-sky-700 font-semibold ml-0.5 text-base lg:text-lg">Tableau Edition v27.0</span>
+                        PRO-INTEGRATOR <span class="text-sky-700 font-semibold ml-0.5 text-base lg:text-lg">Tableau Edition v27.1</span>
                     </h1>
                     <p class="text-slate-500 font-bold text-[10px] uppercase tracking-wider mt-0.5 ml-4 flex items-center gap-2">
                         <span id="status-led" class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
@@ -340,24 +340,24 @@
                 <!-- Widget 4: 총 불가동시간 및 TOP 3 사유 -->
                 <div class="grid-stack-item" gs-id="widget-down" gs-x="7" gs-y="0" gs-w="3" gs-h="2">
                     <div class="grid-stack-item-content">
-                        <div class="glass-panel p-3">
+                        <div class="glass-panel p-2.5 flex flex-col justify-between">
                             <div class="widget-drag-handle">
                                 <span><i class="fa-solid fa-grip-dots-vertical mr-1"></i> 불가동 TOP 3</span>
                                 <i class="fa-solid fa-xmark cursor-pointer hover:text-red-500" onclick="removeWidget('widget-down')"></i>
                             </div>
                             <div class="flex justify-between items-center mb-1">
                                 <div class="flex items-center gap-1.5">
-                                    <div class="p-1.5 rounded-lg bg-red-50 border border-red-200 text-red-600"><i class="fa-solid fa-clock text-xs"></i></div>
-                                    <span class="text-[10px] font-extrabold text-slate-500 uppercase tracking-widest">총 불가동시간</span>
+                                    <div class="p-1 rounded-lg bg-red-50 border border-red-200 text-red-600"><i class="fa-solid fa-clock text-xs"></i></div>
+                                    <span class="text-[9.5px] font-extrabold text-slate-500 uppercase tracking-widest">총 불가동시간</span>
                                 </div>
                                 <div class="flex items-baseline gap-1">
-                                    <h4 id="kpi-down" class="text-lg lg:text-xl font-black text-red-600 font-mono-num">0</h4>
-                                    <span class="text-[9px] font-bold text-slate-500">MIN</span>
+                                    <h4 id="kpi-down" class="text-base lg:text-lg font-black text-red-600 font-mono-num">0</h4>
+                                    <span class="text-[8.5px] font-bold text-slate-500">MIN</span>
                                 </div>
                             </div>
                             
-                            <div id="kpi-down-top3" class="pt-1 border-t border-slate-200 flex flex-col justify-around flex-1 gap-0.5">
-                                <div class="text-center text-slate-400 text-[9.5px] font-bold py-0.5">분석 중...</div>
+                            <div id="kpi-down-top3" class="pt-1 border-t border-slate-200 flex flex-col justify-center flex-1 gap-1 overflow-y-auto no-scrollbar">
+                                <div class="text-center text-slate-400 text-[9px] font-bold py-0.5">분석 중...</div>
                             </div>
                         </div>
                     </div>
@@ -586,7 +586,7 @@
                 <i class="fa-solid fa-robot text-lg text-amber-400"></i>
                 <div>
                     <h3 class="font-black text-xs text-white">PRO-Bot Assistant</h3>
-                    <p class="text-[8.5px] text-slate-300 font-bold">Tableau Manufacturing Intelligence v27.0</p>
+                    <p class="text-[8.5px] text-slate-300 font-bold">Tableau Manufacturing Intelligence v27.1</p>
                 </div>
             </div>
             <i class="fa-solid fa-xmark text-base cursor-pointer hover:text-red-400" onclick="toggleBot()"></i>
@@ -671,6 +671,17 @@
             { id: 'widget-main-chart', name: '생산/포장/불가동 복합 차트 (일간/주간)', icon: 'fa-chart-line' },
             { id: 'widget-ratio-charts', name: '생산 비율 3종 분석 (강종/형상/열처리)', icon: 'fa-pie-chart' },
             { id: 'widget-registry', name: '통합 자산 제어 레지스트리', icon: 'fa-microchip' }
+        ];
+
+        const DEFAULT_GRID_LAYOUT = [
+            { id: 'widget-clock', x: 0, y: 0, w: 3, h: 2 },
+            { id: 'widget-prod', x: 3, y: 0, w: 2, h: 2 },
+            { id: 'widget-pack', x: 5, y: 0, w: 2, h: 2 },
+            { id: 'widget-down', x: 7, y: 0, w: 3, h: 2 },
+            { id: 'widget-oee', x: 10, y: 0, w: 2, h: 2 },
+            { id: 'widget-main-chart', x: 0, y: 2, w: 7, h: 5 },
+            { id: 'widget-ratio-charts', x: 7, y: 2, w: 5, h: 5 },
+            { id: 'widget-registry', x: 0, y: 7, w: 12, h: 4 }
         ];
 
         const CITY_WEATHER = {
@@ -837,21 +848,44 @@
         function saveLayout() {
             if (!grid) return;
             const layout = grid.save();
-            localStorage.setItem('PRO_DASHBOARD_GRID_LAYOUT', JSON.stringify(layout));
+            localStorage.setItem('PRO_DASHBOARD_GRID_LAYOUT_V27', JSON.stringify(layout));
+        }
+
+        function sanitizeLayout(layoutArray) {
+            if (!Array.isArray(layoutArray) || layoutArray.length === 0) return false;
+            // 위젯들의 너비가 최소 기준에 부합하는지 검증
+            const clock = layoutArray.find(item => item.id === 'widget-clock');
+            if (clock && clock.w < 2) return false;
+            const mainChart = layoutArray.find(item => item.id === 'widget-main-chart');
+            if (mainChart && mainChart.w < 4) return false;
+            return true;
         }
 
         function loadSavedLayout() {
-            const saved = localStorage.getItem('PRO_DASHBOARD_GRID_LAYOUT');
+            const saved = localStorage.getItem('PRO_DASHBOARD_GRID_LAYOUT_V27');
             if (saved && grid) {
                 try {
                     const parsed = JSON.parse(saved);
-                    grid.load(parsed);
-                    setTimeout(resizeAllCharts, 100);
+                    if (sanitizeLayout(parsed)) {
+                        grid.load(parsed);
+                        setTimeout(resizeAllCharts, 100);
+                        return;
+                    }
                 } catch(e) { console.error("Layout restore error", e); }
             }
+            // 검증 실패 시 표준 디폴트 레이아웃 적용
+            resetLayoutToDefault();
+        }
+
+        function resetLayoutToDefault() {
+            if (!grid) return;
+            grid.load(DEFAULT_GRID_LAYOUT);
+            saveLayout();
+            setTimeout(resizeAllCharts, 100);
         }
 
         function resetLayout() {
+            localStorage.removeItem('PRO_DASHBOARD_GRID_LAYOUT_V27');
             localStorage.removeItem('PRO_DASHBOARD_GRID_LAYOUT');
             location.reload();
         }
@@ -973,6 +1007,89 @@
         function toggleBot() {
             const bot = document.getElementById('pro-bot-window');
             bot.style.display = bot.style.display === 'flex' ? 'none' : 'flex';
+        }
+
+        function handleChatEnter(event) {
+            if (event.key === 'Enter') {
+                sendChat();
+            }
+        }
+
+        function sendChat() {
+            const input = document.getElementById('chat-input');
+            const text = input ? input.value.trim() : '';
+            if (!text) return;
+
+            appendChatMsg(text, 'user');
+            input.value = '';
+
+            setTimeout(() => {
+                const response = getBotResponse(text);
+                appendChatMsg(response, 'bot');
+            }, 300);
+        }
+
+        function appendChatMsg(text, type) {
+            const body = document.getElementById('chat-body');
+            if (!body) return;
+            const div = document.createElement('div');
+            div.className = type === 'user' ? 'msg-user' : 'msg-bot';
+            div.innerHTML = text;
+            body.appendChild(div);
+            body.scrollTop = body.scrollHeight;
+        }
+
+        function getBotResponse(q) {
+            const query = q.toLowerCase();
+            const safeProd = Array.isArray(prodData) ? prodData : [];
+            const safeDown = Array.isArray(downData) ? downData : [];
+            const safePack = Array.isArray(packData) ? packData : [];
+
+            // 1. 비가동 사유 / TOP 항목 관련 질문
+            if (query.includes('비가동') || query.includes('정지') || query.includes('고장')) {
+                if (query.includes('항목') || query.includes('사유') || query.includes('원인') || query.includes('많은') || query.includes('긴') || query.includes('TOP')) {
+                    const reasonMap = {};
+                    safeDown.forEach(d => {
+                        const r = (d.reason || '기타 고장').trim();
+                        const equip = (d.equipment || '').trim();
+                        const key = `${equip} - ${r}`;
+                        reasonMap[key] = (reasonMap[key] || 0) + d.minutes;
+                    });
+                    const sorted = Object.entries(reasonMap).sort((a,b) => b[1] - a[1]);
+                    if (sorted.length > 0) {
+                        let res = `현재 집계된 <b>비가동 주요 원인 TOP 3</b>입니다:<br>`;
+                        sorted.slice(0, 3).forEach((item, idx) => {
+                            res += `<br><b>${idx + 1}위:</b> ${item[0]} (<b>${item[1].toLocaleString()}분</b>)`;
+                        });
+                        return res;
+                    }
+                }
+                const totalDown = safeDown.reduce((a,c) => a + c.minutes, 0);
+                return `총 누적 불가동시간은 <b>${totalDown.toLocaleString()} 분</b>입니다.`;
+            }
+
+            // 2. 포장 실적 관련 질문
+            if (query.includes('포장')) {
+                const totalPack = safePack.reduce((a,c) => a + c.amount, 0);
+                return `총 CD 포장 실적량은 <b>${Math.round(totalPack / 1000).toLocaleString()} TON</b>입니다.`;
+            }
+
+            // 3. 생산실적 / 생산량 관련 질문
+            if (query.includes('생산') || query.includes('실적') || query.includes('톤') || query.includes('ton')) {
+                const totalProd = safeProd.reduce((a,c) => a + c.amount, 0);
+                return `현재 누적 총 생산실적은 <b>${Math.round(totalProd / 1000).toLocaleString()} TON</b>입니다.`;
+            }
+
+            // 4. 설비 개별 조회 (PCD)
+            const pcdMatch = query.match(/pcd-[0-9a-z-]+/i);
+            if (pcdMatch) {
+                const eq = pcdMatch[0].toUpperCase();
+                const eqProd = safeProd.filter(d => d.equipment.toUpperCase() === eq).reduce((a,c) => a + c.amount, 0);
+                const eqDown = safeDown.filter(d => d.equipment.toUpperCase() === eq).reduce((a,c) => a + c.minutes, 0);
+                return `<b>${eq} 설비 현황</b>:<br>• 누적 생산량: <b>${Math.round(eqProd/1000)} TON</b><br>• 누적 불가동: <b>${eqDown} 분</b>`;
+            }
+
+            return `질문을 이해하였습니다.<br>생산실적: <b>${Math.round(safeProd.reduce((a,c)=>a+c.amount,0)/1000)} TON</b><br>불가동시간: <b>${safeDown.reduce((a,c)=>a+c.minutes,0)} 분</b><br>필요하신 세부 항목을 구체적으로 질문해주세요!`;
         }
 
         function openModal() {
@@ -1250,16 +1367,16 @@
                 const rankBadges = ['bg-red-600 text-white', 'bg-amber-500 text-white', 'bg-slate-600 text-white'];
                 sortedTop3.forEach((item, idx) => {
                     const dispText = item.equip ? `${item.equip} - ${item.reason}` : item.reason;
-                    top3Html += `<div class="flex items-center justify-between text-[10px] font-bold text-slate-800 my-0.5">
-                        <div class="flex items-center gap-1.5 truncate max-w-[70%]" title="${dispText}">
-                            <span class="text-[8.5px] font-black px-1 rounded shrink-0 ${rankBadges[idx]}">${idx+1}위</span>
-                            <span class="truncate text-slate-800 font-bold">${dispText}</span>
+                    top3Html += `<div class="flex items-center justify-between text-[9px] leading-tight font-bold text-slate-800 py-[1.5px] px-1 hover:bg-red-50/60 rounded transition-all">
+                        <div class="flex items-center gap-1.5 truncate max-w-[72%]" title="${dispText}">
+                            <span class="text-[8px] font-black px-1 py-[0.5px] rounded shrink-0 ${rankBadges[idx]}">${idx+1}위</span>
+                            <span class="truncate text-slate-800 font-extrabold text-[9.5px]">${dispText}</span>
                         </div>
-                        <span class="font-mono-num font-black text-red-600 text-xs shrink-0">${item.min.toLocaleString()}<span class="text-[8.5px] font-normal text-slate-500 ml-0.5">분</span></span>
+                        <span class="font-mono-num font-black text-red-600 text-[10px] shrink-0 ml-1">${item.min.toLocaleString()}<span class="text-[8px] font-normal text-slate-500 ml-0.5">분</span></span>
                     </div>`;
                 });
             } else {
-                top3Html = `<div class="text-center text-slate-400 text-[9.5px] py-0.5 font-bold">비가동 발생 내역 없음</div>`;
+                top3Html = `<div class="text-center text-slate-400 text-[9px] py-0.5 font-bold">비가동 발생 내역 없음</div>`;
             }
             if(document.getElementById('kpi-down-top3')) document.getElementById('kpi-down-top3').innerHTML = top3Html;
 
@@ -1533,4 +1650,119 @@
 
             let targetMonth = analyticsMonth === 'LATEST' ? latestMonth : analyticsMonth;
             let cProd = prodData.filter(d => d.date && d.date.startsWith(targetMonth));
-            let cDown = downData.filter(d => d.date && d.
+            let cDown = downData.filter(d => d.date && d.date.startsWith(targetMonth));
+
+            const selMachine = document.getElementById('analytics-machine-select');
+            const availableMachines = [...new Set(cProd.map(d=>d.equipment))].filter(e=>e).sort((a,b) => { const idxA = MACHINE_ORDER.indexOf(a); const idxB = MACHINE_ORDER.indexOf(b); return (idxA === -1 ? 999 : idxA) - (idxB === -1 ? 999 : idxB); });
+
+            if (analyticsGroupBy === 'MACHINE' && selMachine) {
+                let currentMachineVal = selMachine.value;
+                if (!currentMachineVal || !availableMachines.includes(currentMachineVal)) currentMachineVal = availableMachines.length > 0 ? availableMachines[0] : "";
+                selMachine.innerHTML = availableMachines.map(m => `<option value="${m}">${m}</option>`).join('');
+                if(currentMachineVal) selMachine.value = currentMachineVal;
+
+                if (currentMachineVal) { cProd = cProd.filter(d => d.equipment === currentMachineVal); cDown = cDown.filter(d => d.equipment === currentMachineVal); }
+            }
+
+            const map = {}; const groupKeys = ['A', 'B', 'C'];
+            groupKeys.forEach(k => { 
+                map[`${k}-원형`] = { group: k, shape: '원형', amt: 0, down: 0, workDays: new Set() }; 
+                map[`${k}-비원형`] = { group: k, shape: '비원형(이형)', amt: 0, down: 0, workDays: new Set() }; 
+            });
+
+            cProd.forEach(p => {
+                let team = (p.team || '').replace(/조/g, '').trim().toUpperCase(); if(!groupKeys.includes(team)) return;
+                const shapeCat = p.isCircle ? '원형' : '비원형'; const key = `${team}-${shapeCat}`;
+                if(map[key]) { map[key].amt += p.amount; map[key].workDays.add(p.date); }
+            });
+
+            cDown.forEach(d => {
+                let team = (d.team || '').replace(/조/g, '').trim().toUpperCase(); if(!groupKeys.includes(team)) return;
+                const shapeCat = d.isCircle ? '원형' : '비원형'; const key = `${team}-${shapeCat}`;
+                if(map[key]) { map[key].down += d.minutes; }
+            });
+
+            let cUphSum = 0, cUphCnt = 0, ncUphSum = 0, ncUphCnt = 0;
+            let tBodyHtml = '';
+
+            groupKeys.forEach((k) => {
+                ['원형', '비원형'].forEach((shapeCat) => {
+                    const item = map[`${k}-${shapeCat}`];
+                    const activeDays = Math.max(1, item.workDays.size);
+                    const grossMin = activeDays * 480; 
+                    const netMin = Math.max(1, grossMin - item.down); 
+                    const netHours = netMin / 60;
+                    const tons = item.amt / 1000;
+                    const uph = tons / netHours;
+
+                    if(shapeCat === '원형' && uph > 0) { cUphSum += uph; cUphCnt++; }
+                    if(shapeCat === '비원형' && uph > 0) { ncUphSum += uph; ncUphCnt++; }
+
+                    const badgeStyle = k === 'A' ? 'bg-indigo-100 text-indigo-800 border-indigo-300' : k === 'B' ? 'bg-amber-100 text-amber-800 border-amber-300' : 'bg-emerald-100 text-emerald-800 border-emerald-300';
+
+                    tBodyHtml += `<tr class="hover:bg-slate-50 border-b border-slate-100">
+                        <td class="font-bold"><span class="px-2 py-0.5 rounded text-xs font-black border ${badgeStyle}">${k}조</span></td>
+                        <td class="font-bold text-slate-800 text-xs">${item.shape}</td>
+                        <td class="text-right font-mono-num font-black text-slate-900">${tons.toFixed(1)}</td>
+                        <td class="text-right font-mono-num font-extrabold text-red-600">${item.down.toLocaleString()}</td>
+                        <td class="text-right font-mono-num font-extrabold text-emerald-700">${Math.round(netMin).toLocaleString()}</td>
+                        <td class="text-right font-mono-num font-black text-sky-800 text-sm">${uph.toFixed(2)}</td>
+                    </tr>`;
+                });
+            });
+
+            document.getElementById('aly-circle-uph').innerText = cUphCnt > 0 ? (cUphSum/cUphCnt).toFixed(2) : "0.00";
+            document.getElementById('aly-noncircle-uph').innerText = ncUphCnt > 0 ? (ncUphSum/ncUphCnt).toFixed(2) : "0.00";
+            document.getElementById('analytics-body').innerHTML = tBodyHtml;
+
+            renderAnalyticsChart(map);
+        }
+
+        function renderAnalyticsChart(map) {
+            if(!window.Chart) return;
+            const canvas = document.getElementById('analyticsChart');
+            if(!canvas) return;
+
+            if(analyticsChartInstance) analyticsChartInstance.destroy();
+            const ctx = canvas.getContext('2d');
+
+            const groupKeys = ['A', 'B', 'C'];
+            const labels = groupKeys.map(k => `${k}조`);
+            
+            const circleUphs = groupKeys.map(k => {
+                const item = map[`${k}-원형`];
+                const activeDays = Math.max(1, item.workDays.size);
+                const netMin = Math.max(1, (activeDays * 480) - item.down);
+                return parseFloat(((item.amt/1000) / (netMin/60)).toFixed(2)) || 0;
+            });
+
+            const nonCircleUphs = groupKeys.map(k => {
+                const item = map[`${k}-비원형`];
+                const activeDays = Math.max(1, item.workDays.size);
+                const netMin = Math.max(1, (activeDays * 480) - item.down);
+                return parseFloat(((item.amt/1000) / (netMin/60)).toFixed(2)) || 0;
+            });
+
+            analyticsChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        { label: '원형 UPH (TON/Hr)', data: circleUphs, backgroundColor: 'rgba(31, 119, 180, 0.85)', borderRadius: 4 },
+                        { label: '비원형 UPH (TON/Hr)', data: nonCircleUphs, backgroundColor: 'rgba(255, 127, 14, 0.85)', borderRadius: 4 }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { stacked: true, grid: { display: false }, ticks: { font: { size: 11, weight: 'bold' } } },
+                        y: { stacked: true, beginAtZero: true, ticks: { font: { size: 10 } }, grid: { color: 'rgba(0,0,0,0.06)' } }
+                    },
+                    plugins: { legend: { position: 'top', labels: { font: { size: 10, weight: 'bold' } } } }
+                }
+            });
+        }
+    </script>
+</body>
+</html>
