@@ -25,7 +25,6 @@
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700;800&display=swap');
         
         :root {
-            /* 📊 Tableau Professional Aesthetic Palette */
             --tableau-navy: #1f2d3d;
             --tableau-slate-bg: #f3f4f8;
             --tableau-card-bg: #ffffff;
@@ -56,21 +55,20 @@
         .glass-panel {
             background: #ffffff;
             border: 1px solid #e5e7eb;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.9);
             border-radius: 0.75rem;
             color: #111827;
             transition: all 0.2s ease;
-            height: 100%;
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
+            justify-content: flex-start; /* 거대한 공백을 유발하던 space-between 수정 */
             position: relative;
             overflow: hidden;
         }
 
         .glass-panel:hover {
             border-color: #9ca3af;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
         }
 
         .grid-stack-item-content {
@@ -136,7 +134,6 @@
 
         .modal-bg { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(17, 24, 39, 0.6); backdrop-filter: blur(6px); z-index: 950; justify-content: center; align-items: center; }
 
-        /* 📱 Tableau Split Mode Layout */
         body.split-mode-960 main { padding: 0.5rem 0.65rem !important; }
         body.split-mode-960 header { margin-bottom: 0.5rem !important; gap: 0.4rem !important; }
         body.split-mode-960 header h1 { font-size: 1.1rem !important; }
@@ -383,7 +380,7 @@
                     </div>
                 </div>
 
-                <!-- Widget 6: 메인 생산/포장/불가동 복합 차트 (주간 7일 단위 / 일간 지원) -->
+                <!-- Widget 6: 메인 생산/포장/불가동 복합 차트 -->
                 <div class="grid-stack-item" gs-id="widget-main-chart" gs-x="0" gs-y="2" gs-w="7" gs-h="5">
                     <div class="grid-stack-item-content">
                         <div class="glass-panel p-4">
@@ -575,13 +572,14 @@
 
             <!-- 누적 세로막대 UPH 비교 차트 패널 (여백 밀착 최적화) -->
             <div class="glass-panel p-3 mb-2.5">
-                <div class="flex justify-between items-center mb-1.5 border-b border-slate-200 pb-1">
+                <div class="flex justify-between items-center mb-1 border-b border-slate-200 pb-1">
                     <h3 class="text-xs font-black text-slate-900 flex items-center gap-1.5">
                         <i class="fa-solid fa-chart-column text-red-600 text-xs"></i> <span id="aly-chart-title">형상 세분화(원형·정육각·사각·이형) 누적 생산성 비교</span>
                     </h3>
                     <span class="text-[8.5px] font-extrabold text-sky-800 bg-sky-50 px-1.5 py-0.5 rounded border border-sky-200">세부 형상별 UPH 누적</span>
                 </div>
-                <div class="h-[210px] w-full relative"><canvas id="analyticsChart"></canvas></div>
+                <!-- 1px 여백 낭비도 없도록 차트 바로 상착 -->
+                <div class="h-[200px] w-full relative"><canvas id="analyticsChart"></canvas></div>
             </div>
 
             <!-- 세부 가동시간 및 UPH 산출 레지스트리 (고밀도 표 디자인) -->
@@ -684,7 +682,6 @@
 
     <!-- 스크립트 로직 -->
     <script>
-        // 구글 시트 URL 고정 설정
         let SHARED_PROD_URL = localStorage.getItem('GS_PROD_URL') || "https://docs.google.com/spreadsheets/d/e/2PACX-1vQTdp-wPWsANap0UF_ZvT8HzCbnaqxyiL86rxNfZEqA6ir9m5AczfkDYh2LLBVrYuGSxGiS62i51wRh/pub?gid=1999060895&single=true&output=csv";
         let SHARED_DOWN_URL = localStorage.getItem('GS_DOWN_URL') || "https://docs.google.com/spreadsheets/d/e/2PACX-1vQTdp-wPWsANap0UF_ZvT8HzCbnaqxyiL86rxNfZEqA6ir9m5AczfkDYh2LLBVrYuGSxGiS62i51wRh/pub?gid=1618063531&single=true&output=csv";
         let SHARED_PACK_URL = localStorage.getItem('GS_PACK_URL') || "https://docs.google.com/spreadsheets/d/e/2PACX-1vQTdp-wPWsANap0UF_ZvT8HzCbnaqxyiL86rxNfZEqA6ir9m5AczfkDYh2LLBVrYuGSxGiS62i51wRh/pub?gid=433609624&single=true&output=csv";
@@ -883,7 +880,6 @@
 
         function sanitizeLayout(layoutArray) {
             if (!Array.isArray(layoutArray) || layoutArray.length === 0) return false;
-            // 위젯들의 너비가 최소 기준에 부합하는지 검증
             const clock = layoutArray.find(item => item.id === 'widget-clock');
             if (clock && clock.w < 2) return false;
             const mainChart = layoutArray.find(item => item.id === 'widget-main-chart');
@@ -903,7 +899,6 @@
                     }
                 } catch(e) { console.error("Layout restore error", e); }
             }
-            // 검증 실패 시 표준 디폴트 레이아웃 적용
             resetLayoutToDefault();
         }
 
@@ -1075,7 +1070,6 @@
             const safeDown = Array.isArray(downData) ? downData : [];
             const safePack = Array.isArray(packData) ? packData : [];
 
-            // 1. 비가동 사유 / TOP 항목 관련 질문
             if (query.includes('비가동') || query.includes('정지') || query.includes('고장')) {
                 if (query.includes('항목') || query.includes('사유') || query.includes('원인') || query.includes('많은') || query.includes('긴') || query.includes('TOP')) {
                     const reasonMap = {};
@@ -1098,19 +1092,16 @@
                 return `총 누적 불가동시간은 <b>${totalDown.toLocaleString()} 분</b>입니다.`;
             }
 
-            // 2. 포장 실적 관련 질문
             if (query.includes('포장')) {
                 const totalPack = safePack.reduce((a,c) => a + c.amount, 0);
                 return `총 CD 포장 실적량은 <b>${Math.round(totalPack / 1000).toLocaleString()} TON</b>입니다.`;
             }
 
-            // 3. 생산실적 / 생산량 관련 질문
             if (query.includes('생산') || query.includes('실적') || query.includes('톤') || query.includes('ton')) {
                 const totalProd = safeProd.reduce((a,c) => a + c.amount, 0);
                 return `현재 누적 총 생산실적은 <b>${Math.round(totalProd / 1000).toLocaleString()} TON</b>입니다.`;
             }
 
-            // 4. 설비 개별 조회 (PCD)
             const pcdMatch = query.match(/pcd-[0-9a-z-]+/i);
             if (pcdMatch) {
                 const eq = pcdMatch[0].toUpperCase();
@@ -1754,7 +1745,6 @@
 
                     if(uph > 0) { uphTotals[sh].sum += uph; uphTotals[sh].cnt++; }
 
-                    // 가독성을 위한 행 구분 스타일링
                     const borderStyle = sIdx === 0 ? 'border-t-2 border-slate-300' : 'border-t border-slate-100';
 
                     tBodyHtml += `<tr class="hover:bg-sky-50/60 ${borderStyle}">
