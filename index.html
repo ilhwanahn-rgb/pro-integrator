@@ -483,93 +483,123 @@
         </main>
 
         <!-- TAB 2: CD 생산성 분석 DEEP DIVE -->
-        <main class="flex-1 p-3 lg:p-5 overflow-y-auto h-screen relative z-10 tab-content" id="tab-analytics">
-            <header class="flex flex-col xl:flex-row justify-between items-start xl:items-end gap-3 mb-3">
+        <main class="flex-1 p-2.5 lg:p-4 overflow-y-auto h-screen relative z-10 tab-content" id="tab-analytics">
+            <header class="flex flex-col xl:flex-row justify-between items-start xl:items-end gap-2 mb-2.5">
                 <div>
-                    <h1 class="text-xl lg:text-2xl font-black tracking-tight text-slate-900 uppercase flex items-center gap-2.5">
-                        <span class="w-2.5 h-6 bg-red-600 rounded"></span>
-                        CD 생산성 분석 <span class="text-red-700 font-semibold ml-0.5 text-base lg:text-lg">DEEP DIVE</span>
+                    <h1 class="text-lg lg:text-xl font-black tracking-tight text-slate-900 uppercase flex items-center gap-2">
+                        <span class="w-2 h-5 bg-red-600 rounded"></span>
+                        CD 생산성 분석 <span class="text-red-700 font-semibold ml-0.5 text-sm lg:text-base">DEEP DIVE</span>
                     </h1>
-                    <p class="text-slate-500 font-bold text-[10px] mt-0.5 ml-4">순수 가동시간(Net Work Time) 기반 UPH(TON/Hr) 누적세로막대 분석</p>
+                    <p class="text-slate-500 font-bold text-[9.5px] mt-0.5 ml-3">순수 가동시간(Net Work Time) 기반 형상별(원형·정육각·사각·이형) UPH(TON/Hr) 누적 분석</p>
                 </div>
 
-                <div class="flex flex-wrap items-center gap-2 glass-panel p-2 !flex-row !h-auto border border-slate-300">
-                    <button id="btn-toggle-edit-tab2" onclick="toggleEditMode()" class="px-2.5 py-1 text-xs font-black rounded-md text-white bg-sky-700 hover:bg-sky-800 shadow transition-all flex items-center gap-1.5">
+                <div class="flex flex-wrap items-center gap-2 glass-panel p-1.5 !flex-row !h-auto border border-slate-300">
+                    <button id="btn-toggle-edit-tab2" onclick="toggleEditMode()" class="px-2 py-0.5 text-[11px] font-black rounded-md text-white bg-sky-700 hover:bg-sky-800 shadow transition-all flex items-center gap-1">
                         <i class="fa-solid fa-up-down-left-right"></i> <span>레이아웃 자유 편집</span>
                     </button>
-                    <button onclick="openWidgetManager()" class="px-2 py-1 text-xs font-bold rounded-md text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-300 transition-all flex items-center gap-1">
+                    <button onclick="openWidgetManager()" class="px-2 py-0.5 text-[11px] font-bold rounded-md text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-300 transition-all flex items-center gap-1">
                         <i class="fa-solid fa-cubes text-sky-600"></i> 위젯 관리자
                     </button>
-                    <button onclick="resetLayout()" class="px-2 py-1 text-xs font-bold rounded-md text-slate-600 hover:text-red-600 bg-slate-100 border border-slate-300 transition-all" title="기본 배치로 초기화">
+                    <button onclick="resetLayout()" class="px-1.5 py-0.5 text-[11px] font-bold rounded-md text-slate-600 hover:text-red-600 bg-slate-100 border border-slate-300 transition-all" title="기본 배치로 초기화">
                         <i class="fa-solid fa-rotate-left"></i>
                     </button>
 
-                    <div class="w-[1px] h-5 bg-slate-300 my-auto mx-1"></div>
+                    <div class="w-[1px] h-4 bg-slate-300 my-auto mx-0.5"></div>
 
-                    <div class="flex items-center gap-1.5 px-2">
-                        <i class="fa-solid fa-calendar-check text-red-600 text-xs"></i>
-                        <select id="analytics-month-select" class="bg-slate-100 border border-slate-300 text-xs font-bold text-slate-800 py-0.5 px-2 rounded-md outline-none cursor-pointer" onchange="onAnalyticsMonthChange()">
+                    <div class="flex items-center gap-1 px-1.5">
+                        <i class="fa-solid fa-calendar-check text-red-600 text-[11px]"></i>
+                        <select id="analytics-month-select" class="bg-slate-100 border border-slate-300 text-[11px] font-bold text-slate-800 py-0.5 px-1.5 rounded-md outline-none cursor-pointer" onchange="onAnalyticsMonthChange()">
                             <option value="LATEST">월별 선택 로딩 중...</option>
                         </select>
                     </div>
 
-                    <div id="analytics-machine-container" class="flex items-center gap-1.5 px-2 border-l border-slate-300" style="display: none;">
-                        <i class="fa-solid fa-microchip text-slate-500 text-xs"></i>
-                        <select id="analytics-machine-select" class="bg-slate-100 border border-slate-300 text-xs font-bold text-slate-800 py-0.5 px-2 rounded-md outline-none cursor-pointer" onchange="updateAnalytics()">
+                    <div id="analytics-machine-container" class="flex items-center gap-1 px-1.5 border-l border-slate-300" style="display: none;">
+                        <i class="fa-solid fa-microchip text-slate-500 text-[11px]"></i>
+                        <select id="analytics-machine-select" class="bg-slate-100 border border-slate-300 text-[11px] font-bold text-slate-800 py-0.5 px-1.5 rounded-md outline-none cursor-pointer" onchange="updateAnalytics()">
                         </select>
                     </div>
 
-                    <div class="flex bg-slate-100 p-0.5 rounded-md border border-slate-300 ml-1">
-                        <button id="btn-aly-team" onclick="setAnalyticsGroup('TEAM')" class="px-2.5 py-1 text-xs font-bold rounded bg-white text-red-700 border border-slate-300 transition-all">작업조별 (전체)</button>
-                        <button id="btn-aly-machine" onclick="setAnalyticsGroup('MACHINE')" class="px-2.5 py-1 text-xs font-bold rounded text-slate-500 transition-all">호기별 (특정)</button>
+                    <div class="flex bg-slate-100 p-0.5 rounded-md border border-slate-300 ml-0.5">
+                        <button id="btn-aly-team" onclick="setAnalyticsGroup('TEAM')" class="px-2 py-0.5 text-[10.5px] font-bold rounded bg-white text-red-700 border border-slate-300 transition-all">작업조별 (전체)</button>
+                        <button id="btn-aly-machine" onclick="setAnalyticsGroup('MACHINE')" class="px-2 py-0.5 text-[10.5px] font-bold rounded text-slate-500 transition-all">호기별 (특정)</button>
                     </div>
                 </div>
             </header>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
-                <div class="glass-panel p-3">
+            <!-- 4대 세부 형상별 UPH 핵심 요약 KPI -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-2 mb-2.5">
+                <div class="glass-panel p-2.5 border-l-4 border-l-sky-600">
                     <div class="flex items-center justify-between mb-0.5">
-                        <div class="p-1.5 rounded-lg bg-sky-50 text-sky-700"><i class="fa-regular fa-circle text-sm"></i></div>
-                        <span class="px-2 py-0.5 bg-slate-100 text-slate-700 font-extrabold rounded-md text-[9.5px]">순수가동 기준 평균</span>
+                        <span class="text-[9px] font-black text-sky-800 uppercase"><i class="fa-regular fa-circle text-[10px] mr-1"></i> 원형</span>
+                        <span class="px-1.5 py-0.2 bg-sky-50 text-sky-700 font-extrabold rounded text-[8.5px]">순수가동 기준</span>
                     </div>
-                    <p class="text-[9.5px] font-extrabold text-slate-500 uppercase mb-0.5">원형 작업 생산성 (UPH)</p>
-                    <div class="flex items-baseline gap-1"><h4 id="aly-circle-uph" class="text-xl font-black text-slate-900 font-mono-num">0.0</h4><span class="text-xs font-bold text-slate-500">TON/Hr</span></div>
+                    <div class="flex items-baseline justify-between mt-1">
+                        <p class="text-[9px] font-bold text-slate-500">원형 UPH</p>
+                        <div class="flex items-baseline gap-0.5"><h4 id="aly-uph-circle" class="text-base lg:text-lg font-black text-slate-900 font-mono-num">0.00</h4><span class="text-[9px] font-bold text-slate-500">T/Hr</span></div>
+                    </div>
                 </div>
-                <div class="glass-panel p-3">
+
+                <div class="glass-panel p-2.5 border-l-4 border-l-amber-500">
                     <div class="flex items-center justify-between mb-0.5">
-                        <div class="p-1.5 rounded-lg bg-amber-50 text-amber-700"><i class="fa-solid fa-draw-polygon text-sm"></i></div>
-                        <span class="px-2 py-0.5 bg-slate-100 text-slate-700 font-extrabold rounded-md text-[9.5px]">순수가동 기준 평균</span>
+                        <span class="text-[9px] font-black text-amber-800 uppercase"><i class="fa-solid fa-draw-polygon text-[10px] mr-1"></i> 정육각</span>
+                        <span class="px-1.5 py-0.2 bg-amber-50 text-amber-700 font-extrabold rounded text-[8.5px]">순수가동 기준</span>
                     </div>
-                    <p class="text-[9.5px] font-extrabold text-slate-500 uppercase mb-0.5">비원형(이형) 작업 생산성 (UPH)</p>
-                    <div class="flex items-baseline gap-1"><h4 id="aly-noncircle-uph" class="text-xl font-black text-slate-900 font-mono-num">0.0</h4><span class="text-xs font-bold text-slate-500">TON/Hr</span></div>
+                    <div class="flex items-baseline justify-between mt-1">
+                        <p class="text-[9px] font-bold text-slate-500">정육각 UPH</p>
+                        <div class="flex items-baseline gap-0.5"><h4 id="aly-uph-hex" class="text-base lg:text-lg font-black text-slate-900 font-mono-num">0.00</h4><span class="text-[9px] font-bold text-slate-500">T/Hr</span></div>
+                    </div>
+                </div>
+
+                <div class="glass-panel p-2.5 border-l-4 border-l-purple-600">
+                    <div class="flex items-center justify-between mb-0.5">
+                        <span class="text-[9px] font-black text-purple-800 uppercase"><i class="fa-solid fa-square text-[10px] mr-1"></i> 사각</span>
+                        <span class="px-1.5 py-0.2 bg-purple-50 text-purple-700 font-extrabold rounded text-[8.5px]">순수가동 기준</span>
+                    </div>
+                    <div class="flex items-baseline justify-between mt-1">
+                        <p class="text-[9px] font-bold text-slate-500">사각 UPH</p>
+                        <div class="flex items-baseline gap-0.5"><h4 id="aly-uph-square" class="text-base lg:text-lg font-black text-slate-900 font-mono-num">0.00</h4><span class="text-[9px] font-bold text-slate-500">T/Hr</span></div>
+                    </div>
+                </div>
+
+                <div class="glass-panel p-2.5 border-l-4 border-l-rose-500">
+                    <div class="flex items-center justify-between mb-0.5">
+                        <span class="text-[9px] font-black text-rose-800 uppercase"><i class="fa-solid fa-vector-square text-[10px] mr-1"></i> 이형</span>
+                        <span class="px-1.5 py-0.2 bg-rose-50 text-rose-700 font-extrabold rounded text-[8.5px]">순수가동 기준</span>
+                    </div>
+                    <div class="flex items-baseline justify-between mt-1">
+                        <p class="text-[9px] font-bold text-slate-500">이형 UPH</p>
+                        <div class="flex items-baseline gap-0.5"><h4 id="aly-uph-special" class="text-base lg:text-lg font-black text-slate-900 font-mono-num">0.00</h4><span class="text-[9px] font-bold text-slate-500">T/Hr</span></div>
+                    </div>
                 </div>
             </div>
 
-            <div class="glass-panel p-3.5 mb-3">
-                <div class="flex justify-between items-center mb-2 border-b border-slate-200 pb-2">
-                    <h3 class="text-xs lg:text-sm font-black text-slate-900 flex items-center gap-2">
-                        <i class="fa-solid fa-chart-column text-red-600"></i> <span id="aly-chart-title">작업조별 UPH 누적 생산성 비교 (원형 + 비원형)</span>
+            <!-- 누적 세로막대 UPH 비교 차트 패널 (여백 밀착 최적화) -->
+            <div class="glass-panel p-3 mb-2.5">
+                <div class="flex justify-between items-center mb-1.5 border-b border-slate-200 pb-1">
+                    <h3 class="text-xs font-black text-slate-900 flex items-center gap-1.5">
+                        <i class="fa-solid fa-chart-column text-red-600 text-xs"></i> <span id="aly-chart-title">형상 세분화(원형·정육각·사각·이형) 누적 생산성 비교</span>
                     </h3>
-                    <span class="text-[9.5px] font-extrabold text-sky-800 bg-sky-50 px-2 py-0.5 rounded border border-sky-200">누적 세로막대 UPH</span>
+                    <span class="text-[8.5px] font-extrabold text-sky-800 bg-sky-50 px-1.5 py-0.5 rounded border border-sky-200">세부 형상별 UPH 누적</span>
                 </div>
-                <div class="h-[280px] w-full relative"><canvas id="analyticsChart"></canvas></div>
+                <div class="h-[210px] w-full relative"><canvas id="analyticsChart"></canvas></div>
             </div>
 
-            <div class="glass-panel overflow-hidden mb-6">
-                <div class="p-3 border-b border-slate-200 bg-slate-50 flex justify-between items-center">
-                    <h3 class="text-xs lg:text-sm font-black text-slate-900 flex items-center gap-2"><i class="fa-solid fa-table-list text-sky-700"></i> 세부 가동시간 및 UPH 산출 레지스트리</h3>
-                    <span class="text-[9.5px] font-bold text-slate-500">UPH = 총생산량(TON) / 순수가동시간(Hr)</span>
+            <!-- 세부 가동시간 및 UPH 산출 레지스트리 (고밀도 표 디자인) -->
+            <div class="glass-panel overflow-hidden mb-4">
+                <div class="p-2.5 border-b border-slate-200 bg-slate-50 flex justify-between items-center">
+                    <h3 class="text-xs font-black text-slate-900 flex items-center gap-1.5"><i class="fa-solid fa-table-list text-sky-700 text-xs"></i> 세부 가동시간 및 UPH 산출 레지스트리</h3>
+                    <span class="text-[8.5px] font-bold text-slate-500">UPH(TON/Hr) = 총생산량(TON) / 순수가동시간(Hr)</span>
                 </div>
-                <div class="overflow-x-auto p-2">
-                    <table>
+                <div class="overflow-x-auto p-1.5">
+                    <table class="w-full text-xs">
                         <thead>
-                            <tr>
-                                <th id="aly-table-header">분류</th>
-                                <th>작업 형상</th>
-                                <th class="text-right">총 생산량(TON)</th>
-                                <th class="text-right text-red-600">총 비가동(MIN)</th>
-                                <th class="text-right text-emerald-700">순수 가동시간(MIN)</th>
-                                <th class="text-right text-sky-700">생산성 (UPH: TON/Hr)</th>
+                            <tr class="bg-slate-100/80">
+                                <th id="aly-table-header" class="py-1 px-2.5 text-left font-black text-slate-700 text-[10.5px]">작업조 / 구변</th>
+                                <th class="py-1 px-2.5 text-center font-black text-slate-700 text-[10.5px]">작업 형상</th>
+                                <th class="py-1 px-2.5 text-right font-black text-slate-700 text-[10.5px]">총 생산량(TON)</th>
+                                <th class="py-1 px-2.5 text-right font-black text-red-600 text-[10.5px]">총 비가동(MIN)</th>
+                                <th class="py-1 px-2.5 text-right font-black text-emerald-700 text-[10.5px]">순수 가동시간(MIN)</th>
+                                <th class="py-1 px-2.5 text-right font-black text-sky-700 text-[10.5px]">생산성 (UPH: TON/Hr)</th>
                             </tr>
                         </thead>
                         <tbody id="analytics-body"></tbody>
@@ -1664,30 +1694,57 @@
                 if (currentMachineVal) { cProd = cProd.filter(d => d.equipment === currentMachineVal); cDown = cDown.filter(d => d.equipment === currentMachineVal); }
             }
 
-            const map = {}; const groupKeys = ['A', 'B', 'C'];
+            const map = {}; 
+            const groupKeys = analyticsGroupBy === 'MACHINE' ? availableMachines : ['A', 'B', 'C'];
+            const SHAPES = ['원형', '정육각', '사각', '이형'];
+
             groupKeys.forEach(k => { 
-                map[`${k}-원형`] = { group: k, shape: '원형', amt: 0, down: 0, workDays: new Set() }; 
-                map[`${k}-비원형`] = { group: k, shape: '비원형(이형)', amt: 0, down: 0, workDays: new Set() }; 
+                SHAPES.forEach(sh => {
+                    map[`${k}-${sh}`] = { group: k, shape: sh, amt: 0, down: 0, workDays: new Set() };
+                });
             });
 
             cProd.forEach(p => {
-                let team = (p.team || '').replace(/조/g, '').trim().toUpperCase(); if(!groupKeys.includes(team)) return;
-                const shapeCat = p.isCircle ? '원형' : '비원형'; const key = `${team}-${shapeCat}`;
+                let grp = analyticsGroupBy === 'MACHINE' ? p.equipment : (p.team || '').replace(/조/g, '').trim().toUpperCase();
+                if(!groupKeys.includes(grp)) return;
+
+                let sh = p.shapeRaw || '원형';
+                if (sh.includes('육각')) sh = '정육각';
+                else if (sh.includes('사각')) sh = '사각';
+                else if (sh.includes('이형')) sh = '이형';
+                else sh = '원형';
+
+                const key = `${grp}-${sh}`;
                 if(map[key]) { map[key].amt += p.amount; map[key].workDays.add(p.date); }
             });
 
             cDown.forEach(d => {
-                let team = (d.team || '').replace(/조/g, '').trim().toUpperCase(); if(!groupKeys.includes(team)) return;
-                const shapeCat = d.isCircle ? '원형' : '비원형'; const key = `${team}-${shapeCat}`;
+                let grp = analyticsGroupBy === 'MACHINE' ? d.equipment : (d.team || '').replace(/조/g, '').trim().toUpperCase();
+                if(!groupKeys.includes(grp)) return;
+
+                let sh = d.isCircle ? '원형' : '정육각';
+                const key = `${grp}-${sh}`;
                 if(map[key]) { map[key].down += d.minutes; }
             });
 
-            let cUphSum = 0, cUphCnt = 0, ncUphSum = 0, ncUphCnt = 0;
+            const uphTotals = { '원형': { sum: 0, cnt: 0 }, '정육각': { sum: 0, cnt: 0 }, '사각': { sum: 0, cnt: 0 }, '이형': { sum: 0, cnt: 0 } };
             let tBodyHtml = '';
 
+            const shapeBadgeStyles = {
+                '원형': 'bg-sky-100 text-sky-800 border-sky-300',
+                '정육각': 'bg-amber-100 text-amber-800 border-amber-300',
+                '사각': 'bg-purple-100 text-purple-800 border-purple-300',
+                '이형': 'bg-rose-100 text-rose-800 border-rose-300'
+            };
+
             groupKeys.forEach((k) => {
-                ['원형', '비원형'].forEach((shapeCat) => {
-                    const item = map[`${k}-${shapeCat}`];
+                const teamBadge = analyticsGroupBy === 'MACHINE' 
+                    ? `bg-slate-200 text-slate-800 border-slate-300`
+                    : (k === 'A' ? 'bg-indigo-100 text-indigo-800 border-indigo-300' : k === 'B' ? 'bg-amber-100 text-amber-800 border-amber-300' : 'bg-emerald-100 text-emerald-800 border-emerald-300');
+
+                SHAPES.forEach((sh, sIdx) => {
+                    const item = map[`${k}-${sh}`];
+                    if (!item) return;
                     const activeDays = Math.max(1, item.workDays.size);
                     const grossMin = activeDays * 480; 
                     const netMin = Math.max(1, grossMin - item.down); 
@@ -1695,30 +1752,33 @@
                     const tons = item.amt / 1000;
                     const uph = tons / netHours;
 
-                    if(shapeCat === '원형' && uph > 0) { cUphSum += uph; cUphCnt++; }
-                    if(shapeCat === '비원형' && uph > 0) { ncUphSum += uph; ncUphCnt++; }
+                    if(uph > 0) { uphTotals[sh].sum += uph; uphTotals[sh].cnt++; }
 
-                    const badgeStyle = k === 'A' ? 'bg-indigo-100 text-indigo-800 border-indigo-300' : k === 'B' ? 'bg-amber-100 text-amber-800 border-amber-300' : 'bg-emerald-100 text-emerald-800 border-emerald-300';
+                    // 가독성을 위한 행 구분 스타일링
+                    const borderStyle = sIdx === 0 ? 'border-t-2 border-slate-300' : 'border-t border-slate-100';
 
-                    tBodyHtml += `<tr class="hover:bg-slate-50 border-b border-slate-100">
-                        <td class="font-bold"><span class="px-2 py-0.5 rounded text-xs font-black border ${badgeStyle}">${k}조</span></td>
-                        <td class="font-bold text-slate-800 text-xs">${item.shape}</td>
-                        <td class="text-right font-mono-num font-black text-slate-900">${tons.toFixed(1)}</td>
-                        <td class="text-right font-mono-num font-extrabold text-red-600">${item.down.toLocaleString()}</td>
-                        <td class="text-right font-mono-num font-extrabold text-emerald-700">${Math.round(netMin).toLocaleString()}</td>
-                        <td class="text-right font-mono-num font-black text-sky-800 text-sm">${uph.toFixed(2)}</td>
+                    tBodyHtml += `<tr class="hover:bg-sky-50/60 ${borderStyle}">
+                        <td class="font-bold py-1 px-2.5">${sIdx === 0 ? `<span class="px-2 py-0.5 rounded text-[10px] font-black border ${teamBadge}">${k}${analyticsGroupBy === 'TEAM' ? '조' : ''}</span>` : ''}</td>
+                        <td class="text-center font-bold py-1 px-2.5"><span class="px-1.5 py-0.2 rounded text-[9.5px] font-extrabold border ${shapeBadgeStyles[sh]}">${sh}</span></td>
+                        <td class="text-right font-mono-num font-black text-slate-900 py-1 px-2.5">${tons.toFixed(1)}</td>
+                        <td class="text-right font-mono-num font-extrabold text-red-600 py-1 px-2.5">${item.down.toLocaleString()}</td>
+                        <td class="text-right font-mono-num font-extrabold text-emerald-700 py-1 px-2.5">${Math.round(netMin).toLocaleString()}</td>
+                        <td class="text-right font-mono-num font-black text-sky-800 py-1 px-2.5">${uph.toFixed(2)}</td>
                     </tr>`;
                 });
             });
 
-            document.getElementById('aly-circle-uph').innerText = cUphCnt > 0 ? (cUphSum/cUphCnt).toFixed(2) : "0.00";
-            document.getElementById('aly-noncircle-uph').innerText = ncUphCnt > 0 ? (ncUphSum/ncUphCnt).toFixed(2) : "0.00";
+            if (document.getElementById('aly-uph-circle')) document.getElementById('aly-uph-circle').innerText = uphTotals['원형'].cnt > 0 ? (uphTotals['원형'].sum / uphTotals['원형'].cnt).toFixed(2) : "0.00";
+            if (document.getElementById('aly-uph-hex')) document.getElementById('aly-uph-hex').innerText = uphTotals['정육각'].cnt > 0 ? (uphTotals['정육각'].sum / uphTotals['정육각'].cnt).toFixed(2) : "0.00";
+            if (document.getElementById('aly-uph-square')) document.getElementById('aly-uph-square').innerText = uphTotals['사각'].cnt > 0 ? (uphTotals['사각'].sum / uphTotals['사각'].cnt).toFixed(2) : "0.00";
+            if (document.getElementById('aly-uph-special')) document.getElementById('aly-uph-special').innerText = uphTotals['이형'].cnt > 0 ? (uphTotals['이형'].sum / uphTotals['이형'].cnt).toFixed(2) : "0.00";
+
             document.getElementById('analytics-body').innerHTML = tBodyHtml;
 
-            renderAnalyticsChart(map);
+            renderAnalyticsChart(map, groupKeys);
         }
 
-        function renderAnalyticsChart(map) {
+        function renderAnalyticsChart(map, groupKeys) {
             if(!window.Chart) return;
             const canvas = document.getElementById('analyticsChart');
             if(!canvas) return;
@@ -1726,40 +1786,48 @@
             if(analyticsChartInstance) analyticsChartInstance.destroy();
             const ctx = canvas.getContext('2d');
 
-            const groupKeys = ['A', 'B', 'C'];
-            const labels = groupKeys.map(k => `${k}조`);
-            
-            const circleUphs = groupKeys.map(k => {
-                const item = map[`${k}-원형`];
-                const activeDays = Math.max(1, item.workDays.size);
-                const netMin = Math.max(1, (activeDays * 480) - item.down);
-                return parseFloat(((item.amt/1000) / (netMin/60)).toFixed(2)) || 0;
-            });
+            const labels = groupKeys.map(k => analyticsGroupBy === 'MACHINE' ? k : `${k}조`);
+            const SHAPES = ['원형', '정육각', '사각', '이형'];
+            const shapeColors = {
+                '원형': 'rgba(31, 119, 180, 0.85)',
+                '정육각': 'rgba(255, 127, 14, 0.85)',
+                '사각': 'rgba(148, 103, 189, 0.85)',
+                '이형': 'rgba(214, 39, 40, 0.85)'
+            };
 
-            const nonCircleUphs = groupKeys.map(k => {
-                const item = map[`${k}-비원형`];
-                const activeDays = Math.max(1, item.workDays.size);
-                const netMin = Math.max(1, (activeDays * 480) - item.down);
-                return parseFloat(((item.amt/1000) / (netMin/60)).toFixed(2)) || 0;
+            const datasets = SHAPES.map(sh => {
+                const data = groupKeys.map(k => {
+                    const item = map[`${k}-${sh}`];
+                    if (!item) return 0;
+                    const activeDays = Math.max(1, item.workDays.size);
+                    const netMin = Math.max(1, (activeDays * 480) - item.down);
+                    return parseFloat(((item.amt/1000) / (netMin/60)).toFixed(2)) || 0;
+                });
+
+                return {
+                    label: `${sh} UPH (TON/Hr)`,
+                    data: data,
+                    backgroundColor: shapeColors[sh],
+                    borderRadius: 3
+                };
             });
 
             analyticsChartInstance = new Chart(ctx, {
                 type: 'bar',
                 data: {
                     labels: labels,
-                    datasets: [
-                        { label: '원형 UPH (TON/Hr)', data: circleUphs, backgroundColor: 'rgba(31, 119, 180, 0.85)', borderRadius: 4 },
-                        { label: '비원형 UPH (TON/Hr)', data: nonCircleUphs, backgroundColor: 'rgba(255, 127, 14, 0.85)', borderRadius: 4 }
-                    ]
+                    datasets: datasets
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
                     scales: {
-                        x: { stacked: true, grid: { display: false }, ticks: { font: { size: 11, weight: 'bold' } } },
-                        y: { stacked: true, beginAtZero: true, ticks: { font: { size: 10 } }, grid: { color: 'rgba(0,0,0,0.06)' } }
+                        x: { stacked: true, grid: { display: false }, ticks: { font: { size: 10, weight: 'bold' } } },
+                        y: { stacked: true, beginAtZero: true, ticks: { font: { size: 9.5 } }, grid: { color: 'rgba(0,0,0,0.06)' } }
                     },
-                    plugins: { legend: { position: 'top', labels: { font: { size: 10, weight: 'bold' } } } }
+                    plugins: { 
+                        legend: { position: 'top', labels: { font: { size: 9.5, weight: 'bold' }, boxWidth: 12 } } 
+                    }
                 }
             });
         }
