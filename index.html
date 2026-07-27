@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PRO-INTEGRATOR | Ultimate Master v22.0</title>
+    <title>PRO-INTEGRATOR | Ultimate Master v22.1</title>
     
     <script>
         if (window.navigator.userAgent.indexOf('MSIE ') > 0 || window.navigator.userAgent.indexOf('Trident/') > 0) {
@@ -12,7 +12,7 @@
         window.process = window.process || {}; window.process.env = window.process.env || {}; window.process.env.NODE_ENV = 'production';
     </script>
 
-    <!-- 외부 필수 라이브러리 로드 (FontAwesome, Tailwind CSS, Chart.js, SheetJS, PapaParse) -->
+    <!-- 외부 필수 라이브러리 로드 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -26,12 +26,12 @@
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
         table { width: 100%; border-collapse: separate; border-spacing: 0 6px; }
-        th { color: #94a3b8; font-weight: 900; text-transform: uppercase; font-size: 15px; padding: 1rem 1.5rem; letter-spacing: 0.1em; text-align: left; }
-        td { background: #ffffff; padding: 1rem 1.5rem; border-top: 1px solid #f1f5f9; border-bottom: 1px solid #f1f5f9; font-size: 18px; font-weight: bold; }
+        th { color: #94a3b8; font-weight: 900; text-transform: uppercase; font-size: 14px; padding: 0.8rem 1rem; letter-spacing: 0.05em; text-align: left; }
+        td { background: #ffffff; padding: 0.8rem 1rem; border-top: 1px solid #f1f5f9; border-bottom: 1px solid #f1f5f9; font-size: 16px; font-weight: bold; }
         td:first-child { border-left: 1px solid #f1f5f9; border-top-left-radius: 12px; border-bottom-left-radius: 12px; }
         td:last-child { border-right: 1px solid #f1f5f9; border-top-right-radius: 12px; border-bottom-right-radius: 12px; }
         
-        .target-input { background: #ffffff; border: 1px solid #e2e8f0; color: #0f172a; font-family: 'Inter', monospace; padding: 0.3rem 0.5rem; border-radius: 8px; width: 80px; text-align: right; font-weight: 900; outline: none; font-size: 15px; }
+        .target-input { background: #ffffff; border: 1px solid #e2e8f0; color: #0f172a; font-family: 'Inter', monospace; padding: 0.3rem 0.5rem; border-radius: 8px; width: 75px; text-align: right; font-weight: 900; outline: none; font-size: 14px; }
         .toast { position: fixed; bottom: -100px; right: 40px; padding: 20px 30px; border-radius: 20px; color: white; font-weight: 900; font-size: 16px; z-index: 100; transition: bottom 0.4s ease-in-out; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); display: flex; align-items: center; gap: 12px; }
         
         /* OEE 비상 경고등 비주얼 */
@@ -47,39 +47,49 @@
         .chat-header { background: #0f172a; padding: 15px 20px; color: white; display: flex; justify-content: space-between; align-items: center; }
         .chat-body { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; background: #f8fafc; }
         .chat-input-area { padding: 15px; background: white; border-top: 1px solid #e2e8f0; display: flex; gap: 10px; }
-        .msg-bot { background: #e0e7ff; color: #1e40af; padding: 12px 16px; border-radius: 0 16px 16px 16px; max-width: 85%; align-self: flex-start; font-weight: 700; font-size: 14px; line-height: 1.5; }
-        .msg-user { background: #0f172a; color: white; padding: 12px 16px; border-radius: 16px 0 16px 16px; max-width: 85%; align-self: flex-end; font-weight: 700; font-size: 14px; line-height: 1.5; }
-        .gs-input { width: 100%; padding: 12px 15px; border-radius: 12px; border: 2px solid #e2e8f0; font-size: 14px; font-family: monospace; outline: none; transition: all 0.3s; }
+        .msg-bot { background: #e0e7ff; color: #1e40af; padding: 12px 16px; border-radius: 0 16px 16px 16px; max-width: 90%; align-self: flex-start; font-weight: 700; font-size: 13px; line-height: 1.6; }
+        .msg-user { background: #0f172a; color: white; padding: 12px 16px; border-radius: 16px 0 16px 16px; max-width: 85%; align-self: flex-end; font-weight: 700; font-size: 13px; line-height: 1.5; }
+        .gs-input { width: 100%; padding: 12px 15px; border-radius: 12px; border: 2px solid #e2e8f0; font-size: 13px; font-family: monospace; outline: none; transition: all 0.3s; }
         
         .tab-content { display: none; }
         .tab-content.active { display: block; animation: fadeIn 0.4s ease-in-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .nav-icon { cursor: pointer; padding: 12px; border-radius: 1rem; transition: all 0.3s; color: #64748b; }
+        .nav-icon { cursor: pointer; padding: 10px; border-radius: 1rem; transition: all 0.3s; color: #64748b; }
         .nav-icon:hover { background: rgba(255,255,255,0.1); color: #fff; }
         .nav-icon.active { background: #4f46e5; color: #fff; box-shadow: 0 0 15px rgba(79,70,229,0.4); }
 
-        .weather-widget { background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%); border: 1px solid #e2e8f0; border-radius: 2rem; padding: 1.5rem; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05); }
+        .weather-widget { background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%); border: 1px solid #e2e8f0; border-radius: 2rem; padding: 1.25rem; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05); }
         .modal-bg { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(10px); z-index: 950; justify-content: center; align-items: center; }
+
+        /* 📱 960 x 1080 (절반 분할 화면 모드) 전용 스타일 */
+        body.split-mode-960 .kpi-container { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+        body.split-mode-960 .kpi-card { padding: 1rem !important; }
+        body.split-mode-960 .kpi-title { font-size: 11px !important; }
+        body.split-mode-960 .kpi-val { font-size: 1.75rem !important; }
+        body.split-mode-960 .chart-grid { grid-template-columns: repeat(1, minmax(0, 1fr)) !important; }
+        body.split-mode-960 th { font-size: 12px !important; padding: 0.5rem 0.75rem !important; }
+        body.split-mode-960 td { font-size: 14px !important; padding: 0.5rem 0.75rem !important; }
+        body.split-mode-960 aside { width: 4.5rem !important; }
     </style>
 </head>
-<body>
+<body id="app-body" class="split-mode-auto">
     <div id="emergency-overlay" class="fixed inset-0 z-[900] pointer-events-none hidden border-[12px] border-transparent transition-all duration-300"></div>
 
     <div class="flex min-h-screen">
         <!-- 좌측 사이드바 탭 메뉴 -->
-        <aside class="w-20 lg:w-24 bg-[#0f172a] border-r border-slate-800 flex flex-col items-center py-6 gap-6 sticky top-0 h-screen shadow-2xl z-40">
-            <div class="w-12 h-12 lg:w-14 lg:h-14 bg-indigo-600 rounded-2xl flex items-center justify-center shadow-[0_0_20px_rgba(79,70,229,0.4)] mb-2">
-                <i class="fa-solid fa-layer-group text-white text-xl lg:text-2xl"></i>
+        <aside class="w-16 lg:w-20 bg-[#0f172a] border-r border-slate-800 flex flex-col items-center py-5 gap-5 sticky top-0 h-screen shadow-2xl z-40 flex-shrink-0">
+            <div class="w-10 h-10 lg:w-12 lg:h-12 bg-indigo-600 rounded-2xl flex items-center justify-center shadow-[0_0_20px_rgba(79,70,229,0.4)] mb-1">
+                <i class="fa-solid fa-layer-group text-white text-lg lg:text-xl"></i>
             </div>
-            <nav class="flex flex-col gap-4 text-xl lg:text-2xl w-full px-3 lg:px-4 items-center h-full pb-4">
+            <nav class="flex flex-col gap-3 text-lg lg:text-xl w-full px-2 items-center h-full pb-4">
                 <div class="nav-icon active" onclick="switchTab('main')" id="nav-main" title="메인 대시보드"><i class="fa-solid fa-chart-line"></i></div>
                 <div class="nav-icon" onclick="switchTab('analytics')" id="nav-analytics" title="CD 생산성 분석"><i class="fa-solid fa-chart-pie"></i></div>
-                <div class="w-8 h-[1px] bg-slate-700 my-2"></div>
+                <div class="w-6 h-[1px] bg-slate-700 my-1"></div>
                 <div class="nav-icon hover:text-emerald-400" onclick="fetchGoogleSheetsData()" title="데이터 강제 동기화"><i class="fa-solid fa-arrows-rotate"></i></div>
                 <div class="nav-icon hover:text-amber-400" onclick="openModal()" title="구글 시트 연동 설정"><i class="fa-solid fa-gear"></i></div>
                 
                 <div class="nav-icon mt-auto mb-2 text-amber-400 hover:text-amber-300 animate-bounce" onclick="toggleBot()" title="PRO-Bot (AI 챗봇)">
-                    <i class="fa-solid fa-robot text-3xl lg:text-4xl drop-shadow-[0_0_10px_rgba(251,191,36,0.6)]"></i>
+                    <i class="fa-solid fa-robot text-2xl lg:text-3xl drop-shadow-[0_0_10px_rgba(251,191,36,0.6)]"></i>
                 </div>
             </nav>
         </aside>
@@ -87,143 +97,159 @@
         <!-- ================================================================= -->
         <!-- TAB 1: 메인 대시보드 (통합 관제) -->
         <!-- ================================================================= -->
-        <main class="flex-1 p-4 lg:p-8 overflow-y-auto h-screen bg-slate-50 relative z-10 tab-content active" id="tab-main">
-            <header class="flex flex-col xl:flex-row justify-between items-start xl:items-end gap-6 mb-8">
+        <main class="flex-1 p-3 lg:p-6 overflow-y-auto h-screen bg-slate-50 relative z-10 tab-content active" id="tab-main">
+            <header class="flex flex-col xl:flex-row justify-between items-start xl:items-end gap-4 mb-6">
                 <div>
-                    <h1 class="text-3xl lg:text-4xl font-black tracking-tighter text-slate-900 uppercase flex items-center gap-3">
-                        <span class="w-2.5 h-8 bg-indigo-600 rounded-full shadow-[0_0_15px_rgba(79,70,229,0.5)]"></span>
-                        PRO-INTEGRATOR <span class="text-indigo-600 font-light ml-2 text-xl lg:text-2xl">v22.0 (Master)</span>
+                    <h1 class="text-2xl lg:text-3xl font-black tracking-tighter text-slate-900 uppercase flex items-center gap-3">
+                        <span class="w-2.5 h-7 bg-indigo-600 rounded-full shadow-[0_0_15px_rgba(79,70,229,0.5)]"></span>
+                        PRO-INTEGRATOR <span class="text-indigo-600 font-light ml-1 text-lg lg:text-xl">v22.1</span>
                     </h1>
-                    <p class="text-slate-500 font-bold text-xs uppercase tracking-[0.3em] mt-3 ml-5 flex items-center gap-2">
+                    <p class="text-slate-500 font-bold text-[11px] uppercase tracking-[0.2em] mt-1.5 ml-5 flex items-center gap-2">
                         <span id="status-led" class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
                         <span id="status-text">Cloud & Local Multi-Sync Active</span>
                     </p>
                 </div>
 
-                <div class="flex flex-wrap items-center gap-3 bg-white p-2.5 rounded-2xl border border-slate-200 shadow-sm">
-                    <div class="flex gap-4 border-r border-slate-200 pr-4 pl-2">
+                <div class="flex flex-wrap items-center gap-2.5 bg-white p-2 rounded-2xl border border-slate-200 shadow-sm">
+                    <!-- 화면 해상도 2가지 모드 전환 (1920 Full vs 960 Split) -->
+                    <div class="flex bg-slate-100 p-1 rounded-lg mr-1" id="screen-mode-container">
+                        <button id="btn-mode-1920" onclick="setScreenMode('1920')" class="px-2.5 py-1 text-[11px] font-black rounded text-indigo-600 bg-white shadow-sm border border-slate-200 transition-all flex items-center gap-1">
+                            <i class="fa-solid fa-desktop"></i> 1920 Full
+                        </button>
+                        <button id="btn-mode-960" onclick="setScreenMode('960')" class="px-2.5 py-1 text-[11px] font-black rounded text-slate-400 transition-all flex items-center gap-1">
+                            <i class="fa-solid fa-columns"></i> 960 Split
+                        </button>
+                    </div>
+
+                    <div class="flex gap-3 border-r border-slate-200 pr-3 pl-1">
                         <div class="flex flex-col">
-                            <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">운영계획량(월)</span>
+                            <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-0.5">운영계획량(월)</span>
                             <div class="flex items-center gap-1">
                                 <input type="number" id="inp-monthly" class="target-input text-indigo-600" value="4170" onchange="updateTargets()">
-                                <span class="text-[10px] font-black text-slate-400">TON</span>
+                                <span class="text-[9px] font-black text-slate-400">TON</span>
                             </div>
                         </div>
                         <div class="flex flex-col">
-                            <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">일일목표(일)</span>
+                            <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-0.5">일일목표(일)</span>
                             <div class="flex items-center gap-1">
                                 <input type="number" id="inp-daily" class="target-input text-amber-500" value="119" onchange="updateTargets()">
-                                <span class="text-[10px] font-black text-slate-400">TON</span>
+                                <span class="text-[9px] font-black text-slate-400">TON</span>
                             </div>
                         </div>
                     </div>
 
-                    <div class="flex items-center gap-2 px-2">
-                        <i class="fa-solid fa-calendar-days text-indigo-500 text-lg"></i>
-                        <select id="date-select" class="bg-slate-50 border border-slate-200 text-sm font-black text-slate-700 py-1.5 px-3 rounded-lg outline-none cursor-pointer" onchange="onDateChange()">
+                    <div class="flex items-center gap-1.5 px-1">
+                        <i class="fa-solid fa-calendar-days text-indigo-500 text-sm"></i>
+                        <select id="date-select" class="bg-slate-50 border border-slate-200 text-xs font-black text-slate-700 py-1 px-2 rounded-lg outline-none cursor-pointer" onchange="onDateChange()">
                             <option value="ALL">당월 누계 분석</option>
                         </select>
-                        <div class="flex bg-slate-100 p-1 rounded-lg ml-1" id="view-mode-container">
-                            <button id="btn-daily" onclick="setViewMode('DAILY')" class="px-3 py-1.5 text-xs font-black rounded text-indigo-600 bg-white shadow-sm border border-slate-200 transition-all">일간</button>
-                            <button id="btn-weekly" onclick="setViewMode('WEEKLY')" class="px-3 py-1.5 text-xs font-black rounded text-slate-400 transition-all">주간</button>
+                        <div class="flex bg-slate-100 p-0.5 rounded-lg ml-1" id="view-mode-container">
+                            <button id="btn-daily" onclick="setViewMode('DAILY')" class="px-2 py-1 text-[11px] font-black rounded text-indigo-600 bg-white shadow-sm border border-slate-200 transition-all">일간</button>
+                            <button id="btn-weekly" onclick="setViewMode('WEEKLY')" class="px-2 py-1 text-[11px] font-black rounded text-slate-400 transition-all">주간</button>
                         </div>
                     </div>
 
-                    <div class="flex items-center gap-2 px-2 border-l border-slate-200 pl-3">
-                        <i class="fa-solid fa-cloud-sun text-amber-500 text-lg"></i>
-                        <div class="flex bg-slate-100 p-1 rounded-lg">
-                            <button id="btn-shift-all" onclick="setShiftMode('ALL')" class="px-3 py-1.5 text-xs font-black rounded text-indigo-600 bg-white shadow-sm border border-slate-200 transition-all">전체</button>
-                            <button id="btn-shift-day" onclick="setShiftMode('주간')" class="px-3 py-1.5 text-xs font-black rounded text-slate-400 transition-all">주간</button>
-                            <button id="btn-shift-night" onclick="setShiftMode('야간')" class="px-3 py-1.5 text-xs font-black rounded text-slate-400 transition-all">야간</button>
+                    <div class="flex items-center gap-1.5 px-1 border-l border-slate-200 pl-2">
+                        <i class="fa-solid fa-cloud-sun text-amber-500 text-sm"></i>
+                        <div class="flex bg-slate-100 p-0.5 rounded-lg">
+                            <button id="btn-shift-all" onclick="setShiftMode('ALL')" class="px-2 py-1 text-[11px] font-black rounded text-indigo-600 bg-white shadow-sm border border-slate-200 transition-all">전체</button>
+                            <button id="btn-shift-day" onclick="setShiftMode('주간')" class="px-2 py-1 text-[11px] font-black rounded text-slate-400 transition-all">주간</button>
+                            <button id="btn-shift-night" onclick="setShiftMode('야간')" class="px-2 py-1 text-[11px] font-black rounded text-slate-400 transition-all">야간</button>
                         </div>
                     </div>
                 </div>
             </header>
 
-            <div class="grid grid-cols-12 gap-5 mb-8">
+            <div class="grid grid-cols-12 gap-4 mb-6 kpi-container">
                 <!-- 날씨 & 시계 위젯 -->
-                <div class="col-span-12 lg:col-span-2 weather-widget flex flex-col justify-between">
-                    <div class="flex items-center gap-2 text-slate-500 font-black text-xs uppercase tracking-widest"><i class="fa-regular fa-calendar"></i> TODAY</div>
-                    <div class="my-2">
-                        <p class="text-[10px] text-slate-400 font-bold mb-1">현재시간</p>
-                        <div class="text-xl font-black text-slate-800 font-mono tracking-tighter" id="current-time">00:00:00 <span class="text-xs text-slate-400">AM</span></div>
+                <div class="col-span-12 sm:col-span-6 lg:col-span-2 weather-widget flex flex-col justify-between kpi-card">
+                    <div class="flex items-center gap-2 text-slate-500 font-black text-[10px] uppercase tracking-widest"><i class="fa-regular fa-calendar"></i> TODAY</div>
+                    <div class="my-1">
+                        <p class="text-[9px] text-slate-400 font-bold mb-0.5">현재시간</p>
+                        <div class="text-lg font-black text-slate-800 font-mono tracking-tighter" id="current-time">00:00:00 <span class="text-[10px] text-slate-400">AM</span></div>
                     </div>
-                    <div class="flex justify-between items-end border-t border-slate-100 pt-2">
+                    <div class="flex justify-between items-end border-t border-slate-100 pt-1.5">
                         <div>
-                            <p class="text-[9px] font-black text-blue-500 uppercase tracking-widest mb-0.5">포항 공장</p>
-                            <div class="flex items-center gap-1.5"><i class="fa-solid fa-cloud-sun text-slate-400 text-base"></i><span class="text-base font-black text-slate-700">27°</span></div>
+                            <p class="text-[9px] font-black text-blue-500 uppercase tracking-widest">포항 공장</p>
+                            <div class="flex items-center gap-1"><i class="fa-solid fa-cloud-sun text-slate-400 text-sm"></i><span class="text-sm font-black text-slate-700">27°</span></div>
                         </div>
                     </div>
                 </div>
 
                 <!-- KPI 1: 당월 생산 실적 -->
-                <div class="col-span-12 lg:col-span-2.5 bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex flex-col justify-center">
-                    <div class="flex justify-between items-start mb-3">
-                        <div class="p-3 rounded-xl bg-indigo-50 text-indigo-600"><i class="fa-solid fa-industry text-xl"></i></div>
-                        <span id="kpi-reach" class="text-xs font-black px-3 py-1 rounded-lg border bg-indigo-50 text-indigo-600 border-indigo-100">달성률 0%</span>
+                <div class="col-span-12 sm:col-span-6 lg:col-span-2.5 bg-white p-5 rounded-3xl border border-slate-200 shadow-sm flex flex-col justify-center kpi-card">
+                    <div class="flex justify-between items-start mb-2">
+                        <div class="p-2.5 rounded-xl bg-indigo-50 text-indigo-600"><i class="fa-solid fa-industry text-lg"></i></div>
+                        <span id="kpi-reach" class="text-[11px] font-black px-2.5 py-0.5 rounded-lg border bg-indigo-50 text-indigo-600 border-indigo-100">달성률 0%</span>
                     </div>
-                    <p class="text-xs font-black text-slate-400 uppercase tracking-widest mb-1">당월 생산 실적</p>
-                    <div class="flex items-baseline gap-2"><h4 id="kpi-tons" class="text-3xl lg:text-4xl font-black text-slate-800 font-mono">0</h4><span class="text-base font-bold text-slate-500">TON</span></div>
+                    <p class="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-0.5 kpi-title">당월 생산 실적</p>
+                    <div class="flex items-baseline gap-1.5"><h4 id="kpi-tons" class="text-2xl lg:text-3xl font-black text-slate-800 font-mono kpi-val">0</h4><span class="text-xs font-bold text-slate-500">TON</span></div>
                 </div>
 
                 <!-- KPI 2: CD 포장 실적량 -->
-                <div class="col-span-12 lg:col-span-2.5 bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex flex-col justify-center">
-                    <div class="flex justify-between items-start mb-3">
-                        <div class="p-3 rounded-xl bg-blue-50 text-blue-600"><i class="fa-solid fa-box-open text-xl"></i></div>
-                        <span id="kpi-pack-ratio" class="text-xs font-black px-3 py-1 rounded-lg border bg-blue-50 text-blue-600 border-blue-100">포장률 0%</span>
+                <div class="col-span-12 sm:col-span-6 lg:col-span-2.5 bg-white p-5 rounded-3xl border border-slate-200 shadow-sm flex flex-col justify-center kpi-card">
+                    <div class="flex justify-between items-start mb-2">
+                        <div class="p-2.5 rounded-xl bg-blue-50 text-blue-600"><i class="fa-solid fa-box-open text-lg"></i></div>
+                        <span id="kpi-pack-ratio" class="text-[11px] font-black px-2.5 py-0.5 rounded-lg border bg-blue-50 text-blue-600 border-blue-100">포장률 0%</span>
                     </div>
-                    <p class="text-xs font-black text-slate-400 uppercase tracking-widest mb-1">CD 포장 실적량</p>
-                    <div class="flex items-baseline gap-2"><h4 id="kpi-pack-tons" class="text-3xl lg:text-4xl font-black text-slate-800 font-mono">0</h4><span class="text-base font-bold text-slate-500">TON</span></div>
+                    <p class="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-0.5 kpi-title">CD 포장 실적량</p>
+                    <div class="flex items-baseline gap-1.5"><h4 id="kpi-pack-tons" class="text-2xl lg:text-3xl font-black text-slate-800 font-mono kpi-val">0</h4><span class="text-xs font-bold text-slate-500">TON</span></div>
                 </div>
 
                 <!-- KPI 3: 총 불가동시간 -->
-                <div class="col-span-12 lg:col-span-2.5 bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex flex-col justify-center">
-                    <div class="flex justify-between items-start mb-3">
-                        <div class="p-3 rounded-xl bg-rose-50 text-rose-500"><i class="fa-solid fa-clock text-xl"></i></div>
+                <div class="col-span-12 sm:col-span-6 lg:col-span-2.5 bg-white p-5 rounded-3xl border border-slate-200 shadow-sm flex flex-col justify-center kpi-card">
+                    <div class="flex justify-between items-start mb-2">
+                        <div class="p-2.5 rounded-xl bg-rose-50 text-rose-500"><i class="fa-solid fa-clock text-lg"></i></div>
                     </div>
-                    <p class="text-xs font-black text-slate-400 uppercase tracking-widest mb-1">총 불가동시간</p>
-                    <div class="flex items-baseline gap-2"><h4 id="kpi-down" class="text-3xl lg:text-4xl font-black text-slate-800 font-mono">0</h4><span class="text-base font-bold text-slate-500">MIN</span></div>
+                    <p class="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-0.5 kpi-title">총 불가동시간</p>
+                    <div class="flex items-baseline gap-1.5"><h4 id="kpi-down" class="text-2xl lg:text-3xl font-black text-slate-800 font-mono kpi-val">0</h4><span class="text-xs font-bold text-slate-500">MIN</span></div>
                 </div>
 
                 <!-- KPI 4: OEE 종합설비효율 -->
-                <div id="card-oee" class="col-span-12 lg:col-span-2.5 bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex flex-col justify-center transition-all duration-500">
-                    <div class="flex justify-between items-start mb-3">
-                        <div id="icon-oee" class="p-3 rounded-xl bg-emerald-50 text-emerald-500 transition-colors duration-500"><i class="fa-solid fa-gear text-xl"></i></div>
-                        <span id="badge-oee" class="text-[10px] font-black px-2 py-0.5 rounded-md hidden bg-rose-100 text-rose-600 animate-pulse">EMERGENCY</span>
+                <div id="card-oee" class="col-span-12 sm:col-span-6 lg:col-span-2.5 bg-white p-5 rounded-3xl border border-slate-200 shadow-sm flex flex-col justify-center transition-all duration-500 kpi-card">
+                    <div class="flex justify-between items-start mb-2">
+                        <div id="icon-oee" class="p-2.5 rounded-xl bg-emerald-50 text-emerald-500 transition-colors duration-500"><i class="fa-solid fa-gear text-lg"></i></div>
+                        <span id="badge-oee" class="text-[9px] font-black px-2 py-0.5 rounded-md hidden bg-rose-100 text-rose-600 animate-pulse">EMERGENCY</span>
                     </div>
-                    <p class="text-xs font-black text-slate-400 uppercase tracking-widest mb-1">OEE [종합효율]</p>
-                    <div class="flex items-baseline gap-2"><h4 id="kpi-oee" class="text-3xl lg:text-4xl font-black text-slate-800 font-mono transition-colors duration-500">0.0</h4><span class="text-base font-bold text-slate-500">%</span></div>
+                    <p class="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-0.5 kpi-title">OEE [종합효율]</p>
+                    <div class="flex items-baseline gap-1.5"><h4 id="kpi-oee" class="text-2xl lg:text-3xl font-black text-slate-800 font-mono transition-colors duration-500 kpi-val">0.0</h4><span class="text-xs font-bold text-slate-500">%</span></div>
                 </div>
             </div>
 
-            <div class="grid grid-cols-12 gap-6 mb-8">
-                <!-- 생산실적 및 불가동 현황 (복합 차트) -->
-                <div class="col-span-12 lg:col-span-8 bg-white p-8 rounded-[2.5rem] shadow-sm border border-slate-200">
-                    <div class="flex items-center justify-between mb-6">
-                        <h3 class="text-xl font-black text-slate-800 flex items-center gap-2">
-                            <i class="fa-solid fa-chart-simple text-indigo-500"></i> 생산실적 및 불가동 현황
-                            <span id="chart-badge" class="text-xs bg-indigo-50 text-indigo-600 font-black px-3 py-1 rounded-full border border-indigo-100">일간 집계</span>
+            <div class="grid grid-cols-12 gap-5 mb-6 chart-grid">
+                <!-- 생산실적, 포장량 및 불가동 현황 (복합 차트) -->
+                <div class="col-span-12 lg:col-span-8 bg-white p-6 lg:p-8 rounded-[2rem] shadow-sm border border-slate-200">
+                    <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+                        <h3 class="text-lg lg:text-xl font-black text-slate-800 flex items-center gap-2">
+                            <i class="fa-solid fa-chart-simple text-indigo-500"></i> 생산실적 · 포장량 및 불가동 현황
+                            <span id="chart-badge" class="text-[11px] bg-indigo-50 text-indigo-600 font-black px-2.5 py-0.5 rounded-full border border-indigo-100">일간 집계</span>
                         </h3>
+                        <div class="flex items-center gap-3 text-xs font-bold text-slate-600 bg-slate-50 px-3 py-1.5 rounded-xl">
+                            <span class="flex items-center gap-1"><span class="w-3 h-1 bg-indigo-600 rounded"></span> 생산량</span>
+                            <span class="flex items-center gap-1"><span class="w-3 h-1 bg-sky-500 rounded"></span> 포장량</span>
+                            <span class="flex items-center gap-1"><span class="w-3 h-3 bg-rose-400 rounded-sm"></span> 불가동</span>
+                            <span class="flex items-center gap-1"><span class="w-3 h-[1px] border-b-2 border-dashed border-amber-500"></span> 목표</span>
+                        </div>
                     </div>
-                    <div class="h-[340px] relative w-full"><canvas id="mainChart"></canvas></div>
+                    <div class="h-[320px] relative w-full"><canvas id="mainChart"></canvas></div>
                 </div>
 
                 <!-- 작업 형상별 분포 (도넛 차트) -->
-                <div class="col-span-12 lg:col-span-4 bg-white p-8 rounded-[2.5rem] shadow-sm border border-slate-200 flex flex-col justify-between">
-                    <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-xl font-black text-slate-800 flex items-center gap-2"><i class="fa-solid fa-chart-pie text-indigo-500"></i> 작업 형상별 분포</h3>
+                <div class="col-span-12 lg:col-span-4 bg-white p-6 lg:p-8 rounded-[2rem] shadow-sm border border-slate-200 flex flex-col justify-between">
+                    <div class="flex items-center justify-between mb-2">
+                        <h3 class="text-lg lg:text-xl font-black text-slate-800 flex items-center gap-2"><i class="fa-solid fa-chart-pie text-indigo-500"></i> 작업 형상별 분포</h3>
                         <span class="text-xs font-bold text-slate-400">당월 누적</span>
                     </div>
-                    <div class="h-[260px] relative w-full flex items-center justify-center">
+                    <div class="h-[220px] relative w-full flex items-center justify-center">
                         <canvas id="shapeDoughnutChart"></canvas>
                     </div>
-                    <div id="shape-legend" class="grid grid-cols-2 gap-2 mt-4 text-xs font-bold text-slate-600"></div>
+                    <div id="shape-legend" class="grid grid-cols-2 gap-2 mt-2 text-xs font-bold text-slate-600"></div>
                 </div>
             </div>
 
-            <div class="bg-white rounded-[2.5rem] shadow-sm border border-slate-200 overflow-hidden mb-10">
-                <div class="p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
-                    <h3 class="text-xl font-black text-slate-800 flex items-center gap-2"><i class="fa-solid fa-microchip text-indigo-500"></i> 통합 자산 제어 레지스트리</h3>
+            <div class="bg-white rounded-[2rem] shadow-sm border border-slate-200 overflow-hidden mb-10">
+                <div class="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+                    <h3 class="text-lg font-black text-slate-800 flex items-center gap-2"><i class="fa-solid fa-microchip text-indigo-500"></i> 통합 자산 제어 레지스트리</h3>
                     <span class="text-xs font-black text-slate-400 uppercase tracking-widest">Real-time Asset Monitoring</span>
                 </div>
                 <div class="overflow-x-auto p-2">
@@ -247,66 +273,66 @@
         <!-- ================================================================= -->
         <!-- TAB 2: CD 생산성 분석 (Deep Analytics) -->
         <!-- ================================================================= -->
-        <main class="flex-1 p-4 lg:p-8 overflow-y-auto h-screen bg-slate-50 relative z-10 tab-content" id="tab-analytics">
-            <header class="flex flex-col xl:flex-row justify-between items-start xl:items-end gap-6 mb-8">
+        <main class="flex-1 p-3 lg:p-6 overflow-y-auto h-screen bg-slate-50 relative z-10 tab-content" id="tab-analytics">
+            <header class="flex flex-col xl:flex-row justify-between items-start xl:items-end gap-4 mb-6">
                 <div>
-                    <h1 class="text-3xl lg:text-4xl font-black tracking-tighter text-slate-900 uppercase flex items-center gap-3">
-                        <span class="w-2.5 h-8 bg-rose-500 rounded-full shadow-[0_0_15px_rgba(244,63,94,0.5)]"></span>
-                        CD 생산성 분석 <span class="text-rose-500 font-light ml-2 text-xl lg:text-2xl">DEEP DIVE</span>
+                    <h1 class="text-2xl lg:text-3xl font-black tracking-tighter text-slate-900 uppercase flex items-center gap-3">
+                        <span class="w-2.5 h-7 bg-rose-500 rounded-full shadow-[0_0_15px_rgba(244,63,94,0.5)]"></span>
+                        CD 생산성 분석 <span class="text-rose-500 font-light ml-1 text-lg lg:text-xl">DEEP DIVE</span>
                     </h1>
-                    <p class="text-slate-500 font-bold text-xs mt-3 ml-5">순수 가동시간(Net Work Time) 기반 생산성(UPH: TON/Hr) 분석</p>
+                    <p class="text-slate-500 font-bold text-xs mt-1.5 ml-5">순수 가동시간(Net Work Time) 기반 생산성(UPH: TON/Hr) 분석</p>
                 </div>
 
-                <div class="flex flex-wrap items-center gap-3 bg-white p-2.5 rounded-2xl border border-slate-200 shadow-sm">
+                <div class="flex flex-wrap items-center gap-2.5 bg-white p-2 rounded-2xl border border-slate-200 shadow-sm">
                     <div class="flex items-center gap-2 px-2">
-                        <i class="fa-solid fa-calendar-check text-rose-500 text-lg"></i>
-                        <select id="analytics-month-select" class="bg-slate-50 border border-slate-200 text-sm font-black text-slate-700 py-1.5 px-3 rounded-lg outline-none cursor-pointer" onchange="onAnalyticsMonthChange()">
+                        <i class="fa-solid fa-calendar-check text-rose-500 text-base"></i>
+                        <select id="analytics-month-select" class="bg-slate-50 border border-slate-200 text-xs font-black text-slate-700 py-1 px-2 rounded-lg outline-none cursor-pointer" onchange="onAnalyticsMonthChange()">
                             <option value="LATEST">월별 선택 로딩 중...</option>
                         </select>
                     </div>
 
                     <div id="analytics-machine-container" class="flex items-center gap-2 px-2 border-l border-slate-200" style="display: none;">
-                        <i class="fa-solid fa-microchip text-slate-400 text-lg"></i>
-                        <select id="analytics-machine-select" class="bg-slate-50 border border-slate-200 text-sm font-black text-slate-700 py-1.5 px-3 rounded-lg outline-none cursor-pointer" onchange="updateAnalytics()">
+                        <i class="fa-solid fa-microchip text-slate-400 text-base"></i>
+                        <select id="analytics-machine-select" class="bg-slate-50 border border-slate-200 text-xs font-black text-slate-700 py-1 px-2 rounded-lg outline-none cursor-pointer" onchange="updateAnalytics()">
                         </select>
                     </div>
 
                     <div class="flex bg-slate-100 p-1 rounded-lg ml-1">
-                        <button id="btn-aly-team" onclick="setAnalyticsGroup('TEAM')" class="px-3 py-1.5 text-xs font-black rounded bg-white shadow-sm text-rose-600 border border-slate-200 transition-all">작업조별 (전체)</button>
-                        <button id="btn-aly-machine" onclick="setAnalyticsGroup('MACHINE')" class="px-3 py-1.5 text-xs font-black rounded text-slate-400 transition-all">호기별 (특정)</button>
+                        <button id="btn-aly-team" onclick="setAnalyticsGroup('TEAM')" class="px-3 py-1 text-xs font-black rounded bg-white shadow-sm text-rose-600 border border-slate-200 transition-all">작업조별 (전체)</button>
+                        <button id="btn-aly-machine" onclick="setAnalyticsGroup('MACHINE')" class="px-3 py-1 text-xs font-black rounded text-slate-400 transition-all">호기별 (특정)</button>
                     </div>
                 </div>
             </header>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-8">
-                <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200">
-                    <div class="flex items-center justify-between mb-3">
-                        <div class="p-3 rounded-xl bg-indigo-50 text-indigo-600"><i class="fa-regular fa-circle text-2xl"></i></div>
-                        <span class="px-3 py-1 bg-slate-100 text-slate-600 font-black rounded-full text-xs">순수가동 기준 평균</span>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                <div class="bg-white p-5 rounded-3xl shadow-sm border border-slate-200">
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="p-2.5 rounded-xl bg-indigo-50 text-indigo-600"><i class="fa-regular fa-circle text-xl"></i></div>
+                        <span class="px-2.5 py-0.5 bg-slate-100 text-slate-600 font-black rounded-full text-xs">순수가동 기준 평균</span>
                     </div>
-                    <p class="text-sm font-black text-slate-400 uppercase mb-1">원형 작업 생산성 (UPH)</p>
-                    <div class="flex items-baseline gap-2"><h4 id="aly-circle-uph" class="text-4xl font-black text-slate-800 font-mono">0.0</h4><span class="text-lg font-bold text-slate-500">TON/Hr</span></div>
+                    <p class="text-xs font-black text-slate-400 uppercase mb-0.5">원형 작업 생산성 (UPH)</p>
+                    <div class="flex items-baseline gap-1.5"><h4 id="aly-circle-uph" class="text-3xl font-black text-slate-800 font-mono">0.0</h4><span class="text-sm font-bold text-slate-500">TON/Hr</span></div>
                 </div>
-                <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200">
-                    <div class="flex items-center justify-between mb-3">
-                        <div class="p-3 rounded-xl bg-amber-50 text-amber-500"><i class="fa-solid fa-draw-polygon text-2xl"></i></div>
-                        <span class="px-3 py-1 bg-slate-100 text-slate-600 font-black rounded-full text-xs">순수가동 기준 평균</span>
+                <div class="bg-white p-5 rounded-3xl shadow-sm border border-slate-200">
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="p-2.5 rounded-xl bg-amber-50 text-amber-500"><i class="fa-solid fa-draw-polygon text-xl"></i></div>
+                        <span class="px-2.5 py-0.5 bg-slate-100 text-slate-600 font-black rounded-full text-xs">순수가동 기준 평균</span>
                     </div>
-                    <p class="text-sm font-black text-slate-400 uppercase mb-1">비원형 작업 생산성 (UPH)</p>
-                    <div class="flex items-baseline gap-2"><h4 id="aly-noncircle-uph" class="text-4xl font-black text-slate-800 font-mono">0.0</h4><span class="text-lg font-bold text-slate-500">TON/Hr</span></div>
+                    <p class="text-xs font-black text-slate-400 uppercase mb-0.5">비원형 작업 생산성 (UPH)</p>
+                    <div class="flex items-baseline gap-1.5"><h4 id="aly-noncircle-uph" class="text-3xl font-black text-slate-800 font-mono">0.0</h4><span class="text-sm font-bold text-slate-500">TON/Hr</span></div>
                 </div>
             </div>
 
-            <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-slate-200 mb-8">
-                <div class="flex justify-between items-center mb-5">
-                    <h3 class="text-xl font-black text-slate-800 flex items-center gap-2"><i class="fa-solid fa-users-rays text-indigo-500"></i> <span id="aly-chart-title">작업조별 UPH 생산성 비교</span></h3>
+            <div class="bg-white p-6 lg:p-8 rounded-[2rem] shadow-sm border border-slate-200 mb-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg lg:text-xl font-black text-slate-800 flex items-center gap-2"><i class="fa-solid fa-users-rays text-indigo-500"></i> <span id="aly-chart-title">작업조별 UPH 생산성 비교</span></h3>
                 </div>
-                <div class="h-[350px] w-full"><canvas id="analyticsChart"></canvas></div>
+                <div class="h-[320px] w-full"><canvas id="analyticsChart"></canvas></div>
             </div>
 
-            <div class="bg-white rounded-[2.5rem] shadow-sm border border-slate-200 overflow-hidden mb-10">
-                <div class="p-6 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
-                    <h3 class="text-xl font-black text-slate-800"><i class="fa-solid fa-table-list text-indigo-500"></i> 세부 가동시간 및 UPH 산출 레지스트리</h3>
+            <div class="bg-white rounded-[2rem] shadow-sm border border-slate-200 overflow-hidden mb-10">
+                <div class="p-5 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
+                    <h3 class="text-lg font-black text-slate-800"><i class="fa-solid fa-table-list text-indigo-500"></i> 세부 가동시간 및 UPH 산출 레지스트리</h3>
                     <span class="text-xs font-bold text-slate-400">UPH = 총생산량(TON) / 순수가동시간(Hr)</span>
                 </div>
                 <div class="overflow-x-auto p-2">
@@ -331,50 +357,50 @@
     <div id="pro-bot-window" class="chat-bot-window">
         <div class="chat-header">
             <div class="flex items-center gap-3">
-                <i class="fa-solid fa-robot text-2xl text-amber-400"></i>
+                <i class="fa-solid fa-robot text-xl text-amber-400"></i>
                 <div>
-                    <h3 class="font-black text-base">PRO-Bot</h3>
-                    <p class="text-[10px] text-slate-300 font-bold">AI Data Assistant v22.0</p>
+                    <h3 class="font-black text-sm">PRO-Bot</h3>
+                    <p class="text-[9px] text-slate-300 font-bold">Smart AI Assistant v22.1</p>
                 </div>
             </div>
             <i class="fa-solid fa-xmark text-lg cursor-pointer hover:text-rose-400" onclick="toggleBot()"></i>
         </div>
         <div class="chat-body" id="chat-body">
-            <div class="msg-bot">안녕하세요! PRO-Bot입니다.<br>생산/포장/비가동 데이터에 대해 편하게 물어보세요.<br><br><span class="text-[11px] font-normal text-slate-500">예: A조 비가동 시간은? / 포장 실적 보여줘 / 가장 생산량 높은 조는?</span></div>
+            <div class="msg-bot">안녕하세요! PRO-Bot입니다.<br>생산/포장/비가동 데이터에 대해 질의해보세요.<br><br><span class="text-[10px] font-normal text-slate-500">예: 비가동 시간 가장 많은 항목은? / A조 생산량 / 포장 실적 / 최고 실적 조는?</span></div>
         </div>
         <div class="chat-input-area">
             <input type="text" id="chat-input" class="gs-input m-0" placeholder="질문을 입력하세요..." onkeypress="handleChatEnter(event)">
-            <button onclick="sendChat()" class="bg-indigo-600 text-white px-4 rounded-xl hover:bg-indigo-700 transition-all"><i class="fa-solid fa-paper-plane"></i></button>
+            <button onclick="sendChat()" class="bg-indigo-600 text-white px-3.5 rounded-xl hover:bg-indigo-700 transition-all"><i class="fa-solid fa-paper-plane text-xs"></i></button>
         </div>
     </div>
 
     <!-- 구글 시트 연동 설정 모달 -->
     <div id="sync-modal" class="modal-bg">
-        <div class="bg-white rounded-[3rem] w-full max-w-3xl overflow-hidden shadow-2xl border border-slate-200">
-            <div class="p-8 border-b border-slate-100 flex justify-between items-center bg-slate-50">
-                <div class="flex items-center gap-4">
-                    <div class="bg-indigo-600 p-4 rounded-2xl text-white"><i class="fa-solid fa-gear text-2xl"></i></div>
-                    <div><h3 class="text-2xl font-black text-slate-900">클라우드 데이터 연동 설정</h3><p class="text-xs text-slate-500 font-bold mt-0.5">Google Sheets CSV 웹 게시 링크 지정</p></div>
+        <div class="bg-white rounded-[2.5rem] w-full max-w-2xl overflow-hidden shadow-2xl border border-slate-200">
+            <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+                <div class="flex items-center gap-3">
+                    <div class="bg-indigo-600 p-3 rounded-2xl text-white"><i class="fa-solid fa-gear text-xl"></i></div>
+                    <div><h3 class="text-xl font-black text-slate-900">클라우드 데이터 연동 설정</h3><p class="text-xs text-slate-500 font-bold">Google Sheets CSV 웹 게시 링크 지정</p></div>
                 </div>
-                <i class="fa-solid fa-xmark text-2xl text-slate-400 cursor-pointer hover:text-rose-500" onclick="closeModal()"></i>
+                <i class="fa-solid fa-xmark text-xl text-slate-400 cursor-pointer hover:text-rose-500" onclick="closeModal()"></i>
             </div>
-            <div class="p-8 space-y-6">
+            <div class="p-6 space-y-4">
                 <div>
-                    <label class="block text-xs font-black text-slate-500 uppercase tracking-widest mb-2">01. 생산실적 CSV URL</label>
+                    <label class="block text-xs font-black text-slate-500 uppercase tracking-widest mb-1.5">01. 생산실적 CSV URL</label>
                     <input type="text" id="modal-url-prod" class="gs-input" placeholder="https://docs.google.com/.../pub?output=csv">
                 </div>
                 <div>
-                    <label class="block text-xs font-black text-slate-500 uppercase tracking-widest mb-2">02. 불가동현황 CSV URL</label>
+                    <label class="block text-xs font-black text-slate-500 uppercase tracking-widest mb-1.5">02. 불가동현황 CSV URL</label>
                     <input type="text" id="modal-url-down" class="gs-input" placeholder="https://docs.google.com/.../pub?output=csv">
                 </div>
                 <div>
-                    <label class="block text-xs font-black text-slate-500 uppercase tracking-widest mb-2">03. CD 포장실적 CSV URL (Pack Sheet)</label>
+                    <label class="block text-xs font-black text-slate-500 uppercase tracking-widest mb-1.5">03. CD 포장실적 CSV URL (Pack Sheet)</label>
                     <input type="text" id="modal-url-pack" class="gs-input" placeholder="https://docs.google.com/.../pub?output=csv">
                 </div>
             </div>
-            <div class="p-6 bg-slate-50 border-t border-slate-100 flex justify-end gap-3">
-                <button onclick="closeModal()" class="px-6 py-3 rounded-xl text-xs font-black text-slate-500 hover:bg-slate-200">취소</button>
-                <button onclick="saveModalUrls()" class="px-8 py-3 rounded-xl text-xs font-black bg-indigo-600 text-white hover:bg-indigo-700 shadow-md">저장 및 동기화</button>
+            <div class="p-5 bg-slate-50 border-t border-slate-100 flex justify-end gap-2">
+                <button onclick="closeModal()" class="px-5 py-2.5 rounded-xl text-xs font-black text-slate-500 hover:bg-slate-200">취소</button>
+                <button onclick="saveModalUrls()" class="px-6 py-2.5 rounded-xl text-xs font-black bg-indigo-600 text-white hover:bg-indigo-700 shadow-md">저장 및 동기화</button>
             </div>
         </div>
     </div>
@@ -382,7 +408,7 @@
     <div id="toast" class="toast bg-slate-800"><i id="toast-icon" class="fa-solid fa-circle-check text-xl"></i> <span id="toast-msg">메시지</span></div>
 
     <script>
-        // 구글 시트 URL 설정 (기본값 설정 - 지정해 주신 주소 100% 반영)
+        // 구글 시트 URL 고정 설정
         let SHARED_PROD_URL = localStorage.getItem('GS_PROD_URL') || "https://docs.google.com/spreadsheets/d/e/2PACX-1vQTdp-wPWsANap0UF_ZvT8HzCbnaqxyiL86rxNfZEqA6ir9m5AczfkDYh2LLBVrYuGSxGiS62i51wRh/pub?gid=1999060895&single=true&output=csv";
         let SHARED_DOWN_URL = localStorage.getItem('GS_DOWN_URL') || "https://docs.google.com/spreadsheets/d/e/2PACX-1vQTdp-wPWsANap0UF_ZvT8HzCbnaqxyiL86rxNfZEqA6ir9m5AczfkDYh2LLBVrYuGSxGiS62i51wRh/pub?gid=1618063531&single=true&output=csv";
         let SHARED_PACK_URL = localStorage.getItem('GS_PACK_URL') || "https://docs.google.com/spreadsheets/d/e/2PACX-1vQTdp-wPWsANap0UF_ZvT8HzCbnaqxyiL86rxNfZEqA6ir9m5AczfkDYh2LLBVrYuGSxGiS62i51wRh/pub?gid=433609624&single=true&output=csv";
@@ -390,7 +416,7 @@
         const MACHINE_ORDER = ['PCD-0-2', 'PCD-0-3', 'PCD-1', 'PCD-5', 'PCD-2-2', 'PCD-3', 'PCD-4'];
         const EXCLUDED_EQUIPS = ['미분류', 'PCD-W11', 'PCD-W8']; 
 
-        // 🌟 내장 샘플 데이터셋 (최초 접속 시 화면 백화 현상을 100% 방지)
+        // 내장 샘플 데이터셋
         const SAMPLE_PROD_DATA = [
             { date: "2026-07-01", equipment: "PCD-4", team: "A", isCircle: true, shapeRaw: "원형", shift: "주간", amount: 48500, speed: 180, wire: 3.5 },
             { date: "2026-07-01", equipment: "PCD-2-2", team: "B", isCircle: false, shapeRaw: "정육각", shift: "야간", amount: 22100, speed: 150, wire: 4.0 },
@@ -401,7 +427,7 @@
         ];
 
         const SAMPLE_DOWN_DATA = [
-            { date: "2026-07-01", equipment: "PCD-3", team: "A", isCircle: true, shapeRaw: "원형", shift: "주간", minutes: 120, reason: "CD Cutting M/C 정비" },
+            { date: "2026-07-01", equipment: "PCD-3", team: "A", isCircle: true, shapeRaw: "원형", shift: "주간", minutes: 120, reason: "CD Cutting M/C 고장" },
             { date: "2026-07-02", equipment: "PCD-1", team: "B", isCircle: true, shapeRaw: "원형", shift: "야간", minutes: 45, reason: "전원부 점검" }
         ];
 
@@ -424,15 +450,37 @@
         
         let analyticsMonth = 'LATEST'; 
         let analyticsGroupBy = 'TEAM';
+        let screenMode = '1920'; // '1920' or '960'
 
         function updateTime() {
             const now = new Date();
             let h = now.getHours(); const m = String(now.getMinutes()).padStart(2, '0'); const s = String(now.getSeconds()).padStart(2, '0');
             const ampm = h >= 12 ? 'PM' : 'AM'; h = h % 12; h = h ? h : 12;
             const tEl = document.getElementById('current-time');
-            if(tEl) tEl.innerHTML = `${String(h).padStart(2, '0')}:${m}:${s} <span class="text-xs text-slate-400">${ampm}</span>`;
+            if(tEl) tEl.innerHTML = `${String(h).padStart(2, '0')}:${m}:${s} <span class="text-[10px] text-slate-400">${ampm}</span>`;
         }
         setInterval(updateTime, 1000); updateTime();
+
+        // 🌟 1920 Full vs 960 Split 화면 모드 설정
+        function setScreenMode(mode) {
+            screenMode = mode;
+            const body = document.getElementById('app-body');
+            const btn1920 = document.getElementById('btn-mode-1920');
+            const btn960 = document.getElementById('btn-mode-960');
+
+            if (mode === '960') {
+                body.classList.add('split-mode-960');
+                btn960.className = "px-2.5 py-1 text-[11px] font-black rounded text-indigo-600 bg-white shadow-sm border border-slate-200 transition-all flex items-center gap-1";
+                btn1920.className = "px-2.5 py-1 text-[11px] font-black rounded text-slate-400 transition-all flex items-center gap-1";
+            } else {
+                body.classList.remove('split-mode-960');
+                btn1920.className = "px-2.5 py-1 text-[11px] font-black rounded text-indigo-600 bg-white shadow-sm border border-slate-200 transition-all flex items-center gap-1";
+                btn960.className = "px-2.5 py-1 text-[11px] font-black rounded text-slate-400 transition-all flex items-center gap-1";
+            }
+            if (chartInstance) chartInstance.resize();
+            if (doughnutChartInstance) doughnutChartInstance.resize();
+            if (analyticsChartInstance) analyticsChartInstance.resize();
+        }
 
         function switchTab(tabId) {
             document.getElementById('tab-main').classList.remove('active');
@@ -554,7 +602,7 @@
         }
 
         async function fetchGoogleSheetsData() {
-            updateLed('connecting', '하이브리드 멀티 동기화 중...');
+            updateLed('connecting', '하이브리드 동기화 진행 중...');
             let loadedFlags = [];
             
             try {
@@ -585,7 +633,7 @@
             } catch(e) { console.error("PACK fetch error", e); }
 
             if(loadedFlags.length > 0) {
-                showToast(`클라우드 데이터 연동 성공! (${loadedFlags.join(', ')})`);
+                showToast(`클라우드 동기화 성공! (${loadedFlags.join(', ')})`);
                 updateLed('synced', 'Live Sync Active');
             } else {
                 updateLed('synced', 'Demo Data Active');
@@ -599,8 +647,8 @@
 
         function updateTargets() { monthlyTarget = parseFloat(document.getElementById('inp-monthly').value)||0; dailyTarget = parseFloat(document.getElementById('inp-daily').value)||0; updateDashboard(); }
         function onDateChange() { selectedDate = document.getElementById('date-select').value; document.getElementById('view-mode-container').style.display = selectedDate === 'ALL' ? 'flex' : 'none'; updateDashboard(); }
-        function setViewMode(mode) { viewMode = mode; document.getElementById('btn-daily').className = `px-3 py-1.5 text-xs font-black rounded transition-all ${mode === 'DAILY' ? 'text-indigo-600 bg-white shadow-sm border border-slate-200' : 'text-slate-400'}`; document.getElementById('btn-weekly').className = `px-3 py-1.5 text-xs font-black rounded transition-all ${mode === 'WEEKLY' ? 'text-indigo-600 bg-white shadow-sm border border-slate-200' : 'text-slate-400'}`; updateDashboard(); }
-        function setShiftMode(mode) { shiftMode = mode; ['all', 'day', 'night'].forEach(m => { const btn = document.getElementById(`btn-shift-${m}`); if (btn) { const isActive = (mode === 'ALL' && m === 'all') || (mode === '주간' && m === 'day') || (mode === '야간' && m === 'night'); btn.className = `px-3 py-1.5 text-xs font-black rounded transition-all ${isActive ? 'text-indigo-600 bg-white shadow-sm border border-slate-200' : 'text-slate-400'}`; } }); updateDashboard(); }
+        function setViewMode(mode) { viewMode = mode; document.getElementById('btn-daily').className = `px-2 py-1 text-[11px] font-black rounded transition-all ${mode === 'DAILY' ? 'text-indigo-600 bg-white shadow-sm border border-slate-200' : 'text-slate-400'}`; document.getElementById('btn-weekly').className = `px-2 py-1 text-[11px] font-black rounded transition-all ${mode === 'WEEKLY' ? 'text-indigo-600 bg-white shadow-sm border border-slate-200' : 'text-slate-400'}`; updateDashboard(); }
+        function setShiftMode(mode) { shiftMode = mode; ['all', 'day', 'night'].forEach(m => { const btn = document.getElementById(`btn-shift-${m}`); if (btn) { const isActive = (mode === 'ALL' && m === 'all') || (mode === '주간' && m === 'day') || (mode === '야간' && m === 'night'); btn.className = `px-2 py-1 text-[11px] font-black rounded transition-all ${isActive ? 'text-indigo-600 bg-white shadow-sm border border-slate-200' : 'text-slate-400'}`; } }); updateDashboard(); }
 
         function updateDashboard() {
             let latestMonth = "";
@@ -677,38 +725,43 @@
             let tHtml = '';
             mList.forEach(m => {
                 tHtml += `<tr class="group hover:bg-slate-50 transition-all">
-                    <td class="font-black text-slate-700 border-l-4 border-l-transparent group-hover:border-l-indigo-500 pl-4 uppercase text-lg lg:text-xl">${m.name}</td>
-                    <td class="text-right font-black text-2xl lg:text-3xl text-indigo-600">${Math.round(m.amt/1000).toLocaleString()}</td>
-                    <td class="text-center font-bold text-amber-500 text-xl lg:text-2xl">${m.wr}</td>
-                    <td class="text-right font-bold text-slate-600 text-xl lg:text-2xl">${m.avgSpd}</td>
-                    <td class="text-right font-bold text-rose-500 text-xl lg:text-2xl">${m.down.toLocaleString()}</td>
-                    <td class="px-4">
-                        <div class="flex items-center gap-3 justify-end">
-                            <div class="flex-1 bg-slate-100 h-3 lg:h-4 rounded-full overflow-hidden shadow-inner"><div class="h-full rounded-full ${parseFloat(m.oee) < 85 ? 'bg-rose-500' : 'bg-emerald-500'}" style="width: ${m.oee}%"></div></div>
-                            <span class="font-black text-xl lg:text-2xl w-16 lg:w-20 text-right ${parseFloat(m.oee) < 85 ? 'text-rose-500' : 'text-emerald-500'}">${m.oee}%</span>
+                    <td class="font-black text-slate-700 border-l-4 border-l-transparent group-hover:border-l-indigo-500 pl-3 uppercase text-base lg:text-lg">${m.name}</td>
+                    <td class="text-right font-black text-xl lg:text-2xl text-indigo-600">${Math.round(m.amt/1000).toLocaleString()}</td>
+                    <td class="text-center font-bold text-amber-500 text-lg lg:text-xl">${m.wr}</td>
+                    <td class="text-right font-bold text-slate-600 text-lg lg:text-xl">${m.avgSpd}</td>
+                    <td class="text-right font-bold text-rose-500 text-lg lg:text-xl">${m.down.toLocaleString()}</td>
+                    <td class="px-3">
+                        <div class="flex items-center gap-2 justify-end">
+                            <div class="flex-1 bg-slate-100 h-3 rounded-full overflow-hidden shadow-inner"><div class="h-full rounded-full ${parseFloat(m.oee) < 85 ? 'bg-rose-500' : 'bg-emerald-500'}" style="width: ${m.oee}%"></div></div>
+                            <span class="font-black text-lg lg:text-xl w-14 text-right ${parseFloat(m.oee) < 85 ? 'text-rose-500' : 'text-emerald-500'}">${m.oee}%</span>
                         </div>
                     </td>
                 </tr>`;
             });
             document.getElementById('registry-body').innerHTML = tHtml;
 
-            renderMainChart(cProd, cDown);
+            renderMainChart(cProd, cDown, cPack);
             renderShapeDoughnut(fProd);
         }
 
-        function renderMainChart(cProd, cDown) {
+        function renderMainChart(cProd, cDown, cPack) {
             if(!window.Chart) return;
             const agg = {};
             if(selectedDate === 'ALL') {
-                cProd.forEach(p => { if(!agg[p.date]) agg[p.date] = {l:p.date.substring(5), p:0, d:0, s:p.date}; agg[p.date].p += p.amount; });
-                cDown.forEach(p => { if(!agg[p.date]) agg[p.date] = {l:p.date.substring(5), p:0, d:0, s:p.date}; agg[p.date].d += p.minutes; });
+                cProd.forEach(p => { if(!agg[p.date]) agg[p.date] = {l:p.date.substring(5), p:0, pk:0, d:0, s:p.date}; agg[p.date].p += p.amount; });
+                cDown.forEach(p => { if(!agg[p.date]) agg[p.date] = {l:p.date.substring(5), p:0, pk:0, d:0, s:p.date}; agg[p.date].d += p.minutes; });
+                cPack.forEach(p => { if(!agg[p.date]) agg[p.date] = {l:p.date.substring(5), p:0, pk:0, d:0, s:p.date}; agg[p.date].pk += p.amount; });
             } else {
-                cProd.filter(p=>p.date===selectedDate).forEach(p => { if(!agg[p.equipment]) agg[p.equipment] = {l:p.equipment, p:0, d:0, s:MACHINE_ORDER.indexOf(p.equipment)}; agg[p.equipment].p += p.amount; });
-                cDown.filter(p=>p.date===selectedDate).forEach(p => { if(!agg[p.equipment]) agg[p.equipment] = {l:p.equipment, p:0, d:0, s:MACHINE_ORDER.indexOf(p.equipment)}; agg[p.equipment].d += p.minutes; });
+                cProd.filter(p=>p.date===selectedDate).forEach(p => { if(!agg[p.equipment]) agg[p.equipment] = {l:p.equipment, p:0, pk:0, d:0, s:MACHINE_ORDER.indexOf(p.equipment)}; agg[p.equipment].p += p.amount; });
+                cDown.filter(p=>p.date===selectedDate).forEach(p => { if(!agg[p.equipment]) agg[p.equipment] = {l:p.equipment, p:0, pk:0, d:0, s:MACHINE_ORDER.indexOf(p.equipment)}; agg[p.equipment].d += p.minutes; });
+                cPack.filter(p=>p.date===selectedDate).forEach(p => { if(!agg[p.equipment]) agg[p.equipment] = {l:p.equipment, p:0, pk:0, d:0, s:MACHINE_ORDER.indexOf(p.equipment)}; agg[p.equipment].pk += p.amount; });
             }
 
             const chartArr = Object.values(agg).sort((a,b) => selectedDate==='ALL' ? new Date(a.s)-new Date(b.s) : a.s-b.s);
-            const labels = chartArr.map(x=>x.l); const pData = chartArr.map(x=>(x.p/1000).toFixed(1)); const dData = chartArr.map(x=>x.d);
+            const labels = chartArr.map(x=>x.l); 
+            const pData = chartArr.map(x=>(x.p/1000).toFixed(1)); 
+            const pkData = chartArr.map(x=>(x.pk/1000).toFixed(1));
+            const dData = chartArr.map(x=>x.d);
             const activeDailyTarget = shiftMode === 'ALL' ? dailyTarget : dailyTarget / 2;
             const tData = chartArr.map(() => activeDailyTarget);
 
@@ -717,7 +770,15 @@
             
             chartInstance = new Chart(ctx, {
                 type: 'bar',
-                data: { labels: labels, datasets: [ { type: 'line', label: '생산량 (TON)', data: pData, borderColor: '#4f46e5', borderWidth: 3, pointRadius: 4, fill: false, yAxisID: 'y' }, { type: 'bar', label: '불가동 (MIN)', data: dData, backgroundColor: '#fb7185', borderRadius: 4, yAxisID: 'y1' }, { type: 'line', label: '목표 (TON)', data: tData, borderColor: '#f59e0b', borderWidth: 2, borderDash: [5, 5], pointRadius: 0, fill: false, yAxisID: 'y' } ] },
+                data: { 
+                    labels: labels, 
+                    datasets: [ 
+                        { type: 'line', label: '생산량 (TON)', data: pData, borderColor: '#4f46e5', borderWidth: 3, pointRadius: 4, fill: false, yAxisID: 'y' }, 
+                        { type: 'line', label: '포장량 (TON)', data: pkData, borderColor: '#0ea5e9', borderWidth: 2.5, borderDash: [2, 2], pointRadius: 3, fill: false, yAxisID: 'y' }, 
+                        { type: 'bar', label: '불가동 (MIN)', data: dData, backgroundColor: '#fb7185', borderRadius: 4, yAxisID: 'y1' }, 
+                        { type: 'line', label: '목표 (TON)', data: tData, borderColor: '#f59e0b', borderWidth: 2, borderDash: [5, 5], pointRadius: 0, fill: false, yAxisID: 'y' } 
+                    ] 
+                },
                 options: { responsive: true, maintainAspectRatio: false, scales: { x: { grid: { display: false } }, y: { beginAtZero: true }, y1: { position: 'right', beginAtZero: true, grid: { drawOnChartArea: false } } } }
             });
         }
@@ -837,12 +898,12 @@
 
             sortedRes.forEach(m => {
                 tHtml += `<tr class="hover:bg-slate-50">
-                    <td class="font-black text-slate-700 border-l-4 border-l-rose-500 pl-4 text-lg lg:text-xl">${m.group}조</td>
-                    <td class="text-center font-bold text-slate-600 text-lg lg:text-xl">${m.shape}</td>
-                    <td class="text-right font-black text-xl lg:text-2xl text-slate-800">${m.amtTon}</td>
-                    <td class="text-right font-bold text-rose-500 text-xl lg:text-2xl">${m.down}</td>
-                    <td class="text-right font-bold text-emerald-600 text-xl lg:text-2xl">${m.netWorkMin}</td>
-                    <td class="text-right font-black text-indigo-600 text-2xl lg:text-3xl">${m.uph}</td>
+                    <td class="font-black text-slate-700 border-l-4 border-l-rose-500 pl-3 text-base lg:text-lg">${m.group}조</td>
+                    <td class="text-center font-bold text-slate-600 text-base lg:text-lg">${m.shape}</td>
+                    <td class="text-right font-black text-lg lg:text-xl text-slate-800">${m.amtTon}</td>
+                    <td class="text-right font-bold text-rose-500 text-lg lg:text-xl">${m.down}</td>
+                    <td class="text-right font-bold text-emerald-600 text-lg lg:text-xl">${m.netWorkMin}</td>
+                    <td class="text-right font-black text-indigo-600 text-xl lg:text-2xl">${m.uph}</td>
                 </tr>`;
             }); document.getElementById('analytics-body').innerHTML = tHtml;
 
@@ -873,33 +934,102 @@
             body.appendChild(div); body.scrollTop = body.scrollHeight;
         }
 
+        // 🌟 PRO-Bot 지능형 자연어 질의 분석기 (개선됨)
         function processQuery(query) {
-            if (prodData.length === 0) return "데이터가 로드되지 않았습니다.";
-            const txt = query.toUpperCase();
+            if (!prodData || prodData.length === 0) return "현재 로드된 데이터가 없습니다. 먼저 데이터 연동을 확인해주세요.";
+            const txt = query.toUpperCase().replace(/\s/g, '');
             
-            let targetTeam = null; if (txt.includes('A조')) targetTeam = 'A'; else if (txt.includes('B조')) targetTeam = 'B'; else if (txt.includes('C조')) targetTeam = 'C';
-            
-            if (txt.includes('포장')) {
-                const totPack = packData.reduce((a,c) => a + c.amount, 0) / 1000;
-                return `누적 **CD 포장 실적량**은 총 **${totPack.toLocaleString()} TON** 입니다.`;
-            }
+            // 1. 특정 작업조 감지
+            let targetTeam = null; 
+            if (txt.includes('A조')) targetTeam = 'A'; 
+            else if (txt.includes('B조')) targetTeam = 'B'; 
+            else if (txt.includes('C조')) targetTeam = 'C';
 
-            if (txt.includes('최대') || txt.includes('최고')) {
-                const teamAmt = { 'A':0, 'B':0, 'C':0 }; prodData.forEach(p => { if(teamAmt[p.team] !== undefined) teamAmt[p.team] += p.amount; });
-                let bestTeam = 'A'; let maxAmt = teamAmt['A'];
-                ['B','C'].forEach(t => { if(teamAmt[t] > maxAmt) { maxAmt = teamAmt[t]; bestTeam = t; } });
-                return `현재 누적 기준 **${bestTeam}조**가 **${(maxAmt/1000).toLocaleString()} TON**으로 가장 높은 생산량을 기록 중입니다!`;
-            }
+            // 2. 특정 설비 감지
+            let targetEquip = null;
+            MACHINE_ORDER.forEach(e => {
+                if (txt.includes(e.replace(/-/g, '')) || txt.includes(e)) targetEquip = e;
+            });
 
-            if (txt.includes('비가동') || txt.includes('정지')) {
-                let filtered = downData; if(targetTeam) filtered = filtered.filter(d => d.team === targetTeam);
+            // 3. 비가동 사유 / 최다 항목 관련 질의
+            if (txt.includes('비가공') || txt.includes('비가동') || txt.includes('정지') || txt.includes('고장') || txt.includes('사유') || txt.includes('항목')) {
+                if (txt.includes('항목') || txt.includes('사유') || txt.includes('이유') || txt.includes('원인') || txt.includes('가장많') || txt.includes('최대') || txt.includes('많은')) {
+                    let filtered = downData;
+                    if (targetTeam) filtered = filtered.filter(d => (d.team || '').includes(targetTeam));
+                    if (targetEquip) filtered = filtered.filter(d => (d.equipment || '').includes(targetEquip));
+
+                    if (filtered.length === 0) return `조건에 해당하는 비가동 내역이 없습니다.`;
+
+                    // 사유별 집계
+                    const reasonMap = {};
+                    filtered.forEach(d => {
+                        const r = d.reason || '기타 고장';
+                        if (!reasonMap[r]) reasonMap[r] = { min: 0, equip: d.equipment, count: 0 };
+                        reasonMap[r].min += d.minutes;
+                        reasonMap[r].count += 1;
+                    });
+
+                    const sorted = Object.entries(reasonMap).sort((a,b) => b[1].min - a[1].min);
+                    if (sorted.length > 0) {
+                        const top = sorted[0];
+                        let reply = `비가동 시간이 가장 많이 잡힌 사유 1위는 **[${top[0]}]** 입니다.<br>• 총 정지시간: **${top[1].min.toLocaleString()} 분** (${top[1].count}건 발생)`;
+                        if (sorted.length > 1) {
+                            reply += `<br>• 2위: **[${sorted[1][0]}]** (${sorted[1][1].min.toLocaleString()} 분)`;
+                        }
+                        return reply;
+                    }
+                }
+
+                // 일반 비가동 누계 질문
+                let filtered = downData; 
+                if(targetTeam) filtered = filtered.filter(d => (d.team || '').includes(targetTeam));
+                if(targetEquip) filtered = filtered.filter(d => (d.equipment || '').includes(targetEquip));
                 const totalDown = filtered.reduce((a,c) => a + c.minutes, 0);
-                return `${targetTeam ? targetTeam + '조의 ' : ''}총 비가동 시간은 **${totalDown.toLocaleString()} 분** 입니다.`;
+                const prefix = targetEquip ? `${targetEquip} ` : (targetTeam ? `${targetTeam}조 ` : '전체 ');
+                return `${prefix}총 비가동 누적 시간은 **${totalDown.toLocaleString()} 분** 입니다.`;
             }
 
-            let filtered = prodData; if(targetTeam) filtered = filtered.filter(p => p.team === targetTeam);
+            // 4. CD 포장 실적 질문
+            if (txt.includes('포장')) {
+                let filtered = packData;
+                if (targetTeam) filtered = filtered.filter(p => (p.team || '').includes(targetTeam));
+                if (targetEquip) filtered = filtered.filter(p => (p.equipment || '').includes(targetEquip));
+                const totPack = filtered.reduce((a,c) => a + c.amount, 0) / 1000;
+                const prefix = targetEquip ? `${targetEquip} ` : (targetTeam ? `${targetTeam}조 ` : '전체 ');
+                return `${prefix}누적 **CD 포장 실적량**은 총 **${totPack.toLocaleString(undefined, {minimumFractionDigits: 1, maximumFractionDigits: 1})} TON** 입니다.`;
+            }
+
+            // 5. 최고/최대 생산량 질문
+            if (txt.includes('최대') || txt.includes('최고') || txt.includes('1위') || txt.includes('가장높')) {
+                if (txt.includes('조')) {
+                    const teamAmt = { 'A':0, 'B':0, 'C':0 }; 
+                    prodData.forEach(p => { 
+                        let t = (p.team || '').replace(/조/g, '').trim();
+                        if(teamAmt[t] !== undefined) teamAmt[t] += p.amount; 
+                    });
+                    let bestTeam = 'A'; let maxAmt = teamAmt['A'];
+                    ['B','C'].forEach(t => { if(teamAmt[t] > maxAmt) { maxAmt = teamAmt[t]; bestTeam = t; } });
+                    return `현재 누적 기준 생산량 1위는 **${bestTeam}조**이며, 총 **${(maxAmt/1000).toLocaleString(undefined, {minimumFractionDigits: 1})} TON**을 생산했습니다!`;
+                } else {
+                    const equipAmt = {};
+                    prodData.forEach(p => {
+                        if (!equipAmt[p.equipment]) equipAmt[p.equipment] = 0;
+                        equipAmt[p.equipment] += p.amount;
+                    });
+                    const sorted = Object.entries(equipAmt).sort((a,b) => b[1] - a[1]);
+                    if (sorted.length > 0) {
+                        return `가장 생산량이 높은 설비는 **[${sorted[0][0]}]**로 총 **${(sorted[0][1]/1000).toLocaleString(undefined, {minimumFractionDigits: 1})} TON**을 달성했습니다!`;
+                    }
+                }
+            }
+
+            // 6. 기본 생산 실적 질의
+            let filtered = prodData; 
+            if(targetTeam) filtered = filtered.filter(p => (p.team || '').includes(targetTeam));
+            if(targetEquip) filtered = filtered.filter(p => (p.equipment || '').includes(targetEquip));
             const totalProd = filtered.reduce((a,c) => a + c.amount, 0) / 1000;
-            return `${targetTeam ? targetTeam + '조의 ' : '전체 '}누적 생산 실적은 **${totalProd.toLocaleString()} TON** 입니다.`;
+            const prefix = targetEquip ? `${targetEquip} ` : (targetTeam ? `${targetTeam}조 ` : '전체 ');
+            return `${prefix}누적 생산 실적은 **${totalProd.toLocaleString(undefined, {minimumFractionDigits: 1})} TON** 입니다.`;
         }
     </script>
 </body>
