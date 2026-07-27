@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PRO-INTEGRATOR | Cyber Industrial Master v26.0 Luminous Edition</title>
+    <title>PRO-INTEGRATOR | Tableau Executive Edition v27.0</title>
     
     <script>
         if (window.navigator.userAgent.indexOf('MSIE ') > 0 || window.navigator.userAgent.indexOf('Trident/') > 0) {
@@ -22,31 +22,30 @@
     <script src="https://cdn.jsdelivr.net/npm/gridstack@9.2.2/dist/gridstack-all.js"></script>
 
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=JetBrains+Mono:wght@500;700;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700;800&display=swap');
         
         :root {
-            /* ☀️ 훨씬 더 밝고 화사하며 세련된 슬레이트 톤 배경 */
-            --bg-dark: #334155;
-            --card-bg: rgba(255, 255, 255, 0.96);
-            --card-text: #0f172a;
-            --card-border: rgba(203, 213, 225, 0.8);
-            --neon-indigo: #4f46e5;
-            --neon-cyan: #0284c7;
-            --neon-emerald: #059669;
-            --neon-amber: #d97706;
-            --neon-rose: #e11d48;
+            /* 📊 Tableau Professional Aesthetic Palette */
+            --tableau-navy: #1f2d3d;
+            --tableau-slate-bg: #f3f4f8;
+            --tableau-card-bg: #ffffff;
+            --tableau-border: #d1d5db;
+            --tableau-blue: #1f77b4;
+            --tableau-orange: #ff7f0e;
+            --tableau-teal: #17becf;
+            --tableau-red: #d62728;
+            --tableau-green: #2ca02c;
+            --tableau-purple: #9467bd;
+            --tableau-text-dark: #111827;
+            --tableau-text-muted: #6b7280;
         }
 
         body { 
             font-family: 'Inter', 'Malgun Gothic', '맑은 고딕', sans-serif; 
-            background-color: #334155; 
-            background-image: 
-                radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.25) 0px, transparent 50%),
-                radial-gradient(at 100% 100%, rgba(14, 165, 233, 0.2) 0px, transparent 50%),
-                linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
-            background-size: 100% 100%, 100% 100%, 32px 32px, 32px 32px;
-            color: #f8fafc; 
+            background-color: var(--tableau-slate-bg); 
+            background-image: linear-gradient(rgba(31, 45, 61, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(31, 45, 61, 0.03) 1px, transparent 1px);
+            background-size: 24px 24px;
+            color: var(--tableau-text-dark); 
             margin: 0; 
             padding: 0; 
             overflow-x: hidden; 
@@ -56,11 +55,11 @@
 
         .glass-panel {
             background: #ffffff;
-            border: 1px solid var(--card-border);
-            box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.9);
-            border-radius: 1.25rem;
-            color: #0f172a;
-            transition: all 0.25s ease;
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+            border-radius: 0.75rem;
+            color: #111827;
+            transition: all 0.2s ease;
             height: 100%;
             display: flex;
             flex-direction: column;
@@ -70,29 +69,29 @@
         }
 
         .glass-panel:hover {
-            border-color: #94a3b8;
-            box-shadow: 0 15px 30px -5px rgba(15, 23, 42, 0.25);
+            border-color: #9ca3af;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
         }
 
         .grid-stack-item-content {
             overflow: hidden !important;
-            border-radius: 1.25rem;
+            border-radius: 0.75rem;
         }
         
         .edit-mode-active .grid-stack-item-content {
-            outline: 2px dashed var(--neon-cyan);
+            outline: 2px dashed var(--tableau-blue);
             outline-offset: -2px;
         }
 
         .widget-drag-handle {
             display: none;
             cursor: move;
-            background: rgba(2, 132, 199, 0.12);
-            border-bottom: 1px solid rgba(2, 132, 199, 0.25);
+            background: #f0f4f8;
+            border-bottom: 1px solid #d1d5db;
             padding: 4px 10px;
             font-size: 11px;
             font-weight: 800;
-            color: #0284c7;
+            color: var(--tableau-navy);
             align-items: center;
             justify-content: space-between;
             user-select: none;
@@ -103,91 +102,79 @@
             display: flex;
         }
 
-        .ui-resizable-handle {
-            filter: invert(0.5);
-        }
-
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-        table { width: 100%; border-collapse: separate; border-spacing: 0 4px; }
-        th { color: #64748b; font-weight: 800; text-transform: uppercase; font-size: 11px; padding: 0.6rem 0.85rem; letter-spacing: 0.08em; text-align: left; }
-        td { background: #f8fafc; padding: 0.65rem 0.85rem; border-top: 1px solid #e2e8f0; border-bottom: 1px solid #e2e8f0; font-size: 13px; font-weight: 700; color: #0f172a; }
-        td:first-child { border-left: 1px solid #e2e8f0; border-top-left-radius: 10px; border-bottom-left-radius: 10px; }
-        td:last-child { border-right: 1px solid #e2e8f0; border-top-right-radius: 10px; border-bottom-right-radius: 10px; }
-        tr:hover td { background: #e2e8f0; color: #0284c7; }
+        table { width: 100%; border-collapse: separate; border-spacing: 0 3px; }
+        th { color: #4b5563; font-weight: 800; text-transform: uppercase; font-size: 11px; padding: 0.55rem 0.75rem; letter-spacing: 0.05em; text-align: left; background: #f9fafb; border-bottom: 2px solid #e5e7eb; }
+        td { background: #ffffff; padding: 0.55rem 0.75rem; border-top: 1px solid #f3f4f6; border-bottom: 1px solid #f3f4f6; font-size: 12.5px; font-weight: 700; color: #111827; }
+        td:first-child { border-left: 1px solid #f3f4f6; border-top-left-radius: 6px; border-bottom-left-radius: 6px; }
+        td:last-child { border-right: 1px solid #f3f4f6; border-top-right-radius: 6px; border-bottom-right-radius: 6px; }
+        tr:hover td { background: #f0f7ff; color: var(--tableau-blue); }
 
-        .target-input { background: #f1f5f9; border: 1px solid #cbd5e1; color: #0284c7; font-family: 'JetBrains Mono', monospace; padding: 0.2rem 0.4rem; border-radius: 6px; width: 62px; text-align: right; font-weight: 800; outline: none; font-size: 12px; transition: all 0.2s; }
-        .target-input:focus { border-color: var(--neon-cyan); box-shadow: 0 0 10px rgba(2, 132, 199, 0.3); }
+        .target-input { background: #f3f4f6; border: 1px solid #d1d5db; color: var(--tableau-blue); font-family: 'JetBrains Mono', monospace; padding: 0.2rem 0.4rem; border-radius: 6px; width: 62px; text-align: right; font-weight: 800; outline: none; font-size: 12px; transition: all 0.2s; }
+        .target-input:focus { border-color: var(--tableau-blue); box-shadow: 0 0 0 2px rgba(31, 119, 180, 0.2); }
 
-        .toast { position: fixed; bottom: -100px; right: 30px; padding: 14px 24px; border-radius: 14px; color: white; font-weight: 800; font-size: 14px; z-index: 1000; transition: bottom 0.35s cubic-bezier(0.16, 1, 0.3, 1); box-shadow: 0 20px 30px rgba(0,0,0,0.3); display: flex; align-items: center; gap: 10px; border: 1px solid rgba(255,255,255,0.2); }
+        .toast { position: fixed; bottom: -100px; right: 30px; padding: 12px 20px; border-radius: 10px; color: white; font-weight: 800; font-size: 13px; z-index: 1000; transition: bottom 0.35s cubic-bezier(0.16, 1, 0.3, 1); box-shadow: 0 15px 25px rgba(0,0,0,0.25); display: flex; align-items: center; gap: 10px; border: 1px solid rgba(255,255,255,0.2); }
         
-        @keyframes emergencyBlink {
-            0% { box-shadow: inset 0 0 0 rgba(225, 29, 72, 0); background-color: rgba(225, 29, 72, 0); }
-            50% { box-shadow: inset 0 0 80px rgba(225, 29, 72, 0.25); background-color: rgba(225, 29, 72, 0.08); }
-            100% { box-shadow: inset 0 0 0 rgba(225, 29, 72, 0); background-color: rgba(225, 29, 72, 0); }
-        }
-        .emergency-active { display: block !important; animation: emergencyBlink 1.5s infinite; }
-        
-        .chat-bot-window { display: none; position: fixed; bottom: 25px; right: 30px; width: 380px; height: 520px; background: #ffffff; border-radius: 1.25rem; box-shadow: 0 25px 60px rgba(15,23,42,0.35); z-index: 999; flex-direction: column; overflow: hidden; border: 1px solid #cbd5e1; }
-        .chat-header { background: #1e293b; padding: 12px 18px; color: white; display: flex; justify-content: space-between; align-items: center; border-b: 1px solid rgba(255,255,255,0.1); }
-        .chat-body { flex: 1; padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; background: #f8fafc; }
-        .chat-input-area { padding: 12px; background: #ffffff; border-top: 1px solid #e2e8f0; display: flex; gap: 8px; }
-        .msg-bot { background: #e0e7ff; color: #3730a3; border: 1px solid #c7d2fe; padding: 10px 14px; border-radius: 0 14px 14px 14px; max-width: 90%; align-self: flex-start; font-weight: 600; font-size: 12px; line-height: 1.5; }
-        .msg-user { background: var(--neon-indigo); color: white; padding: 10px 14px; border-radius: 14px 0 14px 14px; max-width: 85%; align-self: flex-end; font-weight: 700; font-size: 12px; line-height: 1.4; }
-        .gs-input { width: 100%; padding: 10px 12px; border-radius: 10px; background: #f1f5f9; border: 1px solid #cbd5e1; color: #0f172a; font-size: 12px; font-family: monospace; outline: none; transition: all 0.25s; }
-        .gs-input:focus { border-color: var(--neon-indigo); box-shadow: 0 0 10px rgba(79, 70, 229, 0.3); }
+        .chat-bot-window { display: none; position: fixed; bottom: 25px; right: 30px; width: 380px; height: 520px; background: #ffffff; border-radius: 1rem; box-shadow: 0 20px 50px rgba(0,0,0,0.25); z-index: 999; flex-direction: column; overflow: hidden; border: 1px solid #d1d5db; }
+        .chat-header { background: var(--tableau-navy); padding: 12px 18px; color: white; display: flex; justify-content: space-between; align-items: center; }
+        .chat-body { flex: 1; padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; background: #f9fafb; }
+        .chat-input-area { padding: 12px; background: #ffffff; border-top: 1px solid #e5e7eb; display: flex; gap: 8px; }
+        .msg-bot { background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; padding: 10px 14px; border-radius: 0 12px 12px 12px; max-width: 90%; align-self: flex-start; font-weight: 600; font-size: 12px; line-height: 1.5; }
+        .msg-user { background: var(--tableau-blue); color: white; padding: 10px 14px; border-radius: 12px 0 12px 12px; max-width: 85%; align-self: flex-end; font-weight: 700; font-size: 12px; line-height: 1.4; }
+        .gs-input { width: 100%; padding: 8px 12px; border-radius: 8px; background: #f3f4f6; border: 1px solid #d1d5db; color: #111827; font-size: 12px; font-family: monospace; outline: none; transition: all 0.25s; }
+        .gs-input:focus { border-color: var(--tableau-blue); background: #ffffff; }
 
         .tab-content { display: none; }
-        .tab-content.active { display: block; animation: fadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1); }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        .tab-content.active { display: block; animation: fadeIn 0.25s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
         
-        .nav-icon { cursor: pointer; padding: 10px; border-radius: 0.85rem; transition: all 0.25s; color: #94a3b8; }
-        .nav-icon:hover { background: rgba(255,255,255,0.15); color: #fff; }
-        .nav-icon.active { background: var(--neon-indigo); color: #fff; box-shadow: 0 0 20px rgba(79, 70, 229, 0.5); }
+        .nav-icon { cursor: pointer; padding: 10px; border-radius: 0.6rem; transition: all 0.2s; color: #9ca3af; }
+        .nav-icon:hover { background: rgba(255,255,255,0.1); color: #fff; }
+        .nav-icon.active { background: var(--tableau-blue); color: #fff; box-shadow: 0 4px 10px rgba(31, 119, 180, 0.4); }
 
-        .modal-bg { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(10px); z-index: 950; justify-content: center; align-items: center; }
+        .modal-bg { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(17, 24, 39, 0.6); backdrop-filter: blur(6px); z-index: 950; justify-content: center; align-items: center; }
 
-        /* 📱 960 x 1080 분할 화면 모드 */
+        /* 📱 Tableau Split Mode Layout */
         body.split-mode-960 main { padding: 0.5rem 0.65rem !important; }
         body.split-mode-960 header { margin-bottom: 0.5rem !important; gap: 0.4rem !important; }
         body.split-mode-960 header h1 { font-size: 1.1rem !important; }
         body.split-mode-960 header p { display: none !important; }
-        body.split-mode-960 .target-input { width: 50px !important; padding: 0.1rem 0.25rem !important; font-size: 11px !important; }
 
         .weather-btn {
             padding: 2px 8px;
             font-size: 10px;
             font-weight: 800;
             border-radius: 6px;
-            background: #f1f5f9;
-            color: #475569;
-            border: 1px solid #cbd5e1;
+            background: #f3f4f6;
+            color: #4b5563;
+            border: 1px solid #d1d5db;
             transition: all 0.2s;
             cursor: pointer;
         }
         .weather-btn.active {
-            background: #4f46e5;
+            background: var(--tableau-blue);
             color: #ffffff;
-            border-color: #4338ca;
-            box-shadow: 0 0 8px rgba(79, 70, 229, 0.4);
+            border-color: #1f77b4;
+            box-shadow: 0 2px 6px rgba(31, 119, 180, 0.3);
         }
     </style>
 </head>
 <body id="app-body" class="split-mode-auto">
-    <div id="emergency-overlay" class="fixed inset-0 z-[900] pointer-events-none hidden border-[10px] border-rose-500/50 transition-all duration-300"></div>
+    <div id="emergency-overlay" class="fixed inset-0 z-[900] pointer-events-none hidden border-[8px] border-red-500/50 transition-all duration-300"></div>
 
     <div class="flex min-h-screen">
-        <!-- 좌측 사이드바 탭 메뉴 -->
-        <aside class="w-16 lg:w-20 bg-[#1e293b] border-r border-slate-600/60 flex flex-col items-center py-5 gap-5 sticky top-0 h-screen shadow-2xl z-40 flex-shrink-0">
-            <div class="w-10 h-10 lg:w-11 lg:h-11 bg-gradient-to-tr from-indigo-500 to-cyan-400 rounded-xl flex items-center justify-center shadow-[0_0_18px_rgba(79,70,229,0.5)] mb-1">
-                <i class="fa-solid fa-industry text-white text-base lg:text-lg"></i>
+        <!-- Tableau Style Dark Navy Sidebar -->
+        <aside class="w-16 lg:w-20 bg-[#1f2d3d] border-r border-slate-700/60 flex flex-col items-center py-5 gap-5 sticky top-0 h-screen shadow-lg z-40 flex-shrink-0">
+            <div class="w-10 h-10 lg:w-11 lg:h-11 bg-gradient-to-tr from-sky-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-md mb-1">
+                <i class="fa-solid fa-chart-simple text-white text-base lg:text-lg"></i>
             </div>
             <nav class="flex flex-col gap-3 text-lg lg:text-xl w-full px-2 items-center h-full pb-4">
                 <div class="nav-icon active" onclick="switchTab('main')" id="nav-main" title="메인 대시보드"><i class="fa-solid fa-chart-line"></i></div>
                 <div class="nav-icon" onclick="switchTab('analytics')" id="nav-analytics" title="CD 생산성 분석"><i class="fa-solid fa-chart-pie"></i></div>
                 <div class="w-6 h-[1px] bg-slate-600 my-1"></div>
-                <div class="nav-icon hover:text-cyan-400" onclick="toggleEditMode()" id="nav-edit-mode" title="대시보드 배치/크기 자유 편집"><i class="fa-solid fa-up-down-left-right"></i></div>
+                <div class="nav-icon hover:text-sky-400" onclick="toggleEditMode()" id="nav-edit-mode" title="대시보드 배치/크기 자유 편집"><i class="fa-solid fa-up-down-left-right"></i></div>
                 <div class="nav-icon hover:text-emerald-400" onclick="openWidgetManager()" title="위젯 추가/숨김 관리"><i class="fa-solid fa-cubes"></i></div>
                 <div class="w-6 h-[1px] bg-slate-600 my-1"></div>
                 <div class="nav-icon hover:text-emerald-400" onclick="fetchGoogleSheetsData()" title="데이터 강제 동기화"><i class="fa-solid fa-arrows-rotate"></i></div>
@@ -201,34 +188,34 @@
 
         <!-- TAB 1: 메인 대시보드 -->
         <main class="flex-1 p-3 lg:p-5 overflow-y-auto h-screen relative z-10 tab-content active" id="tab-main">
-            <!-- Header Toolbar -->
+            <!-- Tableau Header Toolbar -->
             <header class="flex flex-col xl:flex-row justify-between items-start xl:items-end gap-3 mb-3">
                 <div>
-                    <h1 class="text-xl lg:text-2xl font-black tracking-tight text-white uppercase flex items-center gap-2.5">
-                        <span class="w-2 h-6 bg-indigo-400 rounded-full shadow-[0_0_12px_#818cf8]"></span>
-                        PRO-INTEGRATOR <span class="text-cyan-300 font-light ml-0.5 text-base lg:text-lg">v26.0 Luminous</span>
+                    <h1 class="text-xl lg:text-2xl font-black tracking-tight text-slate-900 uppercase flex items-center gap-2.5">
+                        <span class="w-2.5 h-6 bg-sky-600 rounded"></span>
+                        PRO-INTEGRATOR <span class="text-sky-700 font-semibold ml-0.5 text-base lg:text-lg">Tableau Edition v27.0</span>
                     </h1>
-                    <p class="text-slate-300 font-bold text-[10px] uppercase tracking-[0.2em] mt-1 ml-4 flex items-center gap-2">
-                        <span id="status-led" class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <p class="text-slate-500 font-bold text-[10px] uppercase tracking-wider mt-0.5 ml-4 flex items-center gap-2">
+                        <span id="status-led" class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                         <span id="status-text">Live Sync Active</span>
                     </p>
                 </div>
 
-                <div class="flex flex-wrap items-center gap-2 glass-panel p-2 !flex-row !h-auto border border-slate-300/80">
-                    <button id="btn-toggle-edit" onclick="toggleEditMode()" class="px-2.5 py-1 text-xs font-black rounded-lg text-white bg-indigo-600 hover:bg-indigo-500 shadow border border-indigo-400 transition-all flex items-center gap-1.5">
+                <div class="flex flex-wrap items-center gap-2 glass-panel p-2 !flex-row !h-auto border border-slate-300">
+                    <button id="btn-toggle-edit" onclick="toggleEditMode()" class="px-2.5 py-1 text-xs font-black rounded-md text-white bg-sky-700 hover:bg-sky-800 shadow transition-all flex items-center gap-1.5">
                         <i class="fa-solid fa-up-down-left-right"></i> <span id="txt-edit-mode">레이아웃 자유 편집</span>
                     </button>
-                    <button onclick="openWidgetManager()" class="px-2 py-1 text-xs font-bold rounded-lg text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-300 transition-all flex items-center gap-1">
-                        <i class="fa-solid fa-cubes text-cyan-600"></i> 위젯 관리자
+                    <button onclick="openWidgetManager()" class="px-2 py-1 text-xs font-bold rounded-md text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-300 transition-all flex items-center gap-1">
+                        <i class="fa-solid fa-cubes text-sky-600"></i> 위젯 관리자
                     </button>
-                    <button onclick="resetLayout()" class="px-2 py-1 text-xs font-bold rounded-lg text-slate-600 hover:text-rose-600 bg-slate-100 border border-slate-300 transition-all" title="기본 배치로 초기화">
+                    <button onclick="resetLayout()" class="px-2 py-1 text-xs font-bold rounded-md text-slate-600 hover:text-red-600 bg-slate-100 border border-slate-300 transition-all" title="기본 배치로 초기화">
                         <i class="fa-solid fa-rotate-left"></i>
                     </button>
 
                     <div class="w-[1px] h-5 bg-slate-300 my-auto mx-1"></div>
 
-                    <div class="flex bg-slate-100 p-0.5 rounded-lg border border-slate-300" id="screen-mode-container">
-                        <button id="btn-mode-1920" onclick="setScreenMode('1920')" class="px-2 py-0.5 text-[10px] font-extrabold rounded text-indigo-700 bg-white shadow border border-slate-300 transition-all flex items-center gap-1">
+                    <div class="flex bg-slate-100 p-0.5 rounded-md border border-slate-300" id="screen-mode-container">
+                        <button id="btn-mode-1920" onclick="setScreenMode('1920')" class="px-2 py-0.5 text-[10px] font-extrabold rounded text-sky-800 bg-white shadow-xs border border-slate-300 transition-all flex items-center gap-1">
                             <i class="fa-solid fa-desktop"></i> 1920 Full
                         </button>
                         <button id="btn-mode-960" onclick="setScreenMode('960')" class="px-2 py-0.5 text-[10px] font-extrabold rounded text-slate-500 transition-all flex items-center gap-1">
@@ -240,7 +227,7 @@
                         <div class="flex flex-col">
                             <span class="text-[8.5px] font-extrabold text-slate-500 uppercase tracking-widest">운영계획(월)</span>
                             <div class="flex items-center gap-1">
-                                <input type="number" id="inp-monthly" class="target-input text-indigo-600" value="4170" onchange="updateTargets()">
+                                <input type="number" id="inp-monthly" class="target-input text-sky-700" value="4170" onchange="updateTargets()">
                                 <span class="text-[8.5px] font-bold text-slate-500">TON</span>
                             </div>
                         </div>
@@ -254,23 +241,25 @@
                     </div>
 
                     <div class="flex items-center gap-1.5 px-1">
-                        <i class="fa-solid fa-calendar-days text-indigo-600 text-xs"></i>
+                        <i class="fa-solid fa-calendar-days text-sky-700 text-xs"></i>
                         <select id="month-select" class="bg-slate-100 border border-slate-300 text-[11px] font-bold text-slate-800 py-0.5 px-2 rounded-md outline-none cursor-pointer" onchange="onMonthChange()">
                             <option value="LATEST">월 선택 로딩 중...</option>
                         </select>
                         <select id="date-select" class="bg-slate-100 border border-slate-300 text-[11px] font-bold text-slate-800 py-0.5 px-2 rounded-md outline-none cursor-pointer" onchange="onDateChange()">
                             <option value="ALL">당월 누계 분석</option>
                         </select>
+
+                        <!-- 주간 / 일간 집계 버튼 -->
                         <div class="flex bg-slate-100 p-0.5 rounded-md border border-slate-300" id="view-mode-container">
-                            <button id="btn-daily" onclick="setViewMode('DAILY')" class="px-1.5 py-0.5 text-[10px] font-bold rounded text-indigo-700 bg-white border border-slate-300 transition-all">일간</button>
-                            <button id="btn-weekly" onclick="setViewMode('WEEKLY')" class="px-1.5 py-0.5 text-[10px] font-bold rounded text-slate-500 transition-all">주간</button>
+                            <button id="btn-daily" onclick="setViewMode('DAILY')" class="px-2 py-0.5 text-[10px] font-bold rounded text-sky-800 bg-white border border-slate-300 transition-all">일간</button>
+                            <button id="btn-weekly" onclick="setViewMode('WEEKLY')" class="px-2 py-0.5 text-[10px] font-bold rounded text-slate-500 transition-all">주간 (7일단위)</button>
                         </div>
                     </div>
 
                     <div class="flex items-center gap-1 px-1 border-l border-slate-300 pl-2">
                         <i class="fa-solid fa-clock text-amber-600 text-xs"></i>
                         <div class="flex bg-slate-100 p-0.5 rounded-md border border-slate-300">
-                            <button id="btn-shift-all" onclick="setShiftMode('ALL')" class="px-1.5 py-0.5 text-[10px] font-bold rounded text-indigo-700 bg-white border border-slate-300 transition-all">전체</button>
+                            <button id="btn-shift-all" onclick="setShiftMode('ALL')" class="px-1.5 py-0.5 text-[10px] font-bold rounded text-sky-800 bg-white border border-slate-300 transition-all">전체</button>
                             <button id="btn-shift-day" onclick="setShiftMode('1근')" class="px-1.5 py-0.5 text-[10px] font-bold rounded text-slate-500 transition-all">1근</button>
                             <button id="btn-shift-night" onclick="setShiftMode('2근')" class="px-1.5 py-0.5 text-[10px] font-bold rounded text-slate-500 transition-all">2근</button>
                         </div>
@@ -280,20 +269,19 @@
 
             <!-- GridStack 자유 드래그 & 리사이즈 대시보드 영역 -->
             <div class="grid-stack mb-6">
-                <!-- Widget 1: 날씨 & 시계 위젯 (포항, 서울, 충주 단추 탭형식 예보) -->
+                <!-- Widget 1: 날씨 & 시계 위젯 -->
                 <div class="grid-stack-item" gs-id="widget-clock" gs-x="0" gs-y="0" gs-w="3" gs-h="2">
                     <div class="grid-stack-item-content">
                         <div class="glass-panel p-3">
                             <div class="widget-drag-handle">
                                 <span><i class="fa-solid fa-grip-dots-vertical mr-1"></i> 시계/단추형 지역 예보</span>
-                                <i class="fa-solid fa-xmark cursor-pointer hover:text-rose-500" onclick="removeWidget('widget-clock')"></i>
+                                <i class="fa-solid fa-xmark cursor-pointer hover:text-red-500" onclick="removeWidget('widget-clock')"></i>
                             </div>
                             <div class="flex justify-between items-center text-slate-600 font-extrabold text-[9.5px] uppercase">
-                                <span><i class="fa-regular fa-calendar text-indigo-600 mr-1"></i> TODAY & FORECAST</span>
+                                <span><i class="fa-regular fa-calendar text-sky-700 mr-1"></i> TODAY & FORECAST</span>
                                 <span class="text-base lg:text-lg font-black text-slate-900 font-mono-num" id="current-time">00:00:00</span>
                             </div>
 
-                            <!-- 단추 형식 지역 선택 버튼 -->
                             <div class="flex items-center justify-between gap-1 my-1">
                                 <span class="text-[9px] font-black text-slate-500">지역 선택:</span>
                                 <div class="flex gap-1">
@@ -303,9 +291,7 @@
                                 </div>
                             </div>
 
-                            <!-- 선택된 지역의 오늘 & 내일 날씨 상세 보드 -->
-                            <div class="grid grid-cols-2 gap-1.5 text-[9px] bg-slate-50 p-2 rounded-xl border border-slate-200" id="weather-card-display">
-                                <!-- JS에서 동적 채움 -->
+                            <div class="grid grid-cols-2 gap-1.5 text-[9px] bg-slate-50 p-2 rounded-lg border border-slate-200" id="weather-card-display">
                             </div>
                         </div>
                     </div>
@@ -317,11 +303,11 @@
                         <div class="glass-panel p-3.5">
                             <div class="widget-drag-handle">
                                 <span><i class="fa-solid fa-grip-dots-vertical mr-1"></i> 생산실적 KPI</span>
-                                <i class="fa-solid fa-xmark cursor-pointer hover:text-rose-500" onclick="removeWidget('widget-prod')"></i>
+                                <i class="fa-solid fa-xmark cursor-pointer hover:text-red-500" onclick="removeWidget('widget-prod')"></i>
                             </div>
                             <div class="flex justify-between items-start mb-1">
-                                <div class="p-2 rounded-lg bg-indigo-50 border border-indigo-200 text-indigo-600"><i class="fa-solid fa-industry text-sm"></i></div>
-                                <span id="kpi-reach" class="text-[9.5px] font-extrabold px-2 py-0.5 rounded-md border bg-indigo-50 text-indigo-700 border-indigo-200">달성률 0%</span>
+                                <div class="p-2 rounded-lg bg-sky-50 border border-sky-200 text-sky-700"><i class="fa-solid fa-industry text-sm"></i></div>
+                                <span id="kpi-reach" class="text-[9.5px] font-extrabold px-2 py-0.5 rounded-md border bg-sky-50 text-sky-800 border-sky-200">달성률 0%</span>
                             </div>
                             <div>
                                 <p class="text-[10px] font-extrabold text-slate-500 uppercase tracking-widest mb-0.5 kpi-title">당월 생산 실적</p>
@@ -337,11 +323,11 @@
                         <div class="glass-panel p-3.5">
                             <div class="widget-drag-handle">
                                 <span><i class="fa-solid fa-grip-dots-vertical mr-1"></i> 포장실적 KPI</span>
-                                <i class="fa-solid fa-xmark cursor-pointer hover:text-rose-500" onclick="removeWidget('widget-pack')"></i>
+                                <i class="fa-solid fa-xmark cursor-pointer hover:text-red-500" onclick="removeWidget('widget-pack')"></i>
                             </div>
                             <div class="flex justify-between items-start mb-1">
-                                <div class="p-2 rounded-lg bg-sky-50 border border-sky-200 text-sky-600"><i class="fa-solid fa-box-open text-sm"></i></div>
-                                <span id="kpi-pack-ratio" class="text-[9.5px] font-extrabold px-2 py-0.5 rounded-md border bg-sky-50 text-sky-700 border-sky-200">포장률 0%</span>
+                                <div class="p-2 rounded-lg bg-teal-50 border border-teal-200 text-teal-700"><i class="fa-solid fa-box-open text-sm"></i></div>
+                                <span id="kpi-pack-ratio" class="text-[9.5px] font-extrabold px-2 py-0.5 rounded-md border bg-teal-50 text-teal-800 border-teal-200">포장률 0%</span>
                             </div>
                             <div>
                                 <p class="text-[10px] font-extrabold text-slate-500 uppercase tracking-widest mb-0.5 kpi-title">CD 포장 실적량</p>
@@ -357,20 +343,19 @@
                         <div class="glass-panel p-3">
                             <div class="widget-drag-handle">
                                 <span><i class="fa-solid fa-grip-dots-vertical mr-1"></i> 불가동 TOP 3</span>
-                                <i class="fa-solid fa-xmark cursor-pointer hover:text-rose-500" onclick="removeWidget('widget-down')"></i>
+                                <i class="fa-solid fa-xmark cursor-pointer hover:text-red-500" onclick="removeWidget('widget-down')"></i>
                             </div>
                             <div class="flex justify-between items-center mb-1">
                                 <div class="flex items-center gap-1.5">
-                                    <div class="p-1.5 rounded-lg bg-rose-50 border border-rose-200 text-rose-600"><i class="fa-solid fa-clock text-xs"></i></div>
+                                    <div class="p-1.5 rounded-lg bg-red-50 border border-red-200 text-red-600"><i class="fa-solid fa-clock text-xs"></i></div>
                                     <span class="text-[10px] font-extrabold text-slate-500 uppercase tracking-widest">총 불가동시간</span>
                                 </div>
                                 <div class="flex items-baseline gap-1">
-                                    <h4 id="kpi-down" class="text-lg lg:text-xl font-black text-rose-600 font-mono-num">0</h4>
+                                    <h4 id="kpi-down" class="text-lg lg:text-xl font-black text-red-600 font-mono-num">0</h4>
                                     <span class="text-[9px] font-bold text-slate-500">MIN</span>
                                 </div>
                             </div>
                             
-                            <!-- TOP 3 리스트 -->
                             <div id="kpi-down-top3" class="pt-1 border-t border-slate-200 flex flex-col justify-around flex-1 gap-0.5">
                                 <div class="text-center text-slate-400 text-[9.5px] font-bold py-0.5">분석 중...</div>
                             </div>
@@ -384,38 +369,38 @@
                         <div id="card-oee" class="glass-panel p-3.5 transition-all duration-300">
                             <div class="widget-drag-handle">
                                 <span><i class="fa-solid fa-grip-dots-vertical mr-1"></i> OEE 설비효율</span>
-                                <i class="fa-solid fa-xmark cursor-pointer hover:text-rose-500" onclick="removeWidget('widget-oee')"></i>
+                                <i class="fa-solid fa-xmark cursor-pointer hover:text-red-500" onclick="removeWidget('widget-oee')"></i>
                             </div>
                             <div>
                                 <div class="flex justify-between items-start mb-1">
-                                    <div id="icon-oee" class="p-2 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-600"><i class="fa-solid fa-gears text-sm"></i></div>
-                                    <span id="badge-oee" class="text-[8.5px] font-extrabold px-1.5 py-0.5 rounded hidden bg-rose-600 text-white animate-pulse">EMERGENCY</span>
+                                    <div id="icon-oee" class="p-2 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-700"><i class="fa-solid fa-gears text-sm"></i></div>
+                                    <span id="badge-oee" class="text-[8.5px] font-extrabold px-1.5 py-0.5 rounded hidden bg-red-600 text-white animate-pulse">EMERGENCY</span>
                                 </div>
                                 <p class="text-[10px] font-extrabold text-slate-500 uppercase tracking-widest mb-0.5 kpi-title">OEE [종합설비효율]</p>
-                                <div class="flex items-baseline gap-1"><h4 id="kpi-oee" class="text-xl lg:text-2xl font-black text-emerald-600 font-mono-num kpi-val">0.0</h4><span class="text-[10px] font-bold text-slate-500">%</span></div>
+                                <div class="flex items-baseline gap-1"><h4 id="kpi-oee" class="text-xl lg:text-2xl font-black text-emerald-700 font-mono-num kpi-val">0.0</h4><span class="text-[10px] font-bold text-slate-500">%</span></div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Widget 6: 메인 생산/포장/불가동 복합 차트 -->
+                <!-- Widget 6: 메인 생산/포장/불가동 복합 차트 (주간 7일 단위 / 일간 지원) -->
                 <div class="grid-stack-item" gs-id="widget-main-chart" gs-x="0" gs-y="2" gs-w="7" gs-h="5">
                     <div class="grid-stack-item-content">
                         <div class="glass-panel p-4">
                             <div class="widget-drag-handle">
                                 <span><i class="fa-solid fa-grip-dots-vertical mr-1"></i> 생산/포장/불가동 복합 차트</span>
-                                <i class="fa-solid fa-xmark cursor-pointer hover:text-rose-500" onclick="removeWidget('widget-main-chart')"></i>
+                                <i class="fa-solid fa-xmark cursor-pointer hover:text-red-500" onclick="removeWidget('widget-main-chart')"></i>
                             </div>
                             <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
                                 <h3 class="text-sm lg:text-base font-black text-slate-900 flex items-center gap-2">
-                                    <i class="fa-solid fa-chart-line text-indigo-600"></i> 생산실적 · 포장량 및 불가동 현황
-                                    <span id="chart-badge" class="text-[9.5px] bg-indigo-50 text-indigo-700 font-extrabold px-2 py-0.5 rounded-full border border-indigo-200">일간 집계</span>
+                                    <i class="fa-solid fa-chart-line text-sky-700"></i> 생산실적 · 포장량 및 불가동 현황
+                                    <span id="chart-badge" class="text-[9.5px] bg-sky-50 text-sky-800 font-extrabold px-2 py-0.5 rounded-full border border-sky-200">일간 집계</span>
                                 </h3>
-                                <div class="flex items-center gap-2 text-[10px] font-bold text-slate-600 bg-slate-100 px-2 py-1 rounded-lg border border-slate-200">
-                                    <span class="flex items-center gap-1"><span class="w-2.5 h-1 bg-indigo-600 rounded"></span> 생산</span>
-                                    <span class="flex items-center gap-1"><span class="w-2.5 h-1 bg-sky-500 rounded"></span> 포장</span>
-                                    <span class="flex items-center gap-1"><span class="w-2.5 h-2 bg-rose-500 rounded-xs"></span> 불가동</span>
-                                    <span class="flex items-center gap-1"><span class="w-2.5 h-[1px] border-b-2 border-dashed border-amber-600"></span> 목표</span>
+                                <div class="flex items-center gap-2 text-[10px] font-bold text-slate-600 bg-slate-100 px-2 py-1 rounded-md border border-slate-200">
+                                    <span class="flex items-center gap-1"><span class="w-2.5 h-1 bg-[#1f77b4] rounded"></span> 생산</span>
+                                    <span class="flex items-center gap-1"><span class="w-2.5 h-1 bg-[#17becf] rounded"></span> 포장</span>
+                                    <span class="flex items-center gap-1"><span class="w-2.5 h-2 bg-[#d62728] rounded-xs"></span> 불가동</span>
+                                    <span class="flex items-center gap-1"><span class="w-2.5 h-[1px] border-b-2 border-dashed border-[#ff7f0e]"></span> 목표</span>
                                 </div>
                             </div>
                             <div class="flex-1 relative w-full h-full min-h-[220px]"><canvas id="mainChart"></canvas></div>
@@ -429,33 +414,33 @@
                         <div class="glass-panel p-3.5">
                             <div class="widget-drag-handle">
                                 <span><i class="fa-solid fa-grip-dots-vertical mr-1"></i> 생산 비율 3D 종합 분석</span>
-                                <i class="fa-solid fa-xmark cursor-pointer hover:text-rose-500" onclick="removeWidget('widget-ratio-charts')"></i>
+                                <i class="fa-solid fa-xmark cursor-pointer hover:text-red-500" onclick="removeWidget('widget-ratio-charts')"></i>
                             </div>
                             <div class="flex items-center justify-between mb-1.5 border-b border-slate-200 pb-1.5">
                                 <h3 class="text-xs lg:text-sm font-black text-slate-900 flex items-center gap-1.5">
-                                    <i class="fa-solid fa-cube text-sky-600"></i> 생산 비율 3D 종합 분석
+                                    <i class="fa-solid fa-pie-chart text-sky-700"></i> 생산 비율 3D 종합 분석
                                 </h3>
-                                <span class="text-[9px] font-extrabold text-slate-500 uppercase tracking-widest">3D Shape & Alloy Analytics</span>
+                                <span class="text-[9px] font-extrabold text-slate-500 uppercase tracking-widest">Tableau Segment Analytics</span>
                             </div>
 
                             <div class="grid grid-cols-3 gap-2 items-center flex-1">
                                 <!-- 01. 강종별 -->
-                                <div class="flex flex-col items-center bg-slate-50 p-2 rounded-xl border border-slate-200 h-full justify-between shadow-sm">
-                                    <p class="text-[9.5px] font-extrabold text-indigo-700 mb-1"><i class="fa-solid fa-layer-group text-[9px] mb-0.5"></i> 강종종류별</p>
+                                <div class="flex flex-col items-center bg-slate-50 p-2 rounded-lg border border-slate-200 h-full justify-between shadow-xs">
+                                    <p class="text-[9.5px] font-extrabold text-sky-800 mb-1"><i class="fa-solid fa-layer-group text-[9px] mb-0.5"></i> 강종종류별</p>
                                     <div class="h-[120px] w-full relative flex items-center justify-center"><canvas id="chartSteelType"></canvas></div>
                                     <div id="legend-steel" class="w-full mt-1 font-bold text-[9px] space-y-0.5 max-h-[70px] overflow-y-auto no-scrollbar"></div>
                                 </div>
 
                                 <!-- 02. 형상별 -->
-                                <div class="flex flex-col items-center bg-slate-50 p-2 rounded-xl border border-slate-200 h-full justify-between shadow-sm">
-                                    <p class="text-[9.5px] font-extrabold text-sky-700 mb-1"><i class="fa-solid fa-draw-polygon text-[9px] mb-0.5"></i> 제품형상별</p>
+                                <div class="flex flex-col items-center bg-slate-50 p-2 rounded-lg border border-slate-200 h-full justify-between shadow-xs">
+                                    <p class="text-[9.5px] font-extrabold text-teal-800 mb-1"><i class="fa-solid fa-draw-polygon text-[9px] mb-0.5"></i> 제품형상별</p>
                                     <div class="h-[120px] w-full relative flex items-center justify-center"><canvas id="chartProductShape"></canvas></div>
                                     <div id="legend-shape" class="w-full mt-1 font-bold text-[9px] space-y-0.5 max-h-[70px] overflow-y-auto no-scrollbar"></div>
                                 </div>
 
                                 <!-- 03. 열처리 비율 -->
-                                <div class="flex flex-col items-center bg-slate-50 p-2 rounded-xl border border-slate-200 h-full justify-between shadow-sm">
-                                    <p class="text-[9.5px] font-extrabold text-amber-700 mb-1"><i class="fa-solid fa-fire text-[9px] mb-0.5"></i> 열처리비율</p>
+                                <div class="flex flex-col items-center bg-slate-50 p-2 rounded-lg border border-slate-200 h-full justify-between shadow-xs">
+                                    <p class="text-[9.5px] font-extrabold text-amber-800 mb-1"><i class="fa-solid fa-fire text-[9px] mb-0.5"></i> 열처리비율</p>
                                     <div class="h-[120px] w-full relative flex items-center justify-center"><canvas id="chartHeatTreat"></canvas></div>
                                     <div id="legend-heat" class="w-full mt-1 font-bold text-[9px] space-y-0.5 max-h-[70px] overflow-y-auto no-scrollbar"></div>
                                 </div>
@@ -470,11 +455,11 @@
                         <div class="glass-panel overflow-hidden">
                             <div class="widget-drag-handle">
                                 <span><i class="fa-solid fa-grip-dots-vertical mr-1"></i> 자산 제어 레지스트리</span>
-                                <i class="fa-solid fa-xmark cursor-pointer hover:text-rose-500" onclick="removeWidget('widget-registry')"></i>
+                                <i class="fa-solid fa-xmark cursor-pointer hover:text-red-500" onclick="removeWidget('widget-registry')"></i>
                             </div>
                             <div class="p-3 border-b border-slate-200 flex items-center justify-between bg-slate-50">
-                                <h3 class="text-xs lg:text-sm font-black text-slate-900 flex items-center gap-2"><i class="fa-solid fa-microchip text-indigo-600"></i> 통합 자산 제어 레지스트리</h3>
-                                <span class="text-[9px] font-extrabold text-slate-500 uppercase tracking-widest">Real-time Equipment Integrity Monitoring</span>
+                                <h3 class="text-xs lg:text-sm font-black text-slate-900 flex items-center gap-2"><i class="fa-solid fa-microchip text-sky-700"></i> 통합 자산 제어 레지스트리</h3>
+                                <span class="text-[9px] font-extrabold text-slate-500 uppercase tracking-widest">Tableau Enterprise Asset Registry</span>
                             </div>
                             <div class="overflow-x-auto p-2 flex-1">
                                 <table>
@@ -484,8 +469,8 @@
                                             <th class="text-right">누적 실적 (TON)</th>
                                             <th class="text-center">작업선경 범위 (mm)</th>
                                             <th class="text-right">평균 선속 (m/min)</th>
-                                            <th class="text-right text-rose-600">불가동 (min)</th>
-                                            <th class="w-1/4 uppercase text-emerald-600 text-center">OEE [종합설비효율]</th>
+                                            <th class="text-right text-red-600">불가동 (min)</th>
+                                            <th class="w-1/4 uppercase text-emerald-700 text-center">OEE [종합설비효율]</th>
                                         </tr>
                                     </thead>
                                     <tbody id="registry-body"></tbody>
@@ -497,33 +482,32 @@
             </div>
         </main>
 
-        <!-- TAB 2: CD 생산성 분석 DEEP DIVE (밀도 강화 및 위젯/레이아웃 단추 탑재) -->
+        <!-- TAB 2: CD 생산성 분석 DEEP DIVE -->
         <main class="flex-1 p-3 lg:p-5 overflow-y-auto h-screen relative z-10 tab-content" id="tab-analytics">
-            <!-- Header Toolbar for Tab 2 -->
             <header class="flex flex-col xl:flex-row justify-between items-start xl:items-end gap-3 mb-3">
                 <div>
-                    <h1 class="text-xl lg:text-2xl font-black tracking-tight text-white uppercase flex items-center gap-2.5">
-                        <span class="w-2 h-6 bg-rose-500 rounded-full shadow-[0_0_12px_#f43f5e]"></span>
-                        CD 생산성 분석 <span class="text-rose-300 font-light ml-0.5 text-base lg:text-lg">DEEP DIVE</span>
+                    <h1 class="text-xl lg:text-2xl font-black tracking-tight text-slate-900 uppercase flex items-center gap-2.5">
+                        <span class="w-2.5 h-6 bg-red-600 rounded"></span>
+                        CD 생산성 분석 <span class="text-red-700 font-semibold ml-0.5 text-base lg:text-lg">DEEP DIVE</span>
                     </h1>
-                    <p class="text-slate-300 font-bold text-[10px] mt-1 ml-4">순수 가동시간(Net Work Time) 기반 UPH(TON/Hr) 누적세로막대 분석</p>
+                    <p class="text-slate-500 font-bold text-[10px] mt-0.5 ml-4">순수 가동시간(Net Work Time) 기반 UPH(TON/Hr) 누적세로막대 분석</p>
                 </div>
 
                 <div class="flex flex-wrap items-center gap-2 glass-panel p-2 !flex-row !h-auto border border-slate-300">
-                    <button id="btn-toggle-edit-tab2" onclick="toggleEditMode()" class="px-2.5 py-1 text-xs font-black rounded-lg text-white bg-indigo-600 hover:bg-indigo-500 shadow border border-indigo-400 transition-all flex items-center gap-1.5">
+                    <button id="btn-toggle-edit-tab2" onclick="toggleEditMode()" class="px-2.5 py-1 text-xs font-black rounded-md text-white bg-sky-700 hover:bg-sky-800 shadow transition-all flex items-center gap-1.5">
                         <i class="fa-solid fa-up-down-left-right"></i> <span>레이아웃 자유 편집</span>
                     </button>
-                    <button onclick="openWidgetManager()" class="px-2 py-1 text-xs font-bold rounded-lg text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-300 transition-all flex items-center gap-1">
-                        <i class="fa-solid fa-cubes text-cyan-600"></i> 위젯 관리자
+                    <button onclick="openWidgetManager()" class="px-2 py-1 text-xs font-bold rounded-md text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-300 transition-all flex items-center gap-1">
+                        <i class="fa-solid fa-cubes text-sky-600"></i> 위젯 관리자
                     </button>
-                    <button onclick="resetLayout()" class="px-2 py-1 text-xs font-bold rounded-lg text-slate-600 hover:text-rose-600 bg-slate-100 border border-slate-300 transition-all" title="기본 배치로 초기화">
+                    <button onclick="resetLayout()" class="px-2 py-1 text-xs font-bold rounded-md text-slate-600 hover:text-red-600 bg-slate-100 border border-slate-300 transition-all" title="기본 배치로 초기화">
                         <i class="fa-solid fa-rotate-left"></i>
                     </button>
 
                     <div class="w-[1px] h-5 bg-slate-300 my-auto mx-1"></div>
 
                     <div class="flex items-center gap-1.5 px-2">
-                        <i class="fa-solid fa-calendar-check text-rose-600 text-xs"></i>
+                        <i class="fa-solid fa-calendar-check text-red-600 text-xs"></i>
                         <select id="analytics-month-select" class="bg-slate-100 border border-slate-300 text-xs font-bold text-slate-800 py-0.5 px-2 rounded-md outline-none cursor-pointer" onchange="onAnalyticsMonthChange()">
                             <option value="LATEST">월별 선택 로딩 중...</option>
                         </select>
@@ -536,17 +520,16 @@
                     </div>
 
                     <div class="flex bg-slate-100 p-0.5 rounded-md border border-slate-300 ml-1">
-                        <button id="btn-aly-team" onclick="setAnalyticsGroup('TEAM')" class="px-2.5 py-1 text-xs font-bold rounded bg-white text-rose-600 border border-slate-300 transition-all">작업조별 (전체)</button>
+                        <button id="btn-aly-team" onclick="setAnalyticsGroup('TEAM')" class="px-2.5 py-1 text-xs font-bold rounded bg-white text-red-700 border border-slate-300 transition-all">작업조별 (전체)</button>
                         <button id="btn-aly-machine" onclick="setAnalyticsGroup('MACHINE')" class="px-2.5 py-1 text-xs font-bold rounded text-slate-500 transition-all">호기별 (특정)</button>
                     </div>
                 </div>
             </header>
 
-            <!-- Compact KPI Row for Tab 2 -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
                 <div class="glass-panel p-3">
                     <div class="flex items-center justify-between mb-0.5">
-                        <div class="p-1.5 rounded-lg bg-indigo-50 text-indigo-600"><i class="fa-regular fa-circle text-sm"></i></div>
+                        <div class="p-1.5 rounded-lg bg-sky-50 text-sky-700"><i class="fa-regular fa-circle text-sm"></i></div>
                         <span class="px-2 py-0.5 bg-slate-100 text-slate-700 font-extrabold rounded-md text-[9.5px]">순수가동 기준 평균</span>
                     </div>
                     <p class="text-[9.5px] font-extrabold text-slate-500 uppercase mb-0.5">원형 작업 생산성 (UPH)</p>
@@ -554,7 +537,7 @@
                 </div>
                 <div class="glass-panel p-3">
                     <div class="flex items-center justify-between mb-0.5">
-                        <div class="p-1.5 rounded-lg bg-amber-50 text-amber-600"><i class="fa-solid fa-draw-polygon text-sm"></i></div>
+                        <div class="p-1.5 rounded-lg bg-amber-50 text-amber-700"><i class="fa-solid fa-draw-polygon text-sm"></i></div>
                         <span class="px-2 py-0.5 bg-slate-100 text-slate-700 font-extrabold rounded-md text-[9.5px]">순수가동 기준 평균</span>
                     </div>
                     <p class="text-[9.5px] font-extrabold text-slate-500 uppercase mb-0.5">비원형(이형) 작업 생산성 (UPH)</p>
@@ -562,20 +545,19 @@
                 </div>
             </div>
 
-            <!-- 누적 세로 막대그래프 (Tight height without huge empty gaps) -->
             <div class="glass-panel p-3.5 mb-3">
                 <div class="flex justify-between items-center mb-2 border-b border-slate-200 pb-2">
                     <h3 class="text-xs lg:text-sm font-black text-slate-900 flex items-center gap-2">
-                        <i class="fa-solid fa-chart-column text-rose-600"></i> <span id="aly-chart-title">작업조별 UPH 누적 생산성 비교 (원형 + 비원형)</span>
+                        <i class="fa-solid fa-chart-column text-red-600"></i> <span id="aly-chart-title">작업조별 UPH 누적 생산성 비교 (원형 + 비원형)</span>
                     </h3>
-                    <span class="text-[9.5px] font-extrabold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded border border-indigo-200">누적 세로막대 UPH</span>
+                    <span class="text-[9.5px] font-extrabold text-sky-800 bg-sky-50 px-2 py-0.5 rounded border border-sky-200">누적 세로막대 UPH</span>
                 </div>
                 <div class="h-[280px] w-full relative"><canvas id="analyticsChart"></canvas></div>
             </div>
 
             <div class="glass-panel overflow-hidden mb-6">
                 <div class="p-3 border-b border-slate-200 bg-slate-50 flex justify-between items-center">
-                    <h3 class="text-xs lg:text-sm font-black text-slate-900 flex items-center gap-2"><i class="fa-solid fa-table-list text-indigo-600"></i> 세부 가동시간 및 UPH 산출 레지스트리</h3>
+                    <h3 class="text-xs lg:text-sm font-black text-slate-900 flex items-center gap-2"><i class="fa-solid fa-table-list text-sky-700"></i> 세부 가동시간 및 UPH 산출 레지스트리</h3>
                     <span class="text-[9.5px] font-bold text-slate-500">UPH = 총생산량(TON) / 순수가동시간(Hr)</span>
                 </div>
                 <div class="overflow-x-auto p-2">
@@ -585,9 +567,9 @@
                                 <th id="aly-table-header">분류</th>
                                 <th>작업 형상</th>
                                 <th class="text-right">총 생산량(TON)</th>
-                                <th class="text-right text-rose-600">총 비가동(MIN)</th>
-                                <th class="text-right text-emerald-600">순수 가동시간(MIN)</th>
-                                <th class="text-right text-indigo-600">생산성 (UPH: TON/Hr)</th>
+                                <th class="text-right text-red-600">총 비가동(MIN)</th>
+                                <th class="text-right text-emerald-700">순수 가동시간(MIN)</th>
+                                <th class="text-right text-sky-700">생산성 (UPH: TON/Hr)</th>
                             </tr>
                         </thead>
                         <tbody id="analytics-body"></tbody>
@@ -604,17 +586,17 @@
                 <i class="fa-solid fa-robot text-lg text-amber-400"></i>
                 <div>
                     <h3 class="font-black text-xs text-white">PRO-Bot Assistant</h3>
-                    <p class="text-[8.5px] text-slate-300 font-bold">Smart Manufacturing Intelligence v26.0</p>
+                    <p class="text-[8.5px] text-slate-300 font-bold">Tableau Manufacturing Intelligence v27.0</p>
                 </div>
             </div>
-            <i class="fa-solid fa-xmark text-base cursor-pointer hover:text-rose-400" onclick="toggleBot()"></i>
+            <i class="fa-solid fa-xmark text-base cursor-pointer hover:text-red-400" onclick="toggleBot()"></i>
         </div>
         <div class="chat-body" id="chat-body">
             <div class="msg-bot">안녕하세요! PRO-Bot입니다.<br>생산실적, 포장량, 비가동 사유에 대해 물어보세요.<br><br><span class="text-[9.5px] font-normal text-slate-500">예: 비가동 시간 제일 긴 항목 / A조 생산량 / 포장 실적 / PCD-4 비가동 시간</span></div>
         </div>
         <div class="chat-input-area">
             <input type="text" id="chat-input" class="gs-input m-0" placeholder="질문을 입력하세요..." onkeypress="handleChatEnter(event)">
-            <button onclick="sendChat()" class="bg-indigo-600 text-white px-3 rounded-lg hover:bg-indigo-500 transition-all"><i class="fa-solid fa-paper-plane text-xs"></i></button>
+            <button onclick="sendChat()" class="bg-sky-700 text-white px-3 rounded-md hover:bg-sky-800 transition-all"><i class="fa-solid fa-paper-plane text-xs"></i></button>
         </div>
     </div>
 
@@ -623,16 +605,16 @@
         <div class="glass-panel w-full max-w-lg overflow-hidden border border-slate-300 !justify-start">
             <div class="p-4 border-b border-slate-200 flex justify-between items-center bg-slate-50">
                 <div class="flex items-center gap-2.5">
-                    <div class="bg-sky-600 p-2 rounded-lg text-white"><i class="fa-solid fa-cubes text-base"></i></div>
+                    <div class="bg-sky-700 p-2 rounded-md text-white"><i class="fa-solid fa-cubes text-base"></i></div>
                     <div><h3 class="text-sm font-black text-slate-900">대시보드 위젯 관리자</h3><p class="text-[9.5px] text-slate-500 font-bold">필요한 위젯을 켜거나 끌 수 있습니다.</p></div>
                 </div>
-                <i class="fa-solid fa-xmark text-base text-slate-500 cursor-pointer hover:text-rose-600" onclick="closeWidgetManager()"></i>
+                <i class="fa-solid fa-xmark text-base text-slate-500 cursor-pointer hover:text-red-600" onclick="closeWidgetManager()"></i>
             </div>
             <div class="p-4 space-y-2 max-h-[380px] overflow-y-auto no-scrollbar" id="widget-toggle-list">
             </div>
             <div class="p-3 bg-slate-50 border-t border-slate-200 flex justify-between items-center">
-                <button onclick="resetLayout()" class="px-3 py-1.5 rounded-lg text-xs font-bold text-rose-600 hover:bg-rose-50 border border-rose-200">기본 배치 리셋</button>
-                <button onclick="closeWidgetManager()" class="px-4 py-1.5 rounded-lg text-xs font-bold bg-indigo-600 text-white hover:bg-indigo-500">완료</button>
+                <button onclick="resetLayout()" class="px-3 py-1.5 rounded-md text-xs font-bold text-red-600 hover:bg-red-50 border border-red-200">기본 배치 리셋</button>
+                <button onclick="closeWidgetManager()" class="px-4 py-1.5 rounded-md text-xs font-bold bg-sky-700 text-white hover:bg-sky-800">완료</button>
             </div>
         </div>
     </div>
@@ -642,10 +624,10 @@
         <div class="glass-panel w-full max-w-xl overflow-hidden border border-slate-300 !justify-start">
             <div class="p-5 border-b border-slate-200 flex justify-between items-center bg-slate-50">
                 <div class="flex items-center gap-3">
-                    <div class="bg-indigo-600 p-2.5 rounded-xl text-white"><i class="fa-solid fa-sliders text-lg"></i></div>
+                    <div class="bg-sky-700 p-2.5 rounded-md text-white"><i class="fa-solid fa-sliders text-lg"></i></div>
                     <div><h3 class="text-base font-black text-slate-900">클라우드 데이터 연동 설정</h3><p class="text-[10px] text-slate-500 font-bold">Google Sheets Published CSV URL</p></div>
                 </div>
-                <i class="fa-solid fa-xmark text-lg text-slate-500 cursor-pointer hover:text-rose-600" onclick="closeModal()"></i>
+                <i class="fa-solid fa-xmark text-lg text-slate-500 cursor-pointer hover:text-red-600" onclick="closeModal()"></i>
             </div>
             <div class="p-5 space-y-3">
                 <div>
@@ -662,8 +644,8 @@
                 </div>
             </div>
             <div class="p-4 bg-slate-50 border-t border-slate-200 flex justify-end gap-2">
-                <button onclick="closeModal()" class="px-4 py-2 rounded-lg text-xs font-bold text-slate-500 hover:bg-slate-200">취소</button>
-                <button onclick="saveModalUrls()" class="px-5 py-2 rounded-lg text-xs font-bold bg-indigo-600 text-white hover:bg-indigo-500 shadow-md">저장 및 동기화</button>
+                <button onclick="closeModal()" class="px-4 py-2 rounded-md text-xs font-bold text-slate-500 hover:bg-slate-200">취소</button>
+                <button onclick="saveModalUrls()" class="px-5 py-2 rounded-md text-xs font-bold bg-sky-700 text-white hover:bg-sky-800 shadow-md">저장 및 동기화</button>
             </div>
         </div>
     </div>
@@ -686,12 +668,11 @@
             { id: 'widget-pack', name: 'CD 포장 실적량 KPI', icon: 'fa-box-open' },
             { id: 'widget-down', name: '총 불가동시간 & TOP 3', icon: 'fa-clock' },
             { id: 'widget-oee', name: 'OEE 종합설비효율', icon: 'fa-gears' },
-            { id: 'widget-main-chart', name: '생산/포장/불가동 복합 차트', icon: 'fa-chart-line' },
-            { id: 'widget-ratio-charts', name: '생산 비율 3종 분석 (강종/형상/열처리)', icon: 'fa-chart-pie' },
+            { id: 'widget-main-chart', name: '생산/포장/불가동 복합 차트 (일간/주간)', icon: 'fa-chart-line' },
+            { id: 'widget-ratio-charts', name: '생산 비율 3종 분석 (강종/형상/열처리)', icon: 'fa-pie-chart' },
             { id: 'widget-registry', name: '통합 자산 제어 레지스트리', icon: 'fa-microchip' }
         ];
 
-        // 3개 지역(포항, 서울, 충주) 오늘/내일 예보 데이터셋
         const CITY_WEATHER = {
             pohang: {
                 name: "포항",
@@ -730,9 +711,8 @@
             const w = CITY_WEATHER[selectedCity] || CITY_WEATHER.pohang;
             
             el.innerHTML = `
-                <!-- 오늘 -->
-                <div class="bg-white p-1.5 rounded-lg border border-slate-200 flex flex-col items-center">
-                    <span class="font-black text-indigo-600 flex items-center gap-1">
+                <div class="bg-white p-1.5 rounded border border-slate-200 flex flex-col items-center">
+                    <span class="font-black text-sky-700 flex items-center gap-1">
                         <i class="fa-solid fa-calendar-day text-[9px]"></i> 오늘 (${w.name})
                     </span>
                     <div class="flex items-center gap-1.5 my-1">
@@ -741,9 +721,8 @@
                     </div>
                     <span class="text-[8.5px] font-extrabold text-slate-600">${w.today.cond} · 습도 ${w.today.humidity}</span>
                 </div>
-                <!-- 내일 -->
-                <div class="bg-white p-1.5 rounded-lg border border-slate-200 flex flex-col items-center">
-                    <span class="font-black text-sky-600 flex items-center gap-1">
+                <div class="bg-white p-1.5 rounded border border-slate-200 flex flex-col items-center">
+                    <span class="font-black text-teal-700 flex items-center gap-1">
                         <i class="fa-solid fa-calendar-plus text-[9px]"></i> 내일 예보
                     </span>
                     <div class="flex items-center gap-1.5 my-1">
@@ -755,26 +734,35 @@
             `;
         }
 
-        // 샘플 데이터셋
         const SAMPLE_PROD_DATA = [
             { date: "2026-07-01", equipment: "PCD-4", team: "A", isCircle: true, steelType: "탄소강", shapeRaw: "원형", heatTreat: "비열처리재", shift: "1근", amount: 48500, speed: 180, wire: 3.5 },
-            { date: "2026-07-01", equipment: "PCD-2-2", team: "B", isCircle: false, steelType: "STS강", shapeRaw: "정육각", heatTreat: "열처리재", shift: "2근", amount: 22100, speed: 150, wire: 4.0 },
-            { date: "2026-07-01", equipment: "PCD-5", team: "C", isCircle: true, steelType: "합금강", shapeRaw: "원형", heatTreat: "비열처리재", shift: "1근", amount: 18400, speed: 165, wire: 2.8 },
-            { date: "2026-07-02", equipment: "PCD-1", team: "A", isCircle: true, steelType: "STS강", shapeRaw: "원형", heatTreat: "열처리재", shift: "1근", amount: 31200, speed: 175, wire: 3.0 },
-            { date: "2026-07-02", equipment: "PCD-3", team: "B", isCircle: false, steelType: "쾌삭강", shapeRaw: "이형", heatTreat: "비열처리재", shift: "2근", amount: 15400, speed: 140, wire: 5.2 },
-            { date: "2026-07-03", equipment: "PCD-4", team: "C", isCircle: true, steelType: "합금강", shapeRaw: "원형", heatTreat: "열처리재", shift: "2근", amount: 51200, speed: 185, wire: 3.5 },
-            { date: "2026-07-03", equipment: "PCD-0-2", team: "A", isCircle: false, steelType: "탄소강", shapeRaw: "사각", heatTreat: "비열처리재", shift: "1근", amount: 18200, speed: 155, wire: 4.2 }
+            { date: "2026-07-02", equipment: "PCD-2-2", team: "B", isCircle: false, steelType: "STS강", shapeRaw: "정육각", heatTreat: "열처리재", shift: "2근", amount: 22100, speed: 150, wire: 4.0 },
+            { date: "2026-07-05", equipment: "PCD-5", team: "C", isCircle: true, steelType: "합금강", shapeRaw: "원형", heatTreat: "비열처리재", shift: "1근", amount: 38400, speed: 165, wire: 2.8 },
+            { date: "2026-07-09", equipment: "PCD-1", team: "A", isCircle: true, steelType: "STS강", shapeRaw: "원형", heatTreat: "열처리재", shift: "1근", amount: 41200, speed: 175, wire: 3.0 },
+            { date: "2026-07-12", equipment: "PCD-3", team: "B", isCircle: false, steelType: "쾌삭강", shapeRaw: "이형", heatTreat: "비열처리재", shift: "2근", amount: 25400, speed: 140, wire: 5.2 },
+            { date: "2026-07-16", equipment: "PCD-4", team: "C", isCircle: true, steelType: "합금강", shapeRaw: "원형", heatTreat: "열처리재", shift: "2근", amount: 51200, speed: 185, wire: 3.5 },
+            { date: "2026-07-20", equipment: "PCD-0-2", team: "A", isCircle: false, steelType: "탄소강", shapeRaw: "사각", heatTreat: "비열처리재", shift: "1근", amount: 28200, speed: 155, wire: 4.2 },
+            { date: "2026-07-24", equipment: "PCD-2-2", team: "B", isCircle: true, steelType: "탄소강", shapeRaw: "원형", heatTreat: "비열처리재", shift: "1근", amount: 44100, speed: 160, wire: 3.8 },
+            { date: "2026-07-29", equipment: "PCD-5", team: "C", isCircle: true, steelType: "STS강", shapeRaw: "원형", heatTreat: "열처리재", shift: "2근", amount: 39800, speed: 170, wire: 3.2 }
         ];
 
         const SAMPLE_DOWN_DATA = [
-            { date: "2026-07-01", equipment: "PCD-3", team: "A", isCircle: true, shift: "1근", minutes: 120, reason: "CD Cutting M/C 고장" },
-            { date: "2026-07-02", equipment: "PCD-1", team: "B", isCircle: true, shift: "2근", minutes: 45, reason: "전원부 점검" }
+            { date: "2026-07-02", equipment: "PCD-3", team: "A", isCircle: true, shift: "1근", minutes: 120, reason: "CD Cutting M/C 고장" },
+            { date: "2026-07-10", equipment: "PCD-1", team: "B", isCircle: true, shift: "2근", minutes: 85, reason: "전원부 점검" },
+            { date: "2026-07-18", equipment: "PCD-4", team: "C", isCircle: true, shift: "1근", minutes: 45, reason: "신선 유압 호스 교체" },
+            { date: "2026-07-25", equipment: "PCD-0-2", team: "A", isCircle: false, shift: "2근", minutes: 90, reason: "사각 다이스 세팅 지연" }
         ];
 
         const SAMPLE_PACK_DATA = [
             { date: "2026-07-01", equipment: "PCD-4", team: "A", shift: "1근", amount: 47000 },
-            { date: "2026-07-01", equipment: "PCD-2-2", team: "B", shift: "2근", amount: 21500 },
-            { date: "2026-07-02", equipment: "PCD-1", team: "A", shift: "1근", amount: 30500 }
+            { date: "2026-07-02", equipment: "PCD-2-2", team: "B", shift: "2근", amount: 21500 },
+            { date: "2026-07-05", equipment: "PCD-5", team: "C", shift: "1근", amount: 37500 },
+            { date: "2026-07-09", equipment: "PCD-1", team: "A", shift: "1근", amount: 40100 },
+            { date: "2026-07-12", equipment: "PCD-3", team: "B", shift: "2근", amount: 24800 },
+            { date: "2026-07-16", equipment: "PCD-4", team: "C", shift: "2근", amount: 50000 },
+            { date: "2026-07-20", equipment: "PCD-0-2", team: "A", shift: "1근", amount: 27500 },
+            { date: "2026-07-24", equipment: "PCD-2-2", team: "B", shift: "1근", amount: 43000 },
+            { date: "2026-07-29", equipment: "PCD-5", team: "C", shift: "2근", amount: 38900 }
         ];
 
         let prodData = SAMPLE_PROD_DATA; 
@@ -798,7 +786,6 @@
         let grid = null;
         let isEditMode = false;
 
-        // GridStack 엔진 초기화
         window.addEventListener('load', function() {
             grid = GridStack.init({
                 column: 12,
@@ -830,16 +817,16 @@
             if (isEditMode) {
                 grid.enable();
                 body.classList.add('edit-mode-active');
-                if (btn) btn.className = "px-2.5 py-1 text-xs font-black rounded-lg text-white bg-rose-600 hover:bg-rose-500 shadow border border-rose-400 transition-all flex items-center gap-1.5 animate-pulse";
-                if (btnTab2) btnTab2.className = "px-2.5 py-1 text-xs font-black rounded-lg text-white bg-rose-600 hover:bg-rose-500 shadow border border-rose-400 transition-all flex items-center gap-1.5 animate-pulse";
+                if (btn) btn.className = "px-2.5 py-1 text-xs font-black rounded-md text-white bg-red-600 hover:bg-red-700 shadow transition-all flex items-center gap-1.5 animate-pulse";
+                if (btnTab2) btnTab2.className = "px-2.5 py-1 text-xs font-black rounded-md text-white bg-red-600 hover:bg-red-700 shadow transition-all flex items-center gap-1.5 animate-pulse";
                 if (txt) txt.innerText = "편집 완료 (저장)";
                 if (navBtn) navBtn.classList.add('active');
-                showToast("대시보드 편집 모드 활성화: 위젯을 마우스로 자유롭게 이동 및 크기 조절하세요!");
+                showToast("대시보드 편집 모드 활성화: 위젯을 드래그하여 이동/크기 조절하세요!");
             } else {
                 grid.disable();
                 body.classList.remove('edit-mode-active');
-                if (btn) btn.className = "px-2.5 py-1 text-xs font-black rounded-lg text-white bg-indigo-600 hover:bg-indigo-500 shadow border border-indigo-400 transition-all flex items-center gap-1.5";
-                if (btnTab2) btnTab2.className = "px-2.5 py-1 text-xs font-black rounded-lg text-white bg-indigo-600 hover:bg-indigo-500 shadow border border-indigo-400 transition-all flex items-center gap-1.5";
+                if (btn) btn.className = "px-2.5 py-1 text-xs font-black rounded-md text-white bg-sky-700 hover:bg-sky-800 shadow transition-all flex items-center gap-1.5";
+                if (btnTab2) btnTab2.className = "px-2.5 py-1 text-xs font-black rounded-md text-white bg-sky-700 hover:bg-sky-800 shadow transition-all flex items-center gap-1.5";
                 if (txt) txt.innerText = "레이아웃 자유 편집";
                 if (navBtn) navBtn.classList.remove('active');
                 saveLayout();
@@ -874,7 +861,7 @@
             if (el && grid) {
                 grid.removeWidget(el);
                 saveLayout();
-                showToast("위젯이 숨겨졌습니다. [위젯 관리자]에서 다시 켤 수 있습니다.");
+                showToast("위젯이 숨겨졌습니다. [위젯 관리자]에서 복원할 수 있습니다.");
             }
         }
 
@@ -885,12 +872,12 @@
             WIDGET_DEFINITIONS.forEach(w => {
                 const exists = document.querySelector(`[gs-id="${w.id}"]`) !== null;
                 html += `
-                <div class="flex items-center justify-between p-2.5 bg-slate-100 rounded-xl border border-slate-300">
+                <div class="flex items-center justify-between p-2.5 bg-slate-100 rounded-lg border border-slate-300">
                     <div class="flex items-center gap-2.5">
-                        <i class="fa-solid ${w.icon} text-cyan-600 text-sm"></i>
+                        <i class="fa-solid ${w.icon} text-sky-700 text-sm"></i>
                         <span class="text-xs font-extrabold text-slate-800">${w.name}</span>
                     </div>
-                    <button onclick="toggleWidgetVisibility('${w.id}')" class="px-3 py-1 rounded-lg text-xs font-black ${exists ? 'bg-rose-100 text-rose-600 border border-rose-300 hover:bg-rose-600 hover:text-white' : 'bg-indigo-100 text-indigo-700 border border-indigo-300 hover:bg-indigo-600 hover:text-white'} transition-all">
+                    <button onclick="toggleWidgetVisibility('${w.id}')" class="px-3 py-1 rounded text-xs font-black ${exists ? 'bg-red-100 text-red-700 border border-red-300 hover:bg-red-600 hover:text-white' : 'bg-sky-100 text-sky-800 border border-sky-300 hover:bg-sky-700 hover:text-white'} transition-all">
                         ${exists ? '<i class="fa-solid fa-eye-slash mr-1"></i> 숨기기' : '<i class="fa-solid fa-plus mr-1"></i> 추가'}
                     </button>
                 </div>`;
@@ -922,7 +909,7 @@
                 grid.addWidget(widgetTemplate, { w, h, id: widgetId });
                 saveLayout();
                 updateDashboard();
-                showToast("위젯이 대시보드에 추가되었습니다.");
+                showToast("위젯이 추가되었습니다.");
             }
             openWidgetManager();
         }
@@ -960,23 +947,16 @@
 
             if (mode === '960') {
                 body.classList.add('split-mode-960');
-                if(btn960) btn960.className = "px-2 py-0.5 text-[10px] font-extrabold rounded text-indigo-700 bg-white shadow border border-slate-300 transition-all flex items-center gap-1";
+                if(btn960) btn960.className = "px-2 py-0.5 text-[10px] font-extrabold rounded text-sky-800 bg-white shadow-xs border border-slate-300 transition-all flex items-center gap-1";
                 if(btn1920) btn1920.className = "px-2 py-0.5 text-[10px] font-extrabold rounded text-slate-500 transition-all flex items-center gap-1";
             } else {
                 body.classList.remove('split-mode-960');
-                if(btn1920) btn1920.className = "px-2 py-0.5 text-[10px] font-extrabold rounded text-indigo-700 bg-white shadow border border-slate-300 transition-all flex items-center gap-1";
+                if(btn1920) btn1920.className = "px-2 py-0.5 text-[10px] font-extrabold rounded text-sky-800 bg-white shadow-xs border border-slate-300 transition-all flex items-center gap-1";
                 if(btn960) btn960.className = "px-2 py-0.5 text-[10px] font-extrabold rounded text-slate-500 transition-all flex items-center gap-1";
             }
             
             setTimeout(resizeAllCharts, 150);
         }
-
-        window.addEventListener('resize', () => {
-            if (window.innerWidth < 1150 && screenMode !== '960') {
-                setScreenMode('960');
-            }
-            resizeAllCharts();
-        });
 
         function switchTab(tabId) {
             document.getElementById('tab-main').classList.remove('active');
@@ -1022,8 +1002,8 @@
         function showToast(msg, type = 'success') {
             const toast = document.getElementById('toast');
             document.getElementById('toast-msg').innerText = msg;
-            toast.className = `toast ${type === 'danger' ? 'bg-rose-900 border-rose-500/50' : 'bg-slate-900 border-slate-700'}`;
-            document.getElementById('toast-icon').className = `fa-solid ${type === 'danger' ? 'fa-triangle-exclamation text-rose-400' : 'fa-circle-check text-emerald-400'} text-lg`;
+            toast.className = `toast ${type === 'danger' ? 'bg-red-900 border-red-500/50' : 'bg-slate-900 border-slate-700'}`;
+            document.getElementById('toast-icon').className = `fa-solid ${type === 'danger' ? 'fa-triangle-exclamation text-red-400' : 'fa-circle-check text-emerald-400'} text-lg`;
             toast.style.bottom = '30px';
             setTimeout(() => { toast.style.bottom = '-100px'; }, 3200);
         }
@@ -1031,7 +1011,7 @@
         function updateLed(status, text) {
             const led = document.getElementById('status-led');
             document.getElementById('status-text').innerText = text;
-            led.className = `w-2 h-2 rounded-full ${status === 'synced' ? 'bg-emerald-500 shadow-[0_0_8px_#10b981]' : status === 'offline' ? 'bg-slate-400' : status === 'connecting' ? 'bg-amber-500 animate-pulse' : 'bg-rose-500 shadow-[0_0_8px_#f43f5e]'}`;
+            led.className = `w-2 h-2 rounded-full ${status === 'synced' ? 'bg-emerald-500 shadow-[0_0_8px_#10b981]' : status === 'offline' ? 'bg-slate-400' : status === 'connecting' ? 'bg-amber-500 animate-pulse' : 'bg-red-500 shadow-[0_0_8px_#ef4444]'}`;
         }
 
         function getSafeCsvUrl(url) {
@@ -1123,7 +1103,7 @@
         }
 
         async function fetchGoogleSheetsData() {
-            updateLed('connecting', '하이브리드 동기화 진행 중...');
+            updateLed('connecting', '동기화 진행 중...');
             let loadedFlags = [];
             
             try {
@@ -1169,14 +1149,21 @@
         function updateTargets() { monthlyTarget = parseFloat(document.getElementById('inp-monthly').value)||0; dailyTarget = parseFloat(document.getElementById('inp-daily').value)||0; updateDashboard(); }
         function onMonthChange() { selectedMonth = document.getElementById('month-select').value; selectedDate = 'ALL'; updateDashboard(); }
         function onDateChange() { selectedDate = document.getElementById('date-select').value; document.getElementById('view-mode-container').style.display = selectedDate === 'ALL' ? 'flex' : 'none'; updateDashboard(); }
-        function setViewMode(mode) { viewMode = mode; document.getElementById('btn-daily').className = `px-1.5 py-0.5 text-[10px] font-bold rounded transition-all ${mode === 'DAILY' ? 'text-indigo-700 bg-white border border-slate-300' : 'text-slate-500'}`; document.getElementById('btn-weekly').className = `px-1.5 py-0.5 text-[10px] font-bold rounded transition-all ${mode === 'WEEKLY' ? 'text-indigo-700 bg-white border border-slate-300' : 'text-slate-500'}`; updateDashboard(); }
+        
+        function setViewMode(mode) { 
+            viewMode = mode; 
+            document.getElementById('btn-daily').className = `px-2 py-0.5 text-[10px] font-bold rounded transition-all ${mode === 'DAILY' ? 'text-sky-800 bg-white border border-slate-300' : 'text-slate-500'}`; 
+            document.getElementById('btn-weekly').className = `px-2 py-0.5 text-[10px] font-bold rounded transition-all ${mode === 'WEEKLY' ? 'text-sky-800 bg-white border border-slate-300' : 'text-slate-500'}`; 
+            updateDashboard(); 
+        }
+
         function setShiftMode(mode) { 
             shiftMode = mode; 
             ['all', 'day', 'night'].forEach(m => { 
                 const btn = document.getElementById(`btn-shift-${m}`); 
                 if (btn) { 
                     const isActive = (mode === 'ALL' && m === 'all') || (mode === '1근' && m === 'day') || (mode === '2근' && m === 'night'); 
-                    btn.className = `px-1.5 py-0.5 text-[10px] font-bold rounded transition-all ${isActive ? 'text-indigo-700 bg-white border border-slate-300' : 'text-slate-500'}`; 
+                    btn.className = `px-1.5 py-0.5 text-[10px] font-bold rounded transition-all ${isActive ? 'text-sky-800 bg-white border border-slate-300' : 'text-slate-500'}`; 
                 } 
             }); 
             updateDashboard(); 
@@ -1260,7 +1247,7 @@
             const sortedTop3 = Object.values(reasonMap).sort((a,b) => b.min - a.min).slice(0, 3);
             let top3Html = '';
             if (sortedTop3.length > 0) {
-                const rankBadges = ['bg-rose-600 text-white', 'bg-amber-500 text-white', 'bg-slate-600 text-white'];
+                const rankBadges = ['bg-red-600 text-white', 'bg-amber-500 text-white', 'bg-slate-600 text-white'];
                 sortedTop3.forEach((item, idx) => {
                     const dispText = item.equip ? `${item.equip} - ${item.reason}` : item.reason;
                     top3Html += `<div class="flex items-center justify-between text-[10px] font-bold text-slate-800 my-0.5">
@@ -1268,7 +1255,7 @@
                             <span class="text-[8.5px] font-black px-1 rounded shrink-0 ${rankBadges[idx]}">${idx+1}위</span>
                             <span class="truncate text-slate-800 font-bold">${dispText}</span>
                         </div>
-                        <span class="font-mono-num font-black text-rose-600 text-xs shrink-0">${item.min.toLocaleString()}<span class="text-[8.5px] font-normal text-slate-500 ml-0.5">분</span></span>
+                        <span class="font-mono-num font-black text-red-600 text-xs shrink-0">${item.min.toLocaleString()}<span class="text-[8.5px] font-normal text-slate-500 ml-0.5">분</span></span>
                     </div>`;
                 });
             } else {
@@ -1299,28 +1286,28 @@
             if(oeeVal) oeeVal.innerText = avgOee;
             if (mList.length > 0 && parseFloat(avgOee) < 80) {
                 if(overlay) overlay.classList.add('emergency-active'); 
-                if(oeeVal) oeeVal.classList.add('text-rose-600'); 
-                if(oeeIcon) { oeeIcon.classList.replace('bg-emerald-50', 'bg-rose-600'); oeeIcon.classList.replace('text-emerald-600', 'text-white'); }
+                if(oeeVal) oeeVal.classList.add('text-red-600'); 
+                if(oeeIcon) { oeeIcon.classList.replace('bg-emerald-50', 'bg-red-600'); oeeIcon.classList.replace('text-emerald-700', 'text-white'); }
                 if(oeeBadge) oeeBadge.classList.remove('hidden');
             } else {
                 if(overlay) overlay.classList.remove('emergency-active'); 
-                if(oeeVal) oeeVal.classList.remove('text-rose-600'); 
-                if(oeeIcon) { oeeIcon.classList.replace('bg-rose-600', 'bg-emerald-50'); oeeIcon.classList.replace('text-white', 'text-emerald-600'); }
+                if(oeeVal) oeeVal.classList.remove('text-red-600'); 
+                if(oeeIcon) { oeeIcon.classList.replace('bg-red-600', 'bg-emerald-50'); oeeIcon.classList.replace('text-white', 'text-emerald-700'); }
                 if(oeeBadge) oeeBadge.classList.add('hidden');
             }
 
             let tHtml = '';
             mList.forEach(m => {
                 tHtml += `<tr class="group hover:bg-slate-100 transition-all">
-                    <td class="font-black text-slate-900 border-l-2 border-l-transparent group-hover:border-l-indigo-600 pl-3 uppercase text-xs lg:text-sm">${m.name}</td>
-                    <td class="text-right font-mono-num font-black text-sm lg:text-base text-indigo-700">${Math.round(m.amt/1000).toLocaleString()}</td>
+                    <td class="font-black text-slate-900 border-l-2 border-l-transparent group-hover:border-l-sky-700 pl-3 uppercase text-xs lg:text-sm">${m.name}</td>
+                    <td class="text-right font-mono-num font-black text-sm lg:text-base text-sky-800">${Math.round(m.amt/1000).toLocaleString()}</td>
                     <td class="text-center font-bold text-amber-700 text-xs lg:text-sm">${m.wr}</td>
                     <td class="text-right font-bold text-slate-700 text-xs lg:text-sm">${m.avgSpd}</td>
-                    <td class="text-right font-bold text-rose-600 text-xs lg:text-sm">${m.down.toLocaleString()}</td>
+                    <td class="text-right font-bold text-red-600 text-xs lg:text-sm">${m.down.toLocaleString()}</td>
                     <td class="px-2">
                         <div class="flex items-center gap-1.5 justify-end">
-                            <div class="flex-1 bg-slate-200 h-2.5 rounded-full overflow-hidden border border-slate-300"><div class="h-full rounded-full ${parseFloat(m.oee) < 85 ? 'bg-rose-600' : 'bg-emerald-600'}" style="width: ${m.oee}%"></div></div>
-                            <span class="font-mono-num font-extrabold text-xs lg:text-sm w-12 text-right ${parseFloat(m.oee) < 85 ? 'text-rose-600' : 'text-emerald-600'}">${m.oee}%</span>
+                            <div class="flex-1 bg-slate-200 h-2.5 rounded-full overflow-hidden border border-slate-300"><div class="h-full rounded-full ${parseFloat(m.oee) < 85 ? 'bg-red-600' : 'bg-emerald-600'}" style="width: ${m.oee}%"></div></div>
+                            <span class="font-mono-num font-extrabold text-xs lg:text-sm w-12 text-right ${parseFloat(m.oee) < 85 ? 'text-red-600' : 'text-emerald-600'}">${m.oee}%</span>
                         </div>
                     </td>
                 </tr>`;
@@ -1331,29 +1318,69 @@
             renderRatioDoughnuts(fProd);
         }
 
+        function get7DayWeekKey(dateStr) {
+            if (!dateStr || !dateStr.includes('-')) return '기타';
+            const parts = dateStr.split('-');
+            const day = parseInt(parts[2], 10);
+            if (isNaN(day)) return '기타';
+            if (day <= 7) return '1주차 (1~7일)';
+            if (day <= 14) return '2주차 (8~14일)';
+            if (day <= 21) return '3주차 (15~21일)';
+            if (day <= 28) return '4주차 (22~28일)';
+            return '5주차 (29일~)';
+        }
+
         function renderMainChart(cProd, cDown, cPack) {
             if(!window.Chart) return;
             const canvas = document.getElementById('mainChart');
             if(!canvas) return;
 
             const agg = {};
+            const badgeEl = document.getElementById('chart-badge');
+
             if(selectedDate === 'ALL') {
-                cProd.forEach(p => { if(!agg[p.date]) agg[p.date] = {l:p.date.substring(5), p:0, pk:0, d:0, s:p.date}; agg[p.date].p += p.amount; });
-                cDown.forEach(p => { if(!agg[p.date]) agg[p.date] = {l:p.date.substring(5), p:0, pk:0, d:0, s:p.date}; agg[p.date].d += p.minutes; });
-                cPack.forEach(p => { if(!agg[p.date]) agg[p.date] = {l:p.date.substring(5), p:0, pk:0, d:0, s:p.date}; agg[p.date].pk += p.amount; });
+                if (viewMode === 'WEEKLY') {
+                    if (badgeEl) badgeEl.innerText = "주간 7일단위 집계";
+                    const weekOrder = ['1주차 (1~7일)', '2주차 (8~14일)', '3주차 (15~21일)', '4주차 (22~28일)', '5주차 (29일~)'];
+                    weekOrder.forEach((w, idx) => { agg[w] = { l: w, p: 0, pk: 0, d: 0, s: idx }; });
+
+                    cProd.forEach(p => {
+                        const wk = get7DayWeekKey(p.date);
+                        if (!agg[wk]) agg[wk] = { l: wk, p: 0, pk: 0, d: 0, s: 99 };
+                        agg[wk].p += p.amount;
+                    });
+                    cDown.forEach(p => {
+                        const wk = get7DayWeekKey(p.date);
+                        if (!agg[wk]) agg[wk] = { l: wk, p: 0, pk: 0, d: 0, s: 99 };
+                        agg[wk].d += p.minutes;
+                    });
+                    cPack.forEach(p => {
+                        const wk = get7DayWeekKey(p.date);
+                        if (!agg[wk]) agg[wk] = { l: wk, p: 0, pk: 0, d: 0, s: 99 };
+                        agg[wk].pk += p.amount;
+                    });
+                } else {
+                    if (badgeEl) badgeEl.innerText = "일간 집계";
+                    cProd.forEach(p => { if(!agg[p.date]) agg[p.date] = {l:p.date.substring(5), p:0, pk:0, d:0, s:p.date}; agg[p.date].p += p.amount; });
+                    cDown.forEach(p => { if(!agg[p.date]) agg[p.date] = {l:p.date.substring(5), p:0, pk:0, d:0, s:p.date}; agg[p.date].d += p.minutes; });
+                    cPack.forEach(p => { if(!agg[p.date]) agg[p.date] = {l:p.date.substring(5), p:0, pk:0, d:0, s:p.date}; agg[p.date].pk += p.amount; });
+                }
             } else {
+                if (badgeEl) badgeEl.innerText = "설비 호기별 집계";
                 cProd.filter(p=>p.date===selectedDate).forEach(p => { if(!agg[p.equipment]) agg[p.equipment] = {l:p.equipment, p:0, pk:0, d:0, s:MACHINE_ORDER.indexOf(p.equipment)}; agg[p.equipment].p += p.amount; });
                 cDown.filter(p=>p.date===selectedDate).forEach(p => { if(!agg[p.equipment]) agg[p.equipment] = {l:p.equipment, p:0, pk:0, d:0, s:MACHINE_ORDER.indexOf(p.equipment)}; agg[p.equipment].d += p.minutes; });
                 cPack.filter(p=>p.date===selectedDate).forEach(p => { if(!agg[p.equipment]) agg[p.equipment] = {l:p.equipment, p:0, pk:0, d:0, s:MACHINE_ORDER.indexOf(p.equipment)}; agg[p.equipment].pk += p.amount; });
             }
 
-            const chartArr = Object.values(agg).sort((a,b) => selectedDate==='ALL' ? new Date(a.s)-new Date(b.s) : a.s-b.s);
+            const chartArr = Object.values(agg).sort((a,b) => (selectedDate==='ALL' && viewMode==='DAILY') ? new Date(a.s)-new Date(b.s) : a.s-b.s);
             const labels = chartArr.map(x=>x.l); 
             const pData = chartArr.map(x=>(x.p/1000).toFixed(1)); 
             const pkData = chartArr.map(x=>(x.pk/1000).toFixed(1));
             const dData = chartArr.map(x=>x.d);
+            
             const activeDailyTarget = shiftMode === 'ALL' ? dailyTarget : dailyTarget / 2;
-            const tData = chartArr.map(() => activeDailyTarget);
+            const targetFactor = (selectedDate === 'ALL' && viewMode === 'WEEKLY') ? 7 : 1;
+            const tData = chartArr.map(() => activeDailyTarget * targetFactor);
 
             if(chartInstance) chartInstance.destroy();
             const ctx = canvas.getContext('2d');
@@ -1363,19 +1390,19 @@
                 data: { 
                     labels: labels, 
                     datasets: [ 
-                        { type: 'line', label: '생산량 (TON)', data: pData, borderColor: '#4f46e5', borderWidth: 3, pointRadius: 3, fill: false, yAxisID: 'y' }, 
-                        { type: 'line', label: '포장량 (TON)', data: pkData, borderColor: '#0284c7', borderWidth: 2, borderDash: [2, 2], pointRadius: 2.5, fill: false, yAxisID: 'y' }, 
-                        { type: 'bar', label: '불가동 (MIN)', data: dData, backgroundColor: 'rgba(225, 29, 72, 0.75)', borderRadius: 4, yAxisID: 'y1' }, 
-                        { type: 'line', label: '목표 (TON)', data: tData, borderColor: '#d97706', borderWidth: 2, borderDash: [4, 4], pointRadius: 0, fill: false, yAxisID: 'y' } 
+                        { type: 'line', label: '생산량 (TON)', data: pData, borderColor: '#1f77b4', borderWidth: 3, pointRadius: 4, fill: false, yAxisID: 'y' }, 
+                        { type: 'line', label: '포장량 (TON)', data: pkData, borderColor: '#17becf', borderWidth: 2, borderDash: [3, 3], pointRadius: 3, fill: false, yAxisID: 'y' }, 
+                        { type: 'bar', label: '불가동 (MIN)', data: dData, backgroundColor: 'rgba(214, 39, 40, 0.75)', borderRadius: 4, yAxisID: 'y1' }, 
+                        { type: 'line', label: '목표 (TON)', data: tData, borderColor: '#ff7f0e', borderWidth: 2, borderDash: [4, 4], pointRadius: 0, fill: false, yAxisID: 'y' } 
                     ] 
                 },
                 options: { 
                     responsive: true, 
                     maintainAspectRatio: false, 
                     scales: { 
-                        x: { grid: { display: false }, ticks: { color: '#475569', font: { size: 10, weight: 'bold' } } }, 
-                        y: { beginAtZero: true, ticks: { color: '#475569', font: { size: 10 } }, grid: { color: 'rgba(0,0,0,0.06)' } }, 
-                        y1: { position: 'right', beginAtZero: true, ticks: { color: '#e11d48', font: { size: 10 } }, grid: { drawOnChartArea: false } } 
+                        x: { grid: { display: false }, ticks: { color: '#4b5563', font: { size: 10, weight: 'bold' } } }, 
+                        y: { beginAtZero: true, ticks: { color: '#4b5563', font: { size: 10 } }, grid: { color: 'rgba(0,0,0,0.06)' } }, 
+                        y1: { position: 'right', beginAtZero: true, ticks: { color: '#d62728', font: { size: 10 } }, grid: { drawOnChartArea: false } } 
                     },
                     plugins: { legend: { display: false } }
                 }
@@ -1418,9 +1445,9 @@
                         datasets: [{
                             data: dataValues,
                             backgroundColor: colors,
-                            borderWidth: 3,
+                            borderWidth: 2,
                             borderColor: '#ffffff',
-                            hoverOffset: 8
+                            hoverOffset: 6
                         }]
                     },
                     options: {
@@ -1452,18 +1479,18 @@
                     const pct = total > 0 ? ((v/total)*100).toFixed(0) : 0;
                     legHtml += `<div class="flex items-center justify-between text-[8.5px] font-bold text-slate-800 bg-white p-0.5 px-1.5 rounded border border-slate-200 shadow-xs">
                         <div class="flex items-center gap-1.5 truncate">
-                            <span class="w-2.5 h-2.5 rounded-full shrink-0 shadow-sm" style="background:${colors[idx]}"></span>
+                            <span class="w-2.5 h-2.5 rounded-full shrink-0 shadow-xs" style="background:${colors[idx]}"></span>
                             <span class="truncate text-slate-800 font-extrabold">${k}</span>
                         </div>
-                        <span class="font-mono-num text-indigo-700 font-black shrink-0 ml-1">${ton}T (${pct}%)</span>
+                        <span class="font-mono-num text-sky-800 font-black shrink-0 ml-1">${ton}T (${pct}%)</span>
                     </div>`;
                 });
                 legendEl.innerHTML = legHtml;
             };
 
-            const steelColors = ['#4f46e5', '#0284c7', '#059669', '#d97706'];
-            const shapeColors = ['#0284c7', '#d97706', '#7c3aed', '#db2777'];
-            const heatColors = ['#d97706', '#64748b'];
+            const steelColors = ['#1f77b4', '#17becf', '#2ca02c', '#ff7f0e'];
+            const shapeColors = ['#1f77b4', '#ff7f0e', '#9467bd', '#e377c2'];
+            const heatColors = ['#ff7f0e', '#7f7f7f'];
 
             chartSteelInstance = createSingleDoughnut('chartSteelType', steelMap, steelColors);
             populateLegend('legend-steel', steelMap, steelColors);
@@ -1477,8 +1504,8 @@
 
         function setAnalyticsGroup(group) {
             analyticsGroupBy = group;
-            document.getElementById('btn-aly-team').className = `px-2.5 py-1 text-xs font-bold rounded transition-all ${group === 'TEAM' ? 'bg-white text-rose-600 border border-slate-300 shadow-xs' : 'text-slate-500'}`;
-            document.getElementById('btn-aly-machine').className = `px-2.5 py-1 text-xs font-bold rounded transition-all ${group === 'MACHINE' ? 'bg-white text-rose-600 border border-slate-300 shadow-xs' : 'text-slate-500'}`;
+            document.getElementById('btn-aly-team').className = `px-2.5 py-1 text-xs font-bold rounded transition-all ${group === 'TEAM' ? 'bg-white text-red-700 border border-slate-300 shadow-xs' : 'text-slate-500'}`;
+            document.getElementById('btn-aly-machine').className = `px-2.5 py-1 text-xs font-bold rounded transition-all ${group === 'MACHINE' ? 'bg-white text-red-700 border border-slate-300 shadow-xs' : 'text-slate-500'}`;
             document.getElementById('analytics-machine-container').style.display = group === 'MACHINE' ? 'flex' : 'none';
             updateAnalytics();
         }
@@ -1506,212 +1533,4 @@
 
             let targetMonth = analyticsMonth === 'LATEST' ? latestMonth : analyticsMonth;
             let cProd = prodData.filter(d => d.date && d.date.startsWith(targetMonth));
-            let cDown = downData.filter(d => d.date && d.date.startsWith(targetMonth));
-
-            const selMachine = document.getElementById('analytics-machine-select');
-            const availableMachines = [...new Set(cProd.map(d=>d.equipment))].filter(e=>e).sort((a,b) => { const idxA = MACHINE_ORDER.indexOf(a); const idxB = MACHINE_ORDER.indexOf(b); return (idxA === -1 ? 999 : idxA) - (idxB === -1 ? 999 : idxB); });
-
-            if (analyticsGroupBy === 'MACHINE' && selMachine) {
-                let currentMachineVal = selMachine.value;
-                if (!currentMachineVal || !availableMachines.includes(currentMachineVal)) currentMachineVal = availableMachines.length > 0 ? availableMachines[0] : "";
-                selMachine.innerHTML = availableMachines.map(m => `<option value="${m}">${m}</option>`).join('');
-                if(currentMachineVal) selMachine.value = currentMachineVal;
-
-                if (currentMachineVal) { cProd = cProd.filter(d => d.equipment === currentMachineVal); cDown = cDown.filter(d => d.equipment === currentMachineVal); }
-            }
-
-            const map = {}; const groupKeys = ['A', 'B', 'C'];
-            groupKeys.forEach(k => { 
-                map[`${k}-원형`] = { group: k, shape: '원형', amt: 0, down: 0, workDays: new Set() }; 
-                map[`${k}-비원형`] = { group: k, shape: '비원형(이형)', amt: 0, down: 0, workDays: new Set() }; 
-            });
-
-            cProd.forEach(p => {
-                let team = (p.team || '').replace(/조/g, '').trim().toUpperCase(); if(!groupKeys.includes(team)) return;
-                const shapeCat = p.isCircle ? '원형' : '비원형'; const key = `${team}-${shapeCat}`;
-                if(map[key]) { map[key].amt += p.amount; map[key].workDays.add(p.date); }
-            });
-
-            cDown.forEach(d => {
-                let team = (d.team || '').replace(/조/g, '').trim().toUpperCase(); if(!groupKeys.includes(team)) return;
-                const shapeCat = d.isCircle ? '원형' : '비원형'; const key = `${team}-${shapeCat}`;
-                if(map[key]) map[key].down += d.minutes;
-            });
-
-            let totCircleAmt=0, totCircleMin=0, totNonAmt=0, totNonMin=0;
-            const res = Object.values(map).map(m => {
-                const minsPerDay = 720;
-                const totalWorkMin = m.workDays.size * minsPerDay; 
-                const netWorkMin = Math.max(0, totalWorkMin - m.down);
-                const uph = netWorkMin > 0 ? (m.amt / 1000) / (netWorkMin / 60) : 0;
-                
-                if(m.shape === '원형') { totCircleAmt+=m.amt; totCircleMin+=netWorkMin; }
-                else { totNonAmt+=m.amt; totNonMin+=netWorkMin; }
-                return { ...m, netWorkMin, uph: uph.toFixed(2), amtTon: (m.amt/1000).toFixed(1) };
-            });
-
-            if(document.getElementById('aly-circle-uph')) document.getElementById('aly-circle-uph').innerText = totCircleMin > 0 ? ((totCircleAmt/1000)/(totCircleMin/60)).toFixed(1) : "0.0";
-            if(document.getElementById('aly-noncircle-uph')) document.getElementById('aly-noncircle-uph').innerText = totNonMin > 0 ? ((totNonAmt/1000)/(totNonMin/60)).toFixed(1) : "0.0";
-
-            let tHtml = ''; const sortedRes = [...res].sort((a,b) => a.group.localeCompare(b.group));
-            if(document.getElementById('aly-table-header')) document.getElementById('aly-table-header').innerHTML = `작업조 <span class="text-[9px] font-bold text-rose-600 bg-rose-50 border border-rose-200 px-1.5 py-0.5 rounded ml-1">${analyticsGroupBy === 'TEAM' ? '전체 설비' : (selMachine ? selMachine.value : '')}</span>`;
-
-            const teamBadges = { 'A': 'bg-indigo-50 text-indigo-700 border-indigo-200', 'B': 'bg-amber-50 text-amber-700 border-amber-200', 'C': 'bg-emerald-50 text-emerald-700 border-emerald-200' };
-
-            sortedRes.forEach(m => {
-                tHtml += `<tr class="hover:bg-slate-100">
-                    <td class="font-black border-l-2 border-l-rose-500 pl-3 text-sm lg:text-base"><span class="px-2 py-0.5 rounded border text-xs font-black ${teamBadges[m.group]}">${m.group}조</span></td>
-                    <td class="text-center font-bold text-slate-700 text-xs lg:text-sm">${m.shape}</td>
-                    <td class="text-right font-mono-num font-black text-sm lg:text-base text-slate-900">${m.amtTon}</td>
-                    <td class="text-right font-mono-num font-bold text-rose-600 text-sm lg:text-base">${m.down}</td>
-                    <td class="text-right font-mono-num font-bold text-emerald-600 text-sm lg:text-base">${m.netWorkMin}</td>
-                    <td class="text-right font-mono-num font-black text-indigo-700 text-base lg:text-lg">${m.uph}</td>
-                </tr>`;
-            }); 
-            if(document.getElementById('analytics-body')) document.getElementById('analytics-body').innerHTML = tHtml;
-
-            if(analyticsChartInstance) analyticsChartInstance.destroy();
-            const canvasA = document.getElementById('analyticsChart');
-            if(!canvasA) return;
-            const ctx = canvasA.getContext('2d');
-            const dataCircle = ['A', 'B', 'C'].map(k => parseFloat(res.find(r => r.group === k && r.shape === '원형')?.uph || 0));
-            const dataNon = ['A', 'B', 'C'].map(k => parseFloat(res.find(r => r.group === k && r.shape.includes('비원형'))?.uph || 0));
-
-            if(document.getElementById('aly-chart-title')) document.getElementById('aly-chart-title').innerText = analyticsGroupBy === 'TEAM' ? '전체 설비 조별 UPH 누적 세로막대 비교 (원형 + 이형)' : `[${selMachine ? selMachine.value : ''}] 호기 조별 UPH 누적 세로막대 비교`;
-
-            analyticsChartInstance = new Chart(ctx, {
-                type: 'bar',
-                data: { 
-                    labels: ['A조', 'B조', 'C조'], 
-                    datasets: [ 
-                        { label: '원형 UPH (TON/Hr)', data: dataCircle, backgroundColor: '#4f46e5', borderRadius: { topLeft: 0, topRight: 0, bottomLeft: 4, bottomRight: 4 } }, 
-                        { label: '비원형(이형) UPH (TON/Hr)', data: dataNon, backgroundColor: '#d97706', borderRadius: { topLeft: 4, topRight: 4, bottomLeft: 0, bottomRight: 0 } } 
-                    ] 
-                },
-                options: { 
-                    responsive: true, 
-                    maintainAspectRatio: false, 
-                    scales: { 
-                        x: { stacked: true, ticks: { color: '#475569', font: { weight: 'bold' } }, grid: { display: false } },
-                        y: { stacked: true, beginAtZero: true, ticks: { color: '#475569' }, grid: { color: 'rgba(0,0,0,0.06)' }, title: { display: true, text: '누적 UPH (TON / Hr)', color: '#64748b' } } 
-                    },
-                    plugins: { 
-                        legend: { labels: { color: '#334155', font: { weight: 'bold' } } },
-                        tooltip: {
-                            callbacks: {
-                                footer: (items) => {
-                                    let sum = 0;
-                                    items.forEach(i => { sum += i.parsed.y; });
-                                    return `합계 생산성: ${sum.toFixed(2)} TON/Hr`;
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        function handleChatEnter(e) { if (e.key === 'Enter') sendChat(); }
-        function sendChat() {
-            const input = document.getElementById('chat-input'); const query = input.value.trim(); if (!query) return;
-            addMsg('user', query); input.value = '';
-            setTimeout(() => { const answer = processQuery(query); addMsg('bot', answer); }, 300); 
-        }
-
-        function addMsg(type, text) {
-            const body = document.getElementById('chat-body'); const div = document.createElement('div');
-            div.className = type === 'bot' ? 'msg-bot' : 'msg-user'; div.innerHTML = text;
-            body.appendChild(div); body.scrollTop = body.scrollHeight;
-        }
-
-        function processQuery(query) {
-            if (!prodData || prodData.length === 0) return "현재 로드된 데이터가 없습니다. 먼저 데이터 연동을 확인해주세요.";
-            const txt = query.toUpperCase().replace(/\s/g, '');
-            
-            let targetTeam = null; 
-            if (txt.includes('A조')) targetTeam = 'A'; 
-            else if (txt.includes('B조')) targetTeam = 'B'; 
-            else if (txt.includes('C조')) targetTeam = 'C';
-
-            let targetEquip = null;
-            MACHINE_ORDER.forEach(e => {
-                if (txt.includes(e.replace(/-/g, '')) || txt.includes(e)) targetEquip = e;
-            });
-
-            if (txt.includes('비가공') || txt.includes('비가동') || txt.includes('정지') || txt.includes('고장') || txt.includes('사유') || txt.includes('항목')) {
-                if (txt.includes('항목') || txt.includes('사유') || txt.includes('이유') || txt.includes('원인') || txt.includes('가장많') || txt.includes('최대') || txt.includes('많은')) {
-                    let filtered = downData;
-                    if (targetTeam) filtered = filtered.filter(d => (d.team || '').includes(targetTeam));
-                    if (targetEquip) filtered = filtered.filter(d => (d.equipment || '').includes(targetEquip));
-
-                    if (filtered.length === 0) return `조건에 해당하는 비가동 내역이 없습니다.`;
-
-                    const reasonMap = {};
-                    filtered.forEach(d => {
-                        const r = d.reason || '기타 고장';
-                        if (!reasonMap[r]) reasonMap[r] = { min: 0, equip: d.equipment, count: 0 };
-                        reasonMap[r].min += d.minutes;
-                        reasonMap[r].count += 1;
-                    });
-
-                    const sorted = Object.entries(reasonMap).sort((a,b) => b[1].min - a[1].min);
-                    if (sorted.length > 0) {
-                        const top = sorted[0];
-                        let reply = `비가동 시간이 가장 많이 잡힌 사유 1위는 **[${top[0]}]** 입니다.<br>• 총 정지시간: **${top[1].min.toLocaleString()} 분** (${top[1].count}건 발생)`;
-                        if (sorted.length > 1) {
-                            reply += `<br>• 2위: **[${sorted[1][0]}]** (${sorted[1][1].min.toLocaleString()} 분)`;
-                        }
-                        return reply;
-                    }
-                }
-
-                let filtered = downData; 
-                if(targetTeam) filtered = filtered.filter(d => (d.team || '').includes(targetTeam));
-                if(targetEquip) filtered = filtered.filter(d => (d.equipment || '').includes(targetEquip));
-                const totalDown = filtered.reduce((a,c) => a + c.minutes, 0);
-                const prefix = targetEquip ? `${targetEquip} ` : (targetTeam ? `${targetTeam}조 ` : '전체 ');
-                return `${prefix}총 비가동 누적 시간은 **${totalDown.toLocaleString()} 분** 입니다.`;
-            }
-
-            if (txt.includes('포장')) {
-                let filtered = packData;
-                if (targetTeam) filtered = filtered.filter(p => (p.team || '').includes(targetTeam));
-                if (targetEquip) filtered = filtered.filter(p => (p.equipment || '').includes(targetEquip));
-                const totPack = filtered.reduce((a,c) => a + c.amount, 0) / 1000;
-                const prefix = targetEquip ? `${targetEquip} ` : (targetTeam ? `${targetTeam}조 ` : '전체 ');
-                return `${prefix}누적 **CD 포장 실적량**은 총 **${totPack.toLocaleString(undefined, {minimumFractionDigits: 1, maximumFractionDigits: 1})} TON** 입니다.`;
-            }
-
-            if (txt.includes('최대') || txt.includes('최고') || txt.includes('1위') || txt.includes('가장높')) {
-                if (txt.includes('조')) {
-                    const teamAmt = { 'A':0, 'B':0, 'C':0 }; 
-                    prodData.forEach(p => { 
-                        let t = (p.team || '').replace(/조/g, '').trim();
-                        if(teamAmt[t] !== undefined) teamAmt[t] += p.amount; 
-                    });
-                    let bestTeam = 'A'; let maxAmt = teamAmt['A'];
-                    ['B','C'].forEach(t => { if(teamAmt[t] > maxAmt) { maxAmt = teamAmt[t]; bestTeam = t; } });
-                    return `현재 누적 기준 생산량 1위는 **${bestTeam}조**이며, 총 **${(maxAmt/1000).toLocaleString(undefined, {minimumFractionDigits: 1})} TON**을 생산했습니다!`;
-                } else {
-                    const equipAmt = {};
-                    prodData.forEach(p => {
-                        if (!equipAmt[p.equipment]) equipAmt[p.equipment] = 0;
-                        equipAmt[p.equipment] += p.amount;
-                    });
-                    const sorted = Object.entries(equipAmt).sort((a,b) => b[1] - a[1]);
-                    if (sorted.length > 0) {
-                        return `가장 생산량이 높은 설비는 **[${sorted[0][0]}]**로 총 **${(sorted[0][1]/1000).toLocaleString(undefined, {minimumFractionDigits: 1})} TON**을 달성했습니다!`;
-                    }
-                }
-            }
-
-            let filtered = prodData; 
-            if(targetTeam) filtered = filtered.filter(p => (p.team || '').includes(targetTeam));
-            if(targetEquip) filtered = filtered.filter(p => (p.equipment || '').includes(targetEquip));
-            const totalProd = filtered.reduce((a,c) => a + c.amount, 0) / 1000;
-            const prefix = targetEquip ? `${targetEquip} ` : (targetTeam ? `${targetTeam}조 ` : '전체 ');
-            return `${prefix}누적 생산 실적은 **${totalProd.toLocaleString(undefined, {minimumFractionDigits: 1})} TON** 입니다.`;
-        }
-    </script>
-</body>
-</html>
+            let cDown = downData.filter(d => d.date && d.
