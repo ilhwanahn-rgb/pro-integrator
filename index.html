@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PRO-INTEGRATOR | Ultimate Edition v21.1</title>
+    <title>PRO-INTEGRATOR | Ultimate Master v22.0</title>
     
     <script>
         if (window.navigator.userAgent.indexOf('MSIE ') > 0 || window.navigator.userAgent.indexOf('Trident/') > 0) {
@@ -12,25 +12,26 @@
         window.process = window.process || {}; window.process.env = window.process.env || {}; window.process.env.NODE_ENV = 'production';
     </script>
 
+    <!-- 외부 라이브러리 (FontAwesome, Tailwind, Chart.js, PapaParse, SheetJS) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap');
-        body { font-family: 'Malgun Gothic', '맑은 고딕', 'Inter', sans-serif; background-color: #f8fafc; margin: 0; padding: 0; }
+        body { font-family: 'Malgun Gothic', '맑은 고딕', 'Inter', sans-serif; background-color: #f8fafc; margin: 0; padding: 0; overflow-x: hidden; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
         table { width: 100%; border-collapse: separate; border-spacing: 0 6px; }
-        th { color: #94a3b8; font-weight: 900; text-transform: uppercase; font-size: 17px; padding: 1rem 1.5rem; letter-spacing: 0.1em; text-align: left; }
-        td { background: #ffffff; padding: 1.25rem 1.5rem; border-top: 1px solid #f1f5f9; border-bottom: 1px solid #f1f5f9; font-size: 20px; font-weight: bold;}
-        td:first-child { border-left: 1px solid #f1f5f9; border-top-left-radius: 16px; border-bottom-left-radius: 16px; }
-        td:last-child { border-right: 1px solid #f1f5f9; border-top-right-radius: 16px; border-bottom-right-radius: 16px; }
-        .target-input { background: #ffffff; border: 1px solid #e2e8f0; color: #0f172a; font-family: 'Inter', monospace; padding: 0.3rem 0.5rem; border-radius: 10px; width: 90px; text-align: right; font-weight: 900; outline: none; font-size: 16px; }
+        th { color: #94a3b8; font-weight: 900; text-transform: uppercase; font-size: 15px; padding: 1rem 1.5rem; letter-spacing: 0.1em; text-align: left; }
+        td { background: #ffffff; padding: 1rem 1.5rem; border-top: 1px solid #f1f5f9; border-bottom: 1px solid #f1f5f9; font-size: 18px; font-weight: bold; }
+        td:first-child { border-left: 1px solid #f1f5f9; border-top-left-radius: 12px; border-bottom-left-radius: 12px; }
+        td:last-child { border-right: 1px solid #f1f5f9; border-top-right-radius: 12px; border-bottom-right-radius: 12px; }
         
-        .modal-bg { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(10px); z-index: 50; justify-content: center; align-items: center; }
+        .target-input { background: #ffffff; border: 1px solid #e2e8f0; color: #0f172a; font-family: 'Inter', monospace; padding: 0.3rem 0.5rem; border-radius: 8px; width: 80px; text-align: right; font-weight: 900; outline: none; font-size: 15px; }
         .toast { position: fixed; bottom: -100px; right: 40px; padding: 20px 30px; border-radius: 20px; color: white; font-weight: 900; font-size: 16px; z-index: 100; transition: bottom 0.4s ease-in-out; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); display: flex; align-items: center; gap: 12px; }
         
         /* 🚨 OEE 비상 경고등 애니메이션 */
@@ -42,253 +43,296 @@
         .emergency-active { display: block !important; animation: emergencyBlink 1.5s infinite; }
         
         /* 🤖 챗봇 UI 스타일 */
-        .chat-bot-window { display: none; position: fixed; bottom: 30px; right: 40px; width: 400px; height: 600px; background: #ffffff; border-radius: 2rem; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); z-index: 999; flex-direction: column; overflow: hidden; border: 1px solid #e2e8f0; }
-        .chat-header { background: #0f172a; padding: 20px; color: white; display: flex; justify-content: space-between; align-items: center; }
-        .chat-body { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; background: #f8fafc; }
-        .chat-input-area { padding: 20px; background: white; border-top: 1px solid #e2e8f0; display: flex; gap: 10px; }
-        .msg-bot { background: #e0e7ff; color: #1e40af; padding: 12px 18px; border-radius: 0 20px 20px 20px; max-width: 85%; align-self: flex-start; font-weight: 700; font-size: 15px; line-height: 1.5;}
-        .msg-user { background: #0f172a; color: white; padding: 12px 18px; border-radius: 20px 0 20px 20px; max-width: 85%; align-self: flex-end; font-weight: 700; font-size: 15px; line-height: 1.5;}
-        .gs-input { width: 100%; padding: 15px 20px; border-radius: 15px; border: 2px solid #e2e8f0; font-size: 14px; font-family: monospace; outline: none; transition: all 0.3s; }
+        .chat-bot-window { display: none; position: fixed; bottom: 30px; right: 40px; width: 380px; height: 550px; background: #ffffff; border-radius: 1.5rem; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); z-index: 999; flex-direction: column; overflow: hidden; border: 1px solid #e2e8f0; }
+        .chat-header { background: #0f172a; padding: 15px 20px; color: white; display: flex; justify-content: space-between; align-items: center; }
+        .chat-body { flex: 1; padding: 20px; overflow-y-auto: auto; display: flex; flex-direction: column; gap: 12px; background: #f8fafc; }
+        .chat-input-area { padding: 15px; background: white; border-top: 1px solid #e2e8f0; display: flex; gap: 10px; }
+        .msg-bot { background: #e0e7ff; color: #1e40af; padding: 12px 16px; border-radius: 0 16px 16px 16px; max-width: 85%; align-self: flex-start; font-weight: 700; font-size: 14px; line-height: 1.5; }
+        .msg-user { background: #0f172a; color: white; padding: 12px 16px; border-radius: 16px 0 16px 16px; max-width: 85%; align-self: flex-end; font-weight: 700; font-size: 14px; line-height: 1.5; }
+        .gs-input { width: 100%; padding: 12px 15px; border-radius: 12px; border: 2px solid #e2e8f0; font-size: 14px; font-family: monospace; outline: none; transition: all 0.3s; }
         
         /* 탭 애니메이션 */
         .tab-content { display: none; }
-        .tab-content.active { display: block; animation: fadeIn 0.5s ease-in-out; }
+        .tab-content.active { display: block; animation: fadeIn 0.4s ease-in-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .nav-icon { cursor: pointer; padding: 15px; border-radius: 1.25rem; transition: all 0.3s; color: #64748b; }
+        .nav-icon { cursor: pointer; padding: 12px; border-radius: 1rem; transition: all 0.3s; color: #64748b; }
         .nav-icon:hover { background: rgba(255,255,255,0.1); color: #fff; }
-        .nav-icon.active { background: #4f46e5; color: #fff; box-shadow: 0 0 20px rgba(79,70,229,0.4); }
+        .nav-icon.active { background: #4f46e5; color: #fff; box-shadow: 0 0 15px rgba(79,70,229,0.4); }
 
-        /* v19.4 날씨/시간 위젯 스타일 */
-        .weather-widget { background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%); border: 1px solid #e2e8f0; border-radius: 2.5rem; padding: 1.5rem; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05); }
+        .weather-widget { background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%); border: 1px solid #e2e8f0; border-radius: 2rem; padding: 1.5rem; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05); }
+        .modal-bg { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(10px); z-index: 950; justify-content: center; align-items: center; }
     </style>
 </head>
 <body>
     <div id="emergency-overlay" class="fixed inset-0 z-[900] pointer-events-none hidden border-[12px] border-transparent transition-all duration-300"></div>
 
     <div class="flex min-h-screen">
-        <aside class="w-24 bg-[#0f172a] border-r border-slate-800 flex flex-col items-center py-6 gap-6 sticky top-0 h-screen shadow-2xl z-40">
-            <div class="w-14 h-14 bg-indigo-600 rounded-2xl flex items-center justify-center shadow-[0_0_20px_rgba(79,70,229,0.4)] mb-4">
-                <i class="fa-solid fa-layer-group text-white text-2xl"></i>
+        <!-- 좌측 사이드바 탭 메뉴 -->
+        <aside class="w-20 lg:w-24 bg-[#0f172a] border-r border-slate-800 flex flex-col items-center py-6 gap-6 sticky top-0 h-screen shadow-2xl z-40">
+            <div class="w-12 h-12 lg:w-14 lg:h-14 bg-indigo-600 rounded-2xl flex items-center justify-center shadow-[0_0_20px_rgba(79,70,229,0.4)] mb-2">
+                <i class="fa-solid fa-layer-group text-white text-xl lg:text-2xl"></i>
             </div>
-            <!-- nav 높이를 꽉 채우도록 h-full 추가 -->
-            <nav class="flex flex-col gap-4 text-2xl w-full px-4 items-center h-full pb-4">
+            <nav class="flex flex-col gap-4 text-xl lg:text-2xl w-full px-3 lg:px-4 items-center h-full pb-4">
                 <div class="nav-icon active" onclick="switchTab('main')" id="nav-main" title="메인 대시보드"><i class="fa-solid fa-chart-line"></i></div>
                 <div class="nav-icon" onclick="switchTab('analytics')" id="nav-analytics" title="CD 생산성 분석"><i class="fa-solid fa-chart-pie"></i></div>
-                <div class="w-10 h-[1px] bg-slate-700 my-2"></div>
-                <div class="nav-icon hover:text-emerald-400" onclick="fetchGoogleSheetsData()" title="구글 시트 동기화"><i class="fa-solid fa-arrows-rotate"></i></div>
+                <div class="w-8 h-[1px] bg-slate-700 my-2"></div>
+                <div class="nav-icon hover:text-emerald-400" onclick="fetchGoogleSheetsData()" title="데이터 강제 동기화"><i class="fa-solid fa-arrows-rotate"></i></div>
+                <div class="nav-icon hover:text-amber-400" onclick="openModal()" title="구글 시트 연동 설정"><i class="fa-solid fa-gear"></i></div>
                 
-                <!-- AI 챗봇 버튼 (절대위치 제거, 통통 튀는 애니메이션 및 노란색 추가) -->
-                <div class="nav-icon mt-auto mb-2 text-amber-400 hover:text-amber-300 animate-bounce" onclick="toggleBot()" title="PRO-Bot (AI 챗봇)"><i class="fa-solid fa-robot text-4xl shadow-[0_0_15px_rgba(251,191,36,0.4)] rounded-full"></i></div>
+                <div class="nav-icon mt-auto mb-2 text-amber-400 hover:text-amber-300 animate-bounce" onclick="toggleBot()" title="PRO-Bot (AI 챗봇)">
+                    <i class="fa-solid fa-robot text-3xl lg:text-4xl drop-shadow-[0_0_10px_rgba(251,191,36,0.6)]"></i>
+                </div>
             </nav>
         </aside>
 
-        <main class="flex-1 p-6 lg:p-10 overflow-y-auto h-screen bg-slate-50 relative z-10 tab-content active" id="tab-main">
-            <div class="bg-indigo-50 border-l-4 border-indigo-500 p-4 mb-6 rounded-r-2xl shadow-sm flex items-center justify-between">
-                <div class="flex items-center gap-3">
-                    <i class="fa-solid fa-satellite-dish text-indigo-500 text-2xl animate-pulse"></i>
-                    <p class="text-[15px] font-bold text-slate-700">
-                        💡 <span class="text-indigo-600 font-extrabold">하이브리드 3D 분석 모드:</span> 구글 시트 데이터를 통합 연동 중입니다. 좌측 로봇 아이콘을 눌러 AI 챗봇을 써보세요!
-                    </p>
-                </div>
-            </div>
-
-            <header class="flex flex-col xl:flex-row justify-between items-start xl:items-end gap-6 mb-10">
+        <!-- ================================================================= -->
+        <!-- TAB 1: 메인 대시보드 (통합 관제) -->
+        <!-- ================================================================= -->
+        <main class="flex-1 p-4 lg:p-8 overflow-y-auto h-screen bg-slate-50 relative z-10 tab-content active" id="tab-main">
+            <header class="flex flex-col xl:flex-row justify-between items-start xl:items-end gap-6 mb-8">
                 <div>
-                    <h1 class="text-4xl font-black tracking-tighter text-slate-900 uppercase flex items-center gap-4">
-                        <span class="w-2.5 h-10 bg-indigo-600 rounded-full shadow-[0_0_15px_rgba(79,70,229,0.5)]"></span>
-                        PRO-INTEGRATOR <span class="text-indigo-600 font-light ml-2 text-2xl">v21.1 (Ultimate)</span>
+                    <h1 class="text-3xl lg:text-4xl font-black tracking-tighter text-slate-900 uppercase flex items-center gap-3">
+                        <span class="w-2.5 h-8 bg-indigo-600 rounded-full shadow-[0_0_15px_rgba(79,70,229,0.5)]"></span>
+                        PRO-INTEGRATOR <span class="text-indigo-600 font-light ml-2 text-xl lg:text-2xl">v22.0 (Master)</span>
                     </h1>
-                    <p class="text-slate-500 font-bold text-xs uppercase tracking-[0.3em] mt-3 ml-6 flex items-center gap-2">
+                    <p class="text-slate-500 font-bold text-xs uppercase tracking-[0.3em] mt-3 ml-5 flex items-center gap-2">
                         <span id="status-led" class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                        <span id="status-text">Google Sheets Live Sync Active</span>
+                        <span id="status-text">Cloud & Local Multi-Sync Active</span>
                     </p>
                 </div>
 
-                <div class="flex flex-wrap items-center gap-4 bg-white p-3 rounded-2xl border border-slate-200 shadow-sm">
-                    <div class="flex gap-5 border-r border-slate-200 pr-5 pl-3">
+                <!-- 글로벌 데이터 필터 컨트롤러 -->
+                <div class="flex flex-wrap items-center gap-3 bg-white p-2.5 rounded-2xl border border-slate-200 shadow-sm">
+                    <div class="flex gap-4 border-r border-slate-200 pr-4 pl-2">
                         <div class="flex flex-col">
-                            <span class="text-xs font-black text-slate-400 uppercase tracking-widest mb-1">운영계획량(월)</span>
-                            <div class="flex items-center gap-2">
+                            <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">운영계획량(월)</span>
+                            <div class="flex items-center gap-1">
                                 <input type="number" id="inp-monthly" class="target-input text-indigo-600" value="4170" onchange="updateTargets()">
-                                <span class="text-xs font-black text-slate-400">TON</span>
+                                <span class="text-[10px] font-black text-slate-400">TON</span>
                             </div>
                         </div>
                         <div class="flex flex-col">
-                            <span class="text-xs font-black text-slate-400 uppercase tracking-widest mb-1">일일목표(일)</span>
-                            <div class="flex items-center gap-2">
+                            <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">일일목표(일)</span>
+                            <div class="flex items-center gap-1">
                                 <input type="number" id="inp-daily" class="target-input text-amber-500" value="119" onchange="updateTargets()">
-                                <span class="text-xs font-black text-slate-400">TON</span>
+                                <span class="text-[10px] font-black text-slate-400">TON</span>
                             </div>
                         </div>
                     </div>
 
-                    <div class="flex items-center gap-3 px-3">
-                        <i class="fa-solid fa-calendar-days text-indigo-500 text-xl"></i>
-                        <select id="date-select" class="bg-slate-50 border border-slate-200 text-base font-black text-slate-700 py-2 px-4 rounded-xl outline-none cursor-pointer" onchange="onDateChange()">
+                    <div class="flex items-center gap-2 px-2">
+                        <i class="fa-solid fa-calendar-days text-indigo-500 text-lg"></i>
+                        <select id="date-select" class="bg-slate-50 border border-slate-200 text-sm font-black text-slate-700 py-1.5 px-3 rounded-lg outline-none cursor-pointer" onchange="onDateChange()">
                             <option value="ALL">당월 누계 분석</option>
                         </select>
-                        <div class="flex bg-slate-100 p-1.5 rounded-xl ml-2">
-                            <button id="btn-daily" onclick="setViewMode('DAILY')" class="px-4 py-2 text-sm font-black rounded-lg bg-white shadow-sm text-indigo-600 border border-slate-200 transition-all">일간</button>
-                            <button id="btn-weekly" onclick="setViewMode('WEEKLY')" class="px-4 py-2 text-sm font-black rounded-lg text-slate-400 transition-all">주간(7일)</button>
+                        <div class="flex bg-slate-100 p-1 rounded-lg ml-1" id="view-mode-container">
+                            <button id="btn-daily" onclick="setViewMode('DAILY')" class="px-3 py-1.5 text-xs font-black rounded text-indigo-600 bg-white shadow-sm border border-slate-200 transition-all">일간</button>
+                            <button id="btn-weekly" onclick="setViewMode('WEEKLY')" class="px-3 py-1.5 text-xs font-black rounded text-slate-400 transition-all">주간</button>
                         </div>
                     </div>
 
-                    <button onclick="fetchGoogleSheetsData()" class="bg-emerald-50 text-emerald-600 px-6 py-3 rounded-xl text-sm font-black hover:bg-emerald-500 hover:text-white transition-all flex items-center gap-2 ml-2">
-                        <i class="fa-solid fa-arrows-rotate"></i> 구글 시트 연동
-                    </button>
+                    <div class="flex items-center gap-2 px-2 border-l border-slate-200 pl-3">
+                        <i class="fa-solid fa-cloud-sun text-amber-500 text-lg"></i>
+                        <div class="flex bg-slate-100 p-1 rounded-lg">
+                            <button id="btn-shift-all" onclick="setShiftMode('ALL')" class="px-3 py-1.5 text-xs font-black rounded text-indigo-600 bg-white shadow-sm border border-slate-200 transition-all">전체</button>
+                            <button id="btn-shift-day" onclick="setShiftMode('주간')" class="px-3 py-1.5 text-xs font-black rounded text-slate-400 transition-all">주간</button>
+                            <button id="btn-shift-night" onclick="setShiftMode('야간')" class="px-3 py-1.5 text-xs font-black rounded text-slate-400 transition-all">야간</button>
+                        </div>
+                    </div>
                 </div>
             </header>
 
-            <div class="grid grid-cols-12 gap-6 mb-10">
-                <!-- 날씨 위젯 (v19.4 특징) -->
+            <!-- 상단 5대 KPI 카드 구역 -->
+            <div class="grid grid-cols-12 gap-5 mb-8">
+                <!-- 날씨 & 시계 위젯 -->
                 <div class="col-span-12 lg:col-span-2 weather-widget flex flex-col justify-between">
                     <div class="flex items-center gap-2 text-slate-500 font-black text-xs uppercase tracking-widest"><i class="fa-regular fa-calendar"></i> TODAY</div>
-                    <div class="my-4">
-                        <p class="text-xs text-slate-400 font-bold mb-1">현재시간</p>
-                        <div class="text-2xl font-black text-slate-800 font-mono tracking-tighter" id="current-time">00:00:00 <span class="text-sm text-slate-400">AM</span></div>
+                    <div class="my-2">
+                        <p class="text-[10px] text-slate-400 font-bold mb-1">현재시간</p>
+                        <div class="text-xl font-black text-slate-800 font-mono tracking-tighter" id="current-time">00:00:00 <span class="text-xs text-slate-400">AM</span></div>
                     </div>
-                    <div class="bg-slate-50 border border-slate-100 rounded-xl p-2 mb-4">
-                        <select class="w-full bg-transparent text-sm font-bold text-slate-700 outline-none cursor-pointer"><option>포항시</option></select>
-                    </div>
-                    <div class="flex justify-between items-end border-t border-slate-100 pt-3">
+                    <div class="flex justify-between items-end border-t border-slate-100 pt-2">
                         <div>
-                            <p class="text-[10px] font-black text-blue-500 uppercase tracking-widest mb-1">TODAY</p>
-                            <div class="flex items-center gap-2"><i class="fa-solid fa-cloud-sun text-slate-400 text-lg"></i><span class="text-lg font-black text-slate-700">27°</span></div>
-                            <p class="text-[10px] font-bold text-slate-400 mt-1">구름조금</p>
-                        </div>
-                        <div class="text-right">
-                            <p class="text-[10px] font-black text-emerald-500 uppercase tracking-widest mb-1">TMRW</p>
-                            <div class="flex items-center gap-2 justify-end"><i class="fa-solid fa-cloud text-slate-400 text-lg"></i><span class="text-lg font-black text-slate-700">31°</span></div>
-                            <p class="text-[10px] font-bold text-slate-400 mt-1">구름조금</p>
+                            <p class="text-[9px] font-black text-blue-500 uppercase tracking-widest mb-0.5">포항 공장</p>
+                            <div class="flex items-center gap-1.5"><i class="fa-solid fa-cloud-sun text-slate-400 text-base"></i><span class="text-base font-black text-slate-700">27°</span></div>
                         </div>
                     </div>
                 </div>
 
-                <div class="col-span-12 lg:col-span-3 bg-white p-7 rounded-[2.5rem] border border-slate-200 shadow-sm flex flex-col justify-center">
-                    <div class="flex justify-between items-start mb-4">
-                        <div class="p-4 rounded-2xl bg-indigo-50 text-indigo-600"><i class="fa-solid fa-arrow-trend-up text-2xl"></i></div>
-                        <span id="kpi-reach" class="text-[15px] font-black px-4 py-1.5 rounded-xl border bg-indigo-50 text-indigo-600 border-indigo-100">달성률 0%</span>
+                <!-- KPI 1: 당월 생산 실적 -->
+                <div class="col-span-12 lg:col-span-2.5 bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex flex-col justify-center">
+                    <div class="flex justify-between items-start mb-3">
+                        <div class="p-3 rounded-xl bg-indigo-50 text-indigo-600"><i class="fa-solid fa-industry text-xl"></i></div>
+                        <span id="kpi-reach" class="text-xs font-black px-3 py-1 rounded-lg border bg-indigo-50 text-indigo-600 border-indigo-100">달성률 0%</span>
                     </div>
-                    <p class="text-[16px] font-black text-slate-400 uppercase tracking-widest mb-1.5">당월 생산 실적</p>
-                    <div class="flex items-baseline gap-2"><h4 id="kpi-tons" class="text-[48px] font-black text-slate-800 font-mono">0</h4><span class="text-xl font-bold text-slate-500">TON</span></div>
+                    <p class="text-xs font-black text-slate-400 uppercase tracking-widest mb-1">당월 생산 실적</p>
+                    <div class="flex items-baseline gap-2"><h4 id="kpi-tons" class="text-3xl lg:text-4xl font-black text-slate-800 font-mono">0</h4><span class="text-base font-bold text-slate-500">TON</span></div>
                 </div>
 
-                <div class="col-span-12 lg:col-span-2 bg-white p-7 rounded-[2.5rem] border border-slate-200 shadow-sm flex flex-col justify-center">
-                    <div class="flex justify-between items-start mb-4">
-                        <div class="p-4 rounded-2xl bg-blue-50 text-blue-500"><i class="fa-solid fa-box-open text-2xl"></i></div>
+                <!-- KPI 2: 복원된 CD 포장 실적량 -->
+                <div class="col-span-12 lg:col-span-2.5 bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex flex-col justify-center">
+                    <div class="flex justify-between items-start mb-3">
+                        <div class="p-3 rounded-xl bg-blue-50 text-blue-600"><i class="fa-solid fa-box-open text-xl"></i></div>
+                        <span id="kpi-pack-ratio" class="text-xs font-black px-3 py-1 rounded-lg border bg-blue-50 text-blue-600 border-blue-100">포장률 0%</span>
                     </div>
-                    <p class="text-[16px] font-black text-slate-400 uppercase tracking-widest mb-1.5">CD포장 실적</p>
-                    <div class="flex items-baseline gap-2"><h4 id="kpi-pack" class="text-[48px] font-black text-slate-800 font-mono">0</h4><span class="text-xl font-bold text-slate-500">TON</span></div>
+                    <p class="text-xs font-black text-slate-400 uppercase tracking-widest mb-1">CD 포장 실적량</p>
+                    <div class="flex items-baseline gap-2"><h4 id="kpi-pack-tons" class="text-3xl lg:text-4xl font-black text-slate-800 font-mono">0</h4><span class="text-base font-bold text-slate-500">TON</span></div>
                 </div>
 
-                <div class="col-span-12 lg:col-span-2 bg-white p-7 rounded-[2.5rem] border border-slate-200 shadow-sm flex flex-col justify-center">
-                    <div class="flex justify-between items-start mb-4">
-                        <div class="p-4 rounded-2xl bg-rose-50 text-rose-500"><i class="fa-solid fa-clock text-2xl"></i></div>
+                <!-- KPI 3: 총 불가동시간 -->
+                <div class="col-span-12 lg:col-span-2.5 bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex flex-col justify-center">
+                    <div class="flex justify-between items-start mb-3">
+                        <div class="p-3 rounded-xl bg-rose-50 text-rose-500"><i class="fa-solid fa-clock text-xl"></i></div>
                     </div>
-                    <p class="text-[16px] font-black text-slate-400 uppercase tracking-widest mb-1.5">총 불가동시간</p>
-                    <div class="flex items-baseline gap-2"><h4 id="kpi-down" class="text-[48px] font-black text-slate-800 font-mono">0</h4><span class="text-xl font-bold text-slate-500">MIN</span></div>
+                    <p class="text-xs font-black text-slate-400 uppercase tracking-widest mb-1">총 불가동시간</p>
+                    <div class="flex items-baseline gap-2"><h4 id="kpi-down" class="text-3xl lg:text-4xl font-black text-slate-800 font-mono">0</h4><span class="text-base font-bold text-slate-500">MIN</span></div>
                 </div>
 
-                <div class="col-span-12 lg:col-span-3 bg-white p-6 rounded-[2.5rem] border border-slate-200 shadow-sm flex flex-col justify-center">
+                <!-- KPI 4: OEE 종합설비효율 (경고등 차부) -->
+                <div id="card-oee" class="col-span-12 lg:col-span-2.5 bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex flex-col justify-center transition-all duration-500">
+                    <div class="flex justify-between items-start mb-3">
+                        <div id="icon-oee" class="p-3 rounded-xl bg-emerald-50 text-emerald-500 transition-colors duration-500"><i class="fa-solid fa-gear text-xl"></i></div>
+                        <span id="badge-oee" class="text-[10px] font-black px-2 py-0.5 rounded-md hidden bg-rose-100 text-rose-600 animate-pulse">EMERGENCY</span>
+                    </div>
+                    <p class="text-xs font-black text-slate-400 uppercase tracking-widest mb-1">OEE [종합효율]</p>
+                    <div class="flex items-baseline gap-2"><h4 id="kpi-oee" class="text-3xl lg:text-4xl font-black text-slate-800 font-mono transition-colors duration-500">0.0</h4><span class="text-base font-bold text-slate-500">%</span></div>
+                </div>
+            </div>
+
+            <!-- 메인 시각화 차트 2종 (생산/불가동 복합 차트 + 형상별 작업량 도넛 차트) -->
+            <div class="grid grid-cols-12 gap-6 mb-8">
+                <!-- 생산실적 및 불가동 현황 (복합 꺾은선/막대 차트) -->
+                <div class="col-span-12 lg:col-span-8 bg-white p-8 rounded-[2.5rem] shadow-sm border border-slate-200">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-xl font-black text-slate-800 flex items-center gap-2">
+                            <i class="fa-solid fa-chart-simple text-indigo-500"></i> 생산실적 및 불가동 현황
+                            <span id="chart-badge" class="text-xs bg-indigo-50 text-indigo-600 font-black px-3 py-1 rounded-full border border-indigo-100">일간 집계</span>
+                        </h3>
+                    </div>
+                    <div class="h-[340px] relative w-full"><canvas id="mainChart"></canvas></div>
+                </div>
+
+                <!-- 복원: 원형, 육각, 이형 등 작업량 도넛 그래프 -->
+                <div class="col-span-12 lg:col-span-4 bg-white p-8 rounded-[2.5rem] shadow-sm border border-slate-200 flex flex-col justify-between">
                     <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-[18px] font-black text-slate-800 flex items-center gap-2"><i class="fa-solid fa-triangle-exclamation text-rose-500 text-xl"></i> 최장 불가동 알림</h3>
+                        <h3 class="text-xl font-black text-slate-800 flex items-center gap-2"><i class="fa-solid fa-chart-pie text-indigo-500"></i> 작업 형상별 분포</h3>
+                        <span class="text-xs font-bold text-slate-400">당월 누적</span>
                     </div>
-                    <div id="ai-risk-container" class="space-y-3 overflow-y-auto max-h-[120px] pr-2">
-                        <div class="py-5 text-center text-slate-400 text-[16px] font-black uppercase">위험 요소 없음</div>
+                    <div class="h-[260px] relative w-full flex items-center justify-center">
+                        <canvas id="shapeDoughnutChart"></canvas>
                     </div>
+                    <div id="shape-legend" class="grid grid-cols-2 gap-2 mt-4 text-xs font-bold text-slate-600"></div>
                 </div>
             </div>
 
-            <div class="bg-white p-10 rounded-[3rem] shadow-sm border border-slate-200 mb-10">
-                <div class="flex items-center justify-between mb-8">
-                    <h3 class="text-2xl font-black text-slate-800 flex items-center gap-3">
-                        <i class="fa-solid fa-chart-simple text-indigo-500"></i> 생산실적 및 불가동 현황
-                        <span id="chart-badge" class="text-sm bg-indigo-50 text-indigo-600 px-3 py-1.5 rounded-xl ml-3">일간 집계</span>
-                    </h3>
+            <!-- 통합 자산 제어 레지스트리 (표 폰트 18px+) -->
+            <div class="bg-white rounded-[2.5rem] shadow-sm border border-slate-200 overflow-hidden mb-10">
+                <div class="p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+                    <h3 class="text-xl font-black text-slate-800 flex items-center gap-2"><i class="fa-solid fa-microchip text-indigo-500"></i> 통합 자산 제어 레지스트리</h3>
+                    <span class="text-xs font-black text-slate-400 uppercase tracking-widest">Real-time Asset Monitoring</span>
                 </div>
-                <div class="h-[420px] relative w-full">
-                    <canvas id="mainChart"></canvas>
-                </div>
-            </div>
-
-            <!-- v19.4 스타일 통합 레지스트리 -->
-            <div class="bg-white rounded-[3rem] shadow-sm border border-slate-200 overflow-hidden mb-20">
-                <div class="p-8 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
-                    <h3 class="text-2xl font-black text-slate-800 flex items-center gap-3"><i class="fa-solid fa-microchip text-indigo-500"></i> 통합 자산 제어 레지스트리</h3>
-                </div>
-                <div class="overflow-x-auto p-4">
+                <div class="overflow-x-auto p-2">
                     <table>
-                        <thead><tr><th>설비 식별</th><th class="text-right">누적 실적 (TON)</th><th class="text-right">CD포장 (TON)</th><th class="text-center">작업선경 범위 (mm)</th><th class="text-right">평균 선속 (m/min)</th><th class="text-right text-rose-500">불가동 (min)</th><th class="w-1/4 uppercase text-emerald-600 text-center">OEE [종합설비효율]</th></tr></thead>
+                        <thead>
+                            <tr>
+                                <th>설비 식별</th>
+                                <th class="text-right">누적 실적 (TON)</th>
+                                <th class="text-center">작업선경 범위 (mm)</th>
+                                <th class="text-right">평균 선속 (m/min)</th>
+                                <th class="text-right text-rose-500">불가동 (min)</th>
+                                <th class="w-1/4 uppercase text-emerald-600 text-center">OEE [종합설비효율]</th>
+                            </tr>
+                        </thead>
                         <tbody id="registry-body"></tbody>
                     </table>
                 </div>
             </div>
         </main>
 
-        <main class="flex-1 p-6 lg:p-10 overflow-y-auto h-screen bg-slate-50 relative z-10 tab-content" id="tab-analytics">
-            <header class="flex flex-col xl:flex-row justify-between items-start xl:items-end gap-6 mb-10">
+        <!-- ================================================================= -->
+        <!-- TAB 2: CD 생산성 분석 (Deep Analytics) -->
+        <!-- ================================================================= -->
+        <main class="flex-1 p-4 lg:p-8 overflow-y-auto h-screen bg-slate-50 relative z-10 tab-content" id="tab-analytics">
+            <header class="flex flex-col xl:flex-row justify-between items-start xl:items-end gap-6 mb-8">
                 <div>
-                    <h1 class="text-4xl font-black tracking-tighter text-slate-900 uppercase flex items-center gap-4">
-                        <span class="w-2.5 h-10 bg-rose-500 rounded-full shadow-[0_0_15px_rgba(244,63,94,0.5)]"></span>
-                        CD 생산성 분석 (DEEP DIVE)
+                    <h1 class="text-3xl lg:text-4xl font-black tracking-tighter text-slate-900 uppercase flex items-center gap-3">
+                        <span class="w-2.5 h-8 bg-rose-500 rounded-full shadow-[0_0_15px_rgba(244,63,94,0.5)]"></span>
+                        CD 생산성 분석 <span class="text-rose-500 font-light ml-2 text-xl lg:text-2xl">DEEP DIVE</span>
                     </h1>
-                    <p class="text-slate-500 font-bold text-sm mt-3 ml-6">순수 가동시간 기반 생산성(UPH) 분석: 원형 vs 비원형</p>
+                    <p class="text-slate-500 font-bold text-xs mt-3 ml-5">순수 가동시간(Net Work Time) 기반 생산성(UPH: TON/Hr) 분석</p>
                 </div>
 
-                <div class="flex flex-wrap items-center gap-4 bg-white p-3 rounded-2xl border border-slate-200 shadow-sm">
-                    <div class="flex items-center gap-3 px-3">
-                        <i class="fa-solid fa-calendar-days text-rose-500 text-xl"></i>
-                        <select id="analytics-month-select" class="bg-slate-50 border border-slate-200 text-base font-black text-slate-700 py-2 px-4 rounded-xl outline-none cursor-pointer" onchange="onAnalyticsMonthChange()">
-                            <option value="LATEST">최신 데이터 로딩 중...</option>
+                <!-- 분석용 제어 필터 -->
+                <div class="flex flex-wrap items-center gap-3 bg-white p-2.5 rounded-2xl border border-slate-200 shadow-sm">
+                    <!-- 연/월 선택기 -->
+                    <div class="flex items-center gap-2 px-2">
+                        <i class="fa-solid fa-calendar-check text-rose-500 text-lg"></i>
+                        <select id="analytics-month-select" class="bg-slate-50 border border-slate-200 text-sm font-black text-slate-700 py-1.5 px-3 rounded-lg outline-none cursor-pointer" onchange="onAnalyticsMonthChange()">
+                            <option value="LATEST">월별 선택 로딩 중...</option>
                         </select>
                     </div>
-                    <div id="analytics-machine-container" class="flex items-center gap-3 px-3 border-l border-slate-200" style="display: none;">
-                        <i class="fa-solid fa-microchip text-slate-400 text-xl"></i>
-                        <select id="analytics-machine-select" class="bg-slate-50 border border-slate-200 text-base font-black text-slate-700 py-2 px-4 rounded-xl outline-none cursor-pointer" onchange="updateAnalytics()">
+
+                    <!-- 호기별 선택 드롭다운 (호기별 클릭 시에만 활성화) -->
+                    <div id="analytics-machine-container" class="flex items-center gap-2 px-2 border-l border-slate-200" style="display: none;">
+                        <i class="fa-solid fa-microchip text-slate-400 text-lg"></i>
+                        <select id="analytics-machine-select" class="bg-slate-50 border border-slate-200 text-sm font-black text-slate-700 py-1.5 px-3 rounded-lg outline-none cursor-pointer" onchange="updateAnalytics()">
                         </select>
                     </div>
-                    <div class="flex bg-slate-100 p-1.5 rounded-xl ml-2">
-                        <button id="btn-aly-team" onclick="setAnalyticsGroup('TEAM')" class="px-4 py-2 text-sm font-black rounded-lg bg-white shadow-sm text-rose-600 border border-slate-200 transition-all">작업조별</button>
-                        <button id="btn-aly-machine" onclick="setAnalyticsGroup('MACHINE')" class="px-4 py-2 text-sm font-black rounded-lg text-slate-400 transition-all">호기별</button>
+
+                    <!-- 관점 스위처: 작업조별 vs 호기별 -->
+                    <div class="flex bg-slate-100 p-1 rounded-lg ml-1">
+                        <button id="btn-aly-team" onclick="setAnalyticsGroup('TEAM')" class="px-3 py-1.5 text-xs font-black rounded bg-white shadow-sm text-rose-600 border border-slate-200 transition-all">작업조별 (전체)</button>
+                        <button id="btn-aly-machine" onclick="setAnalyticsGroup('MACHINE')" class="px-3 py-1.5 text-xs font-black rounded text-slate-400 transition-all">호기별 (특정)</button>
                     </div>
                 </div>
             </header>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
-                <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-slate-200">
-                    <div class="flex items-center justify-between mb-4">
-                        <div class="p-4 rounded-2xl bg-indigo-50 text-indigo-600"><i class="fa-regular fa-circle text-3xl"></i></div>
-                        <span class="px-4 py-1.5 bg-slate-100 text-slate-600 font-black rounded-full text-sm">전체 조 평균</span>
+            <!-- UPH KPI 서머리 카격 -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-8">
+                <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="p-3 rounded-xl bg-indigo-50 text-indigo-600"><i class="fa-regular fa-circle text-2xl"></i></div>
+                        <span class="px-3 py-1 bg-slate-100 text-slate-600 font-black rounded-full text-xs">순수가동 기준 평균</span>
                     </div>
-                    <p class="text-lg font-black text-slate-400 uppercase mb-1">원형 작업 생산성 (UPH)</p>
-                    <div class="flex items-baseline gap-2"><h4 id="aly-circle-uph" class="text-[50px] font-black text-slate-800 font-mono">0.0</h4><span class="text-xl font-bold text-slate-500">TON / Hour</span></div>
+                    <p class="text-sm font-black text-slate-400 uppercase mb-1">원형 작업 생산성 (UPH)</p>
+                    <div class="flex items-baseline gap-2"><h4 id="aly-circle-uph" class="text-4xl font-black text-slate-800 font-mono">0.0</h4><span class="text-lg font-bold text-slate-500">TON/Hr</span></div>
                 </div>
-                <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-slate-200">
-                    <div class="flex items-center justify-between mb-4">
-                        <div class="p-4 rounded-2xl bg-amber-50 text-amber-500"><i class="fa-solid fa-draw-polygon text-3xl"></i></div>
-                        <span class="px-4 py-1.5 bg-slate-100 text-slate-600 font-black rounded-full text-sm">전체 조 평균</span>
+                <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="p-3 rounded-xl bg-amber-50 text-amber-500"><i class="fa-solid fa-draw-polygon text-2xl"></i></div>
+                        <span class="px-3 py-1 bg-slate-100 text-slate-600 font-black rounded-full text-xs">순수가동 기준 평균</span>
                     </div>
-                    <p class="text-lg font-black text-slate-400 uppercase mb-1">비원형 작업 생산성 (UPH)</p>
-                    <div class="flex items-baseline gap-2"><h4 id="aly-noncircle-uph" class="text-[50px] font-black text-slate-800 font-mono">0.0</h4><span class="text-xl font-bold text-slate-500">TON / Hour</span></div>
+                    <p class="text-sm font-black text-slate-400 uppercase mb-1">비원형 작업 생산성 (UPH)</p>
+                    <div class="flex items-baseline gap-2"><h4 id="aly-noncircle-uph" class="text-4xl font-black text-slate-800 font-mono">0.0</h4><span class="text-lg font-bold text-slate-500">TON/Hr</span></div>
                 </div>
             </div>
 
-            <div class="bg-white p-10 rounded-[3rem] shadow-sm border border-slate-200 mb-10">
-                <div class="flex justify-between items-center mb-6">
-                    <h3 class="text-2xl font-black text-slate-800 flex items-center gap-3"><i class="fa-solid fa-users-rays text-indigo-500"></i> <span id="aly-chart-title">작업조별 생산성 (UPH) 비교</span></h3>
+            <!-- 시각화 UPH 비교 차트 -->
+            <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-slate-200 mb-8">
+                <div class="flex justify-between items-center mb-5">
+                    <h3 class="text-xl font-black text-slate-800 flex items-center gap-2"><i class="fa-solid fa-users-rays text-indigo-500"></i> <span id="aly-chart-title">작업조별 UPH 생산성 비교</span></h3>
                 </div>
-                <div class="h-[400px] w-full">
-                    <canvas id="analyticsChart"></canvas>
-                </div>
+                <div class="h-[350px] w-full"><canvas id="analyticsChart"></canvas></div>
             </div>
 
-            <div class="bg-white rounded-[3rem] shadow-sm border border-slate-200 overflow-hidden mb-20">
-                <div class="p-8 border-b border-slate-100 bg-slate-50/50">
-                    <h3 class="text-2xl font-black text-slate-800"><i class="fa-solid fa-table-list text-indigo-500"></i> 상세 분석 레지스트리</h3>
+            <!-- 심층 분석 테이블 레지스트리 -->
+            <div class="bg-white rounded-[2.5rem] shadow-sm border border-slate-200 overflow-hidden mb-10">
+                <div class="p-6 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
+                    <h3 class="text-xl font-black text-slate-800"><i class="fa-solid fa-table-list text-indigo-500"></i> 세부 가동시간 및 UPH 산출 레지스트리</h3>
+                    <span class="text-xs font-bold text-slate-400">UPH = 총생산량(TON) / 순수가동시간(Hr)</span>
                 </div>
-                <div class="overflow-x-auto p-4">
+                <div class="overflow-x-auto p-2">
                     <table>
-                        <thead><tr><th id="aly-table-header">작업조</th><th>작업 형상</th><th class="text-right">총 생산량(TON)</th><th class="text-right text-rose-500">총 비가동(MIN)</th><th class="text-right">순수 가동시간(MIN)</th><th class="text-right text-indigo-600">생산성 (UPH)</th></tr></thead>
+                        <thead>
+                            <tr>
+                                <th id="aly-table-header">분류</th>
+                                <th>작업 형상</th>
+                                <th class="text-right">총 생산량(TON)</th>
+                                <th class="text-right text-rose-500">총 비가동(MIN)</th>
+                                <th class="text-right text-emerald-600">순수 가동시간(MIN)</th>
+                                <th class="text-right text-indigo-600">생산성 (UPH: TON/Hr)</th>
+                            </tr>
+                        </thead>
                         <tbody id="analytics-body"></tbody>
                     </table>
                 </div>
@@ -296,58 +340,89 @@
         </main>
     </div>
 
+    <!-- 🤖 PRO-Bot AI 플로팅 챗봇 창 -->
     <div id="pro-bot-window" class="chat-bot-window">
         <div class="chat-header">
             <div class="flex items-center gap-3">
                 <i class="fa-solid fa-robot text-2xl text-amber-400"></i>
                 <div>
-                    <h3 class="font-black text-lg">PRO-Bot</h3>
-                    <p class="text-xs text-slate-300 font-bold">AI Data Assistant</p>
+                    <h3 class="font-black text-base">PRO-Bot</h3>
+                    <p class="text-[10px] text-slate-300 font-bold">AI Data Assistant v22.0</p>
                 </div>
             </div>
-            <i class="fa-solid fa-xmark text-xl cursor-pointer hover:text-rose-400" onclick="toggleBot()"></i>
+            <i class="fa-solid fa-xmark text-lg cursor-pointer hover:text-rose-400" onclick="toggleBot()"></i>
         </div>
         <div class="chat-body" id="chat-body">
-            <div class="msg-bot">안녕하세요! PRO-Bot입니다.<br>무엇을 도와드릴까요?<br><br><span class="text-xs font-normal text-slate-500">예시: A조 비가동 알려줘 / C조 원형 생산량은? / 최대 생산량 조는?</span></div>
+            <div class="msg-bot">안녕하세요! PRO-Bot입니다.<br>생산/포장/비가동 데이터에 대해 편하게 물어보세요.<br><br><span class="text-[11px] font-normal text-slate-500">예: A조 비가동 시간은? / 포장 실적 보여줘 / 가장 생산량 높은 조는?</span></div>
         </div>
         <div class="chat-input-area">
             <input type="text" id="chat-input" class="gs-input m-0" placeholder="질문을 입력하세요..." onkeypress="handleChatEnter(event)">
-            <button onclick="sendChat()" class="bg-indigo-600 text-white px-5 rounded-xl hover:bg-indigo-700 transition-all"><i class="fa-solid fa-paper-plane"></i></button>
+            <button onclick="sendChat()" class="bg-indigo-600 text-white px-4 rounded-xl hover:bg-indigo-700 transition-all"><i class="fa-solid fa-paper-plane"></i></button>
         </div>
     </div>
 
+    <!-- 구글 시트 및 데이터 연결 설정 모달 -->
+    <div id="sync-modal" class="modal-bg">
+        <div class="bg-white rounded-[3rem] w-full max-w-3xl overflow-hidden shadow-2xl border border-slate-200">
+            <div class="p-8 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+                <div class="flex items-center gap-4">
+                    <div class="bg-indigo-600 p-4 rounded-2xl text-white"><i class="fa-solid fa-gear text-2xl"></i></div>
+                    <div><h3 class="text-2xl font-black text-slate-900">클라우드 데이터 연동 설정</h3><p class="text-xs text-slate-500 font-bold mt-0.5">Google Sheets CSV 웹 게시 링크 지정</p></div>
+                </div>
+                <i class="fa-solid fa-xmark text-2xl text-slate-400 cursor-pointer hover:text-rose-500" onclick="closeModal()"></i>
+            </div>
+            <div class="p-8 space-y-6">
+                <div>
+                    <label class="block text-xs font-black text-slate-500 uppercase tracking-widest mb-2">01. 생산실적 CSV URL</label>
+                    <input type="text" id="modal-url-prod" class="gs-input" placeholder="https://docs.google.com/.../pub?output=csv">
+                </div>
+                <div>
+                    <label class="block text-xs font-black text-slate-500 uppercase tracking-widest mb-2">02. 불가동현황 CSV URL</label>
+                    <input type="text" id="modal-url-down" class="gs-input" placeholder="https://docs.google.com/.../pub?output=csv">
+                </div>
+                <div>
+                    <label class="block text-xs font-black text-slate-500 uppercase tracking-widest mb-2">03. CD 포장실적 CSV URL (Pack Sheet)</label>
+                    <input type="text" id="modal-url-pack" class="gs-input" placeholder="https://docs.google.com/.../pub?output=csv">
+                </div>
+            </div>
+            <div class="p-6 bg-slate-50 border-t border-slate-100 flex justify-end gap-3">
+                <button onclick="closeModal()" class="px-6 py-3 rounded-xl text-xs font-black text-slate-500 hover:bg-slate-200">취소</button>
+                <button onclick="saveModalUrls()" class="px-8 py-3 rounded-xl text-xs font-black bg-indigo-600 text-white hover:bg-indigo-700 shadow-md">저장 및 동기화</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 토스트 알림 메시지 -->
     <div id="toast" class="toast bg-slate-800"><i id="toast-icon" class="fa-solid fa-circle-check text-xl"></i> <span id="toast-msg">메시지</span></div>
 
     <script>
         // =====================================================================
-        // 🌟🌟🌟 [관리자 전용 설정] 🌟🌟🌟
-        // 여기에 구글 시트 웹게시(CSV) 링크를 반드시 다시 붙여넣어 주세요! (7월 최신 데이터용)
+        // 🌟 [관리자 전용 설정: 구글 시트 웹게시 링크]
         // =====================================================================
-        const SHARED_PROD_URL =  "https://docs.google.com/spreadsheets/d/e/2PACX-1vQTdp-wPWsANap0UF_ZvT8HzCbnaqxyiL86rxNfZEqA6ir9m5AczfkDYh2LLBVrYuGSxGiS62i51wRh/pub?gid=1999060895&single=true&output=csv";
-        const SHARED_DOWN_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQTdp-wPWsANap0UF_ZvT8HzCbnaqxyiL86rxNfZEqA6ir9m5AczfkDYh2LLBVrYuGSxGiS62i51wRh/pub?gid=1618063531&single=true&output=csv";
- 
-        // =====================================================================
+        let SHARED_PROD_URL = localStorage.getItem('GS_PROD_URL') || "https://docs.google.com/spreadsheets/d/e/2PACX-1vQTdp-wPWsANapOUF_ZvT8HzCbnaqxyiL86rxNfZEqA6ir9m5AczfkDYh2LLBVrYuGSxGiS62i51wRh/pub?gid=1999060895&single=true&output=csv";
+        let SHARED_DOWN_URL = localStorage.getItem('GS_DOWN_URL') || "https://docs.google.com/spreadsheets/d/e/2PACX-1vQTdp-wPWsANapOUF_ZvT8HzCbnaqxyiL86rxNfZEqA6ir9m5AczfkDYh2LLBVrYuGSxGiS62i51wRh/pub?gid=1618063531&single=true&output=csv";
+        let SHARED_PACK_URL = localStorage.getItem('GS_PACK_URL') || "https://docs.google.com/spreadsheets/d/e/2PACX-1vQTdp-wPWsANapOUF_ZvT8HzCbnaqxyiL86rxNfZEqA6ir9m5AczfkDYh2LLBVrYuGSxGiS62i51wRh/pub?gid=882319401&single=true&output=csv";
 
         const MACHINE_ORDER = ['PCD-0-2', 'PCD-0-3', 'PCD-1', 'PCD-5', 'PCD-2-2', 'PCD-3', 'PCD-4'];
         const EXCLUDED_EQUIPS = ['미분류', 'PCD-W11', 'PCD-W8']; 
 
-        let prodData = [];
-        let downData = [];
-        let selectedDate = 'ALL';
-        let viewMode = 'DAILY';
-        let monthlyTarget = 4170;
-        let dailyTarget = 119;
-        let chartInstance = null;
-        let analyticsChartInstance = null;
-        let analyticsMonth = 'LATEST';
-        let analyticsGroupBy = 'TEAM';
+        let prodData = []; let downData = []; let packData = [];
+        let selectedDate = 'ALL'; let viewMode = 'DAILY'; let shiftMode = 'ALL';
+        let monthlyTarget = 4170; let dailyTarget = 119;
         
-        // 시간 업데이트 위젯
+        let chartInstance = null;
+        let doughnutChartInstance = null;
+        let analyticsChartInstance = null;
+        
+        let analyticsMonth = 'LATEST'; 
+        let analyticsGroupBy = 'TEAM';
+
         function updateTime() {
             const now = new Date();
             let h = now.getHours(); const m = String(now.getMinutes()).padStart(2, '0'); const s = String(now.getSeconds()).padStart(2, '0');
             const ampm = h >= 12 ? 'PM' : 'AM'; h = h % 12; h = h ? h : 12;
-            document.getElementById('current-time').innerHTML = `${String(h).padStart(2, '0')}:${m}:${s} <span class="text-sm text-slate-400">${ampm}</span>`;
+            const tEl = document.getElementById('current-time');
+            if(tEl) tEl.innerHTML = `${String(h).padStart(2, '0')}:${m}:${s} <span class="text-xs text-slate-400">${ampm}</span>`;
         }
         setInterval(updateTime, 1000); updateTime();
 
@@ -359,13 +434,36 @@
             
             document.getElementById(`tab-${tabId}`).classList.add('active');
             document.getElementById(`nav-${tabId}`).classList.add('active');
-            
             if(tabId === 'analytics') updateAnalytics();
         }
 
         function toggleBot() {
             const bot = document.getElementById('pro-bot-window');
             bot.style.display = bot.style.display === 'flex' ? 'none' : 'flex';
+        }
+
+        function openModal() {
+            document.getElementById('modal-url-prod').value = SHARED_PROD_URL;
+            document.getElementById('modal-url-down').value = SHARED_DOWN_URL;
+            document.getElementById('modal-url-pack').value = SHARED_PACK_URL;
+            document.getElementById('sync-modal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('sync-modal').style.display = 'none';
+        }
+
+        function saveModalUrls() {
+            SHARED_PROD_URL = document.getElementById('modal-url-prod').value.trim();
+            SHARED_DOWN_URL = document.getElementById('modal-url-down').value.trim();
+            SHARED_PACK_URL = document.getElementById('modal-url-pack').value.trim();
+
+            localStorage.setItem('GS_PROD_URL', SHARED_PROD_URL);
+            localStorage.setItem('GS_DOWN_URL', SHARED_DOWN_URL);
+            localStorage.setItem('GS_PACK_URL', SHARED_PACK_URL);
+
+            closeModal();
+            fetchGoogleSheetsData();
         }
 
         function showToast(msg, type = 'success') {
@@ -384,29 +482,15 @@
         }
 
         function getSafeCsvUrl(url) {
-            if (!url) return "";
-            let safeUrl = url.trim();
+            if (!url) return ""; let safeUrl = url.trim();
             if (safeUrl.includes('/pubhtml')) safeUrl = safeUrl.replace('/pubhtml', '/pub');
             if (!safeUrl.includes('output=csv')) safeUrl += (safeUrl.includes('?') ? '&' : '?') + 'output=csv';
             return safeUrl;
         }
 
-        function decodeBufferSafe(buffer) {
-            const utf8Text = new TextDecoder('utf-8').decode(buffer);
-            const euckrText = new TextDecoder('euc-kr').decode(buffer);
-            const keywords = ['일자', '날짜', '설비', '호기', '생산', '작업', '선속', '불가동', '사유', '원인'];
-            const utf8Score = keywords.filter(k => utf8Text.includes(k)).length;
-            const euckrScore = keywords.filter(k => euckrText.includes(k)).length;
-            return euckrScore > utf8Score ? euckrText : utf8Text;
-        }
-
         function normalizeDate(val) {
-            if (!val) return null;
-            let s = String(val).trim();
-            if (/^\d{5}$/.test(s)) {
-                let d = new Date(Math.round((s - 25569) * 86400 * 1000));
-                return d.toISOString().split('T')[0];
-            }
+            if (!val) return null; let s = String(val).trim();
+            if (/^\d{5}$/.test(s)) { let d = new Date(Math.round((s - 25569) * 86400 * 1000)); return d.toISOString().split('T')[0]; }
             s = s.replace(/[\.\/]/g, '-');
             if (/^\d{8}$/.test(s)) { return `${s.substring(0,4)}-${s.substring(4,6)}-${s.substring(6,8)}`; }
             const match = s.match(/(\d{4})-(\d{1,2})-(\d{1,2})/);
@@ -416,356 +500,273 @@
 
         const safeNum = (val) => parseFloat((val || '0').toString().replace(/,/g, '')) || 0;
 
-        function extractDataFromAOA(aoa, isProd) {
-            let headerIdx = -1;
-            let headers = [];
+        // 지능형 데이터 파서 (AOA 스캐너)
+        function extractDataFromAOA(aoa, dataType) {
+            let headerIdx = -1; let headers = [];
             for (let i = 0; i < Math.min(20, aoa.length); i++) {
                 if(!aoa[i]) continue;
                 const rowStr = aoa[i].join('').replace(/\s/g, '').toLowerCase();
-                const hasDate = ['일자', '날짜', 'date', '시간'].some(k => rowStr.includes(k));
-                const hasEquip = ['설비', '호기', '기계', 'equip'].some(k => rowStr.includes(k));
-                if (hasDate || hasEquip) {
-                    headerIdx = i;
-                    headers = aoa[i].map(h => h ? String(h).trim().replace(/\s/g, '').replace('\ufeff', '').toUpperCase() : '');
-                    break;
+                if (['일자', '날짜', 'date', '시간'].some(k => rowStr.includes(k)) || ['설비', '호기', '기계', 'equip'].some(k => rowStr.includes(k))) {
+                    headerIdx = i; headers = aoa[i].map(h => h ? String(h).trim().replace(/\s/g, '').replace('\ufeff', '').toUpperCase() : ''); break;
                 }
             }
-
-            if (headerIdx === -1 && aoa.length > 0) {
-                headerIdx = 0;
-                headers = aoa[0].map(h => h ? String(h).trim().replace(/\s/g, '').replace('\ufeff', '').toUpperCase() : '');
-            }
+            if (headerIdx === -1 && aoa.length > 0) { headerIdx = 0; headers = aoa[0].map(h => h ? String(h).trim().replace(/\s/g, '').replace('\ufeff', '').toUpperCase() : ''); }
             if (headerIdx === -1) return []; 
-
-            // 조별, 형상 키워드 확장
-            const dateKws = ['작업일자', '일자', '날짜', '생산일', 'DATE'];
-            const equipKws = ['작업설비', '설비', '호기', '기계', '설비명', 'EQUIPMENT'];
-            const teamKws = ['작업조', '조명', 'TEAM', '조'];
-            const shapeKws = ['형상', '품종', '모양'];
 
             const getVal = (row, keywords) => {
                 for (const k of keywords) {
                     const searchKey = k.toUpperCase();
-                    let idx = headers.indexOf(searchKey); 
-                    if(idx !== -1 && row[idx] !== undefined) return row[idx];
-                    idx = headers.findIndex(h => h.includes(searchKey)); 
-                    if(idx !== -1 && row[idx] !== undefined) return row[idx];
-                }
-                return null;
+                    let idx = headers.indexOf(searchKey); if(idx !== -1 && row[idx] !== undefined) return row[idx];
+                    idx = headers.findIndex(h => h.includes(searchKey)); if(idx !== -1 && row[idx] !== undefined) return row[idx];
+                } return null;
             };
 
             const parsed = [];
             for (let i = headerIdx + 1; i < aoa.length; i++) {
-                const row = aoa[i];
-                if (!row || row.length === 0 || !row.join('').trim()) continue; 
-
-                let date = normalizeDate(getVal(row, dateKws));
-                let equip = String(getVal(row, equipKws) || '미분류').trim();
-                let team = String(getVal(row, teamKws) || '').trim().replace('조',''); // A, B, C 추출
-                let shapeRaw = String(getVal(row, shapeKws) || '').trim();
+                const row = aoa[i]; if (!row || row.length === 0 || !row.join('').trim()) continue; 
+                
+                let date = normalizeDate(getVal(row, ['작업일자', '일자', '날짜', '생산일', '포장일', 'DATE']));
+                let equip = String(getVal(row, ['작업설비', '설비', '호기', '기계', 'EQUIPMENT']) || '미분류').trim();
+                let team = String(getVal(row, ['작업조', '조명', 'TEAM', '조']) || '').trim().replace('조','');
+                let shapeRaw = String(getVal(row, ['형상', '품종', '모양', 'SHAPE']) || '원형').trim();
                 let isCircle = shapeRaw.includes('원형') && !shapeRaw.includes('비원형');
+                let shiftVal = String(getVal(row, ['주야간', '주야', '근무', '구분', 'SHIFT']) || '').trim();
 
-                if (!date || !equip || EXCLUDED_EQUIPS.includes(equip.toUpperCase().trim())) continue;
+                if (!date) continue;
 
-                if (isProd) {
-                    parsed.push({
-                        date, equipment: equip, team, isCircle, shapeRaw,
-                        amount: safeNum(getVal(row, ['작업량', '생산량', '중량', '실적', '수량'])),
-                        packAmount: safeNum(getVal(row, ['포장량'])), // v19.4 포장량 추가
-                        speed: safeNum(getVal(row, ['선속', '속도', 'RPM', '신선선속'])),
-                        wire: safeNum(getVal(row, ['작업선경', '선경', '두께', 'WIRE']))
-                    });
-                } else {
-                    parsed.push({
-                        date, equipment: equip, team, isCircle, shapeRaw,
-                        minutes: safeNum(getVal(row, ['세부불가동', '불가동시간', '정지시간', '시간'])),
-                        reason: String(getVal(row, ['불가동명', '사유', '원인', '내역']) || '기타 고장')
-                    });
+                if (dataType === 'PROD') {
+                    if (EXCLUDED_EQUIPS.includes(equip.toUpperCase().trim())) continue;
+                    parsed.push({ date, equipment: equip, team, isCircle, shapeRaw, shift: shiftVal, amount: safeNum(getVal(row, ['작업량', '생산량', '중량', '실적', '수량'])), speed: safeNum(getVal(row, ['선속', '속도', 'RPM', '신선선속'])), wire: safeNum(getVal(row, ['작업선경', '선경', '두께', 'WIRE'])) });
+                } else if (dataType === 'DOWN') {
+                    if (EXCLUDED_EQUIPS.includes(equip.toUpperCase().trim())) continue;
+                    parsed.push({ date, equipment: equip, team, isCircle, shapeRaw, shift: shiftVal, minutes: safeNum(getVal(row, ['세부불가동', '불가동시간', '정지시간', '시간'])), reason: String(getVal(row, ['불가동명', '사유', '원인', '내역']) || '기타 고장') });
+                } else if (dataType === 'PACK') {
+                    parsed.push({ date, equipment: equip, team, shift: shiftVal, amount: safeNum(getVal(row, ['포장량', '포장중량', '실적', '작업량', '수량'])) });
                 }
-            }
-            return parsed;
+            } return parsed;
         }
 
         async function fetchGoogleSheetsData() {
-            if (!SHARED_PROD_URL || !SHARED_DOWN_URL) {
-                showToast("HTML 코드 상단에 구글 시트 링크를 입력해주세요!", "danger");
-                updateLed('error', 'Link Not Configured');
-                loadFromLocal();
-                return;
+            updateLed('connecting', '하이브리드 멀티 동기화 중...');
+            let loadedFlags = [];
+            
+            // 1. 생산 데이터
+            try {
+                const pRes = await fetch(getSafeCsvUrl(SHARED_PROD_URL));
+                if (pRes.ok) {
+                    const text = await pRes.text(); const aoa = Papa.parse(text, { skipEmptyLines: true }).data;
+                    const parsed = extractDataFromAOA(aoa, 'PROD');
+                    if(parsed.length > 0) { prodData = parsed; loadedFlags.push(`생산:${parsed.length}`); }
+                }
+            } catch(e) { console.error("PROD fetch error", e); }
+
+            // 2. 불가동 데이터
+            try {
+                const dRes = await fetch(getSafeCsvUrl(SHARED_DOWN_URL));
+                if (dRes.ok) {
+                    const text = await dRes.text(); const aoa = Papa.parse(text, { skipEmptyLines: true }).data;
+                    const parsed = extractDataFromAOA(aoa, 'DOWN');
+                    if(parsed.length > 0) { downData = parsed; loadedFlags.push(`불가동:${parsed.length}`); }
+                }
+            } catch(e) { console.error("DOWN fetch error", e); }
+
+            // 3. 포장 데이터 (Pack)
+            try {
+                const pkRes = await fetch(getSafeCsvUrl(SHARED_PACK_URL));
+                if (pkRes.ok) {
+                    const text = await pkRes.text(); const aoa = Papa.parse(text, { skipEmptyLines: true }).data;
+                    const parsed = extractDataFromAOA(aoa, 'PACK');
+                    if(parsed.length > 0) { packData = parsed; loadedFlags.push(`포장:${parsed.length}`); }
+                }
+            } catch(e) { console.error("PACK fetch error", e); }
+
+            if(loadedFlags.length > 0) {
+                showToast(`데이터 연동 완료! (${loadedFlags.join(', ')})`);
+                updateLed('synced', 'Sync Active');
+            } else {
+                updateLed('error', 'Fetch Failed');
             }
 
-            updateLed('connecting', '구글 시트 실시간 동기화 중...');
-            try {
-                let serverLoaded = false;
-                let msg = [];
-
-                try {
-                    const pRes = await fetch(getSafeCsvUrl(SHARED_PROD_URL));
-                    if (pRes.ok) {
-                        const text = await pRes.text();
-                        const aoa = Papa.parse(text, { skipEmptyLines: true }).data;
-                        const parsed = extractDataFromAOA(aoa, true);
-                        if(parsed.length > 0) { 
-                            prodData = parsed; serverLoaded = true; msg.push(`생산: ${parsed.length}건`);
-                        }
-                    }
-                } catch(e) { console.error("생산 시트 로드 에러", e); }
-
-                try {
-                    const dRes = await fetch(getSafeCsvUrl(SHARED_DOWN_URL));
-                    if (dRes.ok) {
-                        const text = await dRes.text();
-                        const aoa = Papa.parse(text, { skipEmptyLines: true }).data;
-                        const parsed = extractDataFromAOA(aoa, false);
-                        if(parsed.length > 0) { 
-                            downData = parsed; serverLoaded = true; msg.push(`불가동: ${parsed.length}건`);
-                        }
-                    }
-                } catch(e) { console.error("불가동 시트 로드 에러", e); }
-
-                if(serverLoaded) {
-                    showToast(`구글 시트 연동 완료! (${msg.join(', ')})`);
-                    updateLed('synced', 'Google Sheets Live Sync');
-                    saveToLocal();
-                } else {
-                    showToast("구글 시트에서 데이터를 불러오지 못했습니다.", "danger");
-                    loadFromLocal();
-                }
-                updateDashboard();
-                if(document.getElementById('tab-analytics').classList.contains('active')) updateAnalytics();
-
-            } catch (err) {
-                console.error("구글 시트 통신 에러:", err);
-                loadFromLocal();
-                updateDashboard();
-            }
-        }
-
-        function loadFromLocal() {
-            try {
-                const saved = localStorage.getItem('PRO_INTEGRATOR_DB');
-                if (saved) {
-                    const data = JSON.parse(saved);
-                    if (data.prodData && data.prodData.length > 0) prodData = data.prodData;
-                    if (data.downData && data.downData.length > 0) downData = data.downData;
-                    if (data.monthlyTarget) { monthlyTarget = data.monthlyTarget; document.getElementById('inp-monthly').value = monthlyTarget; }
-                    if (data.dailyTarget) { dailyTarget = data.dailyTarget; document.getElementById('inp-daily').value = dailyTarget; }
-                    updateLed('offline', '로컬 캐시 사용중 (데이터 확인 요망)');
-                }
-            } catch (e) {}
-        }
-
-        function saveToLocal() {
-            try {
-                localStorage.setItem('PRO_INTEGRATOR_DB', JSON.stringify({
-                    prodData, downData, monthlyTarget, dailyTarget, timestamp: Date.now()
-                }));
-            } catch(e) {}
-        }
-
-        fetchGoogleSheetsData();
-
-        function updateTargets() {
-            monthlyTarget = parseFloat(document.getElementById('inp-monthly').value) || 0;
-            dailyTarget = parseFloat(document.getElementById('inp-daily').value) || 0;
-            updateDashboard();
-            saveToLocal();
-        }
-
-        function setViewMode(mode) {
-            viewMode = mode;
-            document.getElementById('btn-daily').className = `px-4 py-2 text-sm font-black rounded-lg transition-all ${mode === 'DAILY' ? 'bg-white shadow-sm text-indigo-600 border border-slate-200' : 'text-slate-400'}`;
-            document.getElementById('btn-weekly').className = `px-4 py-2 text-sm font-black rounded-lg transition-all ${mode === 'WEEKLY' ? 'bg-white shadow-sm text-indigo-600 border border-slate-200' : 'text-slate-400'}`;
-            document.getElementById('chart-badge').innerText = mode === 'WEEKLY' ? '주간 집계' : '일간 집계';
-            updateDashboard();
-        }
-
-        function onDateChange() {
-            selectedDate = document.getElementById('date-select').value;
-            document.getElementById('view-mode-container').style.display = selectedDate === 'ALL' ? 'flex' : 'none';
-            document.getElementById('chart-badge').style.display = selectedDate === 'ALL' ? 'inline-block' : 'none';
             updateDashboard();
             if(document.getElementById('tab-analytics').classList.contains('active')) updateAnalytics();
         }
 
+        fetchGoogleSheetsData();
+
+        function updateTargets() { monthlyTarget = parseFloat(document.getElementById('inp-monthly').value)||0; dailyTarget = parseFloat(document.getElementById('inp-daily').value)||0; updateDashboard(); }
+        function onDateChange() { selectedDate = document.getElementById('date-select').value; document.getElementById('view-mode-container').style.display = selectedDate === 'ALL' ? 'flex' : 'none'; updateDashboard(); }
+        function setViewMode(mode) { viewMode = mode; document.getElementById('btn-daily').className = `px-3 py-1.5 text-xs font-black rounded transition-all ${mode === 'DAILY' ? 'text-indigo-600 bg-white shadow-sm border border-slate-200' : 'text-slate-400'}`; document.getElementById('btn-weekly').className = `px-3 py-1.5 text-xs font-black rounded transition-all ${mode === 'WEEKLY' ? 'text-indigo-600 bg-white shadow-sm border border-slate-200' : 'text-slate-400'}`; updateDashboard(); }
+        function setShiftMode(mode) { shiftMode = mode; ['all', 'day', 'night'].forEach(m => { const btn = document.getElementById(`btn-shift-${m}`); if (btn) { const isActive = (mode === 'ALL' && m === 'all') || (mode === '주간' && m === 'day') || (mode === '야간' && m === 'night'); btn.className = `px-3 py-1.5 text-xs font-black rounded transition-all ${isActive ? 'text-indigo-600 bg-white shadow-sm border border-slate-200' : 'text-slate-400'}`; } }); updateDashboard(); }
+
+        // 메인 대시보드 데이터 갱신
         function updateDashboard() {
             let latestMonth = "";
-            const safeProdData = Array.isArray(prodData) ? prodData : [];
-            const safeDownData = Array.isArray(downData) ? downData : [];
+            const safeProd = Array.isArray(prodData) ? prodData : [];
+            const safeDown = Array.isArray(downData) ? downData : [];
+            const safePack = Array.isArray(packData) ? packData : [];
 
-            if (safeProdData.length > 0 || safeDownData.length > 0) {
-                const allDates = [...safeProdData.map(d=>d.date), ...safeDownData.map(d=>d.date)]
-                    .filter(d => d && d.length >= 7 && d.includes('-')).sort();
+            if (safeProd.length > 0 || safeDown.length > 0) {
+                const allDates = [...safeProd.map(d=>d.date), ...safeDown.map(d=>d.date)].filter(d => d && d.length >= 7 && d.includes('-')).sort();
                 if(allDates.length > 0) latestMonth = allDates[allDates.length - 1].substring(0, 7); 
             }
-            if(!latestMonth) {
-                const now = new Date(); latestMonth = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+            if(!latestMonth) { const now = new Date(); latestMonth = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`; }
+
+            let cProd = safeProd.filter(d => d.date && d.date.startsWith(latestMonth));
+            let cDown = safeDown.filter(d => d.date && d.date.startsWith(latestMonth));
+            let cPack = safePack.filter(d => d.date && d.date.startsWith(latestMonth));
+
+            if (shiftMode !== 'ALL') {
+                cProd = cProd.filter(d => d.shift && d.shift.includes(shiftMode));
+                cDown = cDown.filter(d => d.shift && d.shift.includes(shiftMode));
+                cPack = cPack.filter(d => d.shift && d.shift.includes(shiftMode));
             }
 
-            const cProd = safeProdData.filter(d => d.date && d.date.startsWith(latestMonth));
-            const cDown = safeDownData.filter(d => d.date && d.date.startsWith(latestMonth));
-
             const dates = ["ALL", ...new Set(cProd.map(d => d.date))].sort();
-            const sel = document.getElementById('date-select');
-            const currentVal = selectedDate;
-            
-            sel.innerHTML = `<option value="ALL">당월 전체 누계 (${latestMonth})</option>` + dates.filter(d=>d!=='ALL').map(d => `<option value="${d}">${d}</option>`).join('');
-            if(dates.includes(currentVal)) { sel.value = currentVal; selectedDate = currentVal; } 
-            else { sel.value = "ALL"; selectedDate = "ALL"; }
+            const sel = document.getElementById('date-select'); const currentVal = selectedDate;
+            sel.innerHTML = `<option value="ALL">당월 누계 (${latestMonth})</option>` + dates.filter(d=>d!=='ALL').map(d => `<option value="${d}">${d}</option>`).join('');
+            if(dates.includes(currentVal)) { sel.value = currentVal; selectedDate = currentVal; } else { sel.value = "ALL"; selectedDate = "ALL"; }
 
             const fProd = selectedDate === 'ALL' ? cProd : cProd.filter(d => d.date === selectedDate);
             const fDown = selectedDate === 'ALL' ? cDown : cDown.filter(d => d.date === selectedDate);
+            const fPack = selectedDate === 'ALL' ? cPack : cPack.filter(d => d.date === selectedDate);
+
+            const totKg = fProd.reduce((a,c)=>a+c.amount, 0);
+            const totPackKg = fPack.reduce((a,c)=>a+c.amount, 0);
+            const totDown = fDown.reduce((a,c)=>a+c.minutes, 0);
+
+            const activeMonthlyTarget = shiftMode === 'ALL' ? monthlyTarget : monthlyTarget / 2;
+
+            // KPI 카드 반영
+            document.getElementById('kpi-tons').innerText = (totKg/1000).toFixed(0).toLocaleString();
+            document.getElementById('kpi-reach').innerText = `달성률 ${activeMonthlyTarget > 0 ? ((totKg/1000/activeMonthlyTarget)*100).toFixed(1) : 0}%`;
+            
+            document.getElementById('kpi-pack-tons').innerText = (totPackKg/1000).toFixed(0).toLocaleString();
+            document.getElementById('kpi-pack-ratio').innerText = `포장률 ${totKg > 0 ? ((totPackKg/totKg)*100).toFixed(1) : 0}%`;
+
+            document.getElementById('kpi-down').innerText = totDown.toLocaleString();
+
+            // OEE 계산 및 표 구동
             const daysCount = selectedDate === 'ALL' ? Math.max(1, dates.length - 1) : 1;
+            const shiftFactor = (shiftMode === 'ALL') ? 1 : 0.5;
+            const totalMin = 1440 * daysCount * shiftFactor; 
 
             const mMap = {};
             fProd.forEach(d => {
-                if(!mMap[d.equipment]) mMap[d.equipment] = {name: d.equipment, amt:0, pack:0, down:0, spdSum:0, spdCnt:0, minW:Infinity, maxW:-Infinity};
+                if(!mMap[d.equipment]) mMap[d.equipment] = {name: d.equipment, amt:0, down:0, spdSum:0, spdCnt:0, minW:Infinity, maxW:-Infinity};
                 mMap[d.equipment].amt += d.amount;
-                mMap[d.equipment].pack += (d.packAmount || 0); // v19.4 포장량 
                 if(d.speed > 0) { mMap[d.equipment].spdSum += d.speed; mMap[d.equipment].spdCnt++; }
                 if(d.wire > 0) { mMap[d.equipment].minW = Math.min(mMap[d.equipment].minW, d.wire); mMap[d.equipment].maxW = Math.max(mMap[d.equipment].maxW, d.wire); }
             });
             fDown.forEach(d => { if(mMap[d.equipment]) mMap[d.equipment].down += d.minutes; });
 
-            const totalMin = 1440 * daysCount;
             let mList = Object.values(mMap).map(m => ({
-                ...m,
-                oee: totalMin > 0 ? Math.max(0, ((totalMin - m.down)/totalMin * 100)).toFixed(1) : "0.0",
-                avgSpd: m.spdCnt > 0 ? (m.spdSum/m.spdCnt).toFixed(1) : "0.0",
-                wr: m.minW === Infinity ? "기록없음" : `${m.minW} - ${m.maxW}`
-            })).sort((a,b) => {
-                const idxA = MACHINE_ORDER.indexOf(a.name); const idxB = MACHINE_ORDER.indexOf(b.name);
-                return (idxA === -1 ? 999 : idxA) - (idxB === -1 ? 999 : idxB);
-            });
+                ...m, oee: totalMin > 0 ? Math.max(0, ((totalMin - m.down)/totalMin * 100)).toFixed(1) : "0.0", avgSpd: m.spdCnt > 0 ? (m.spdSum/m.spdCnt).toFixed(1) : "0.0", wr: m.minW === Infinity ? "기록없음" : `${m.minW} - ${m.maxW}`
+            })).sort((a,b) => { const idxA = MACHINE_ORDER.indexOf(a.name); const idxB = MACHINE_ORDER.indexOf(b.name); return (idxA === -1 ? 999 : idxA) - (idxB === -1 ? 999 : idxB); });
 
-            const totKg = fProd.reduce((a,c)=>a+c.amount, 0);
-            const totPack = fProd.reduce((a,c)=>a+(c.packAmount||0), 0); // 포장량 총합
-            const totDown = fDown.reduce((a,c)=>a+c.minutes, 0);
             const avgOee = mList.length > 0 ? (mList.reduce((a,c)=>a+parseFloat(c.oee), 0) / mList.length).toFixed(1) : "0.0";
             
-            document.getElementById('kpi-tons').innerText = (totKg/1000).toFixed(0).toLocaleString();
-            document.getElementById('kpi-pack').innerText = (totPack/1000).toFixed(0).toLocaleString(); // 포장량 출력
-            document.getElementById('kpi-reach').innerText = `달성률 ${monthlyTarget > 0 ? ((totKg/1000/monthlyTarget)*100).toFixed(1) : 0}%`;
-            document.getElementById('kpi-down').innerText = totDown.toLocaleString();
-            
-            // 🚨 비상 모드 연동
-            const oeeValueObj = document.getElementById('kpi-oee');
-            oeeValueObj.innerText = avgOee;
+            // OEE 비상 경고등 제어
+            const oeeVal = document.getElementById('kpi-oee'); const oeeCard = document.getElementById('card-oee'); const oeeIcon = document.getElementById('icon-oee'); const oeeBadge = document.getElementById('badge-oee'); const overlay = document.getElementById('emergency-overlay');
+            oeeVal.innerText = avgOee;
+            if (mList.length > 0 && parseFloat(avgOee) < 80) {
+                overlay.classList.add('emergency-active'); oeeCard.classList.add('ring-4', 'ring-rose-500', 'bg-rose-50/20'); oeeVal.classList.add('text-rose-600'); oeeIcon.classList.replace('bg-emerald-50', 'bg-rose-500'); oeeIcon.classList.replace('text-emerald-500', 'text-white'); oeeBadge.classList.remove('hidden');
+            } else {
+                overlay.classList.remove('emergency-active'); oeeCard.classList.remove('ring-4', 'ring-rose-500', 'bg-rose-50/20'); oeeVal.classList.remove('text-rose-600'); oeeIcon.classList.add('text-slate-800'); oeeIcon.classList.replace('bg-rose-500', 'bg-emerald-50'); oeeIcon.classList.replace('text-white', 'text-emerald-500'); oeeBadge.classList.add('hidden');
+            }
 
-            const avgYield = mList.reduce((a,c)=>a+c.amt, 0) / (mList.length||1);
+            // 통합 레지스트리 표 그리기
             let tHtml = '';
             mList.forEach(m => {
-                const isLow = m.amt < avgYield * 0.7;
-                tHtml += `<tr class="group hover:bg-slate-50 transition-all ${isLow ? 'bg-rose-50/20' : ''}">
-                    <td class="font-black text-slate-700 border-l-4 border-l-transparent group-hover:border-l-indigo-500 pl-6 uppercase text-2xl">${m.name} ${isLow ? '<i class="fa-solid fa-triangle-exclamation text-rose-500 ml-2 animate-pulse"></i>' : ''}</td>
-                    <td class="text-right font-black text-3xl text-indigo-600">${Math.round(m.amt/1000).toLocaleString()}</td>
-                    <td class="text-right font-black text-2xl text-blue-500">${Math.round(m.pack/1000).toLocaleString()}</td>
-                    <td class="text-center font-bold text-amber-500 text-2xl">${m.wr}</td>
-                    <td class="text-right font-bold text-slate-600 text-2xl">${m.avgSpd}</td>
-                    <td class="text-right font-bold text-rose-500 text-2xl">${m.down.toLocaleString()}</td>
-                    <td class="px-6">
-                        <div class="flex items-center gap-4 justify-end">
-                            <div class="flex-1 bg-slate-100 h-4 rounded-full overflow-hidden shadow-inner"><div class="h-full rounded-full ${parseFloat(m.oee) < 85 ? 'bg-rose-500' : 'bg-emerald-500'}" style="width: ${m.oee}%"></div></div>
-                            <span class="font-black text-3xl w-24 text-right ${parseFloat(m.oee) < 85 ? 'text-rose-500' : 'text-emerald-500'}">${m.oee}%</span>
+                tHtml += `<tr class="group hover:bg-slate-50 transition-all">
+                    <td class="font-black text-slate-700 border-l-4 border-l-transparent group-hover:border-l-indigo-500 pl-4 uppercase text-lg lg:text-xl">${m.name}</td>
+                    <td class="text-right font-black text-2xl lg:text-3xl text-indigo-600">${Math.round(m.amt/1000).toLocaleString()}</td>
+                    <td class="text-center font-bold text-amber-500 text-xl lg:text-2xl">${m.wr}</td>
+                    <td class="text-right font-bold text-slate-600 text-xl lg:text-2xl">${m.avgSpd}</td>
+                    <td class="text-right font-bold text-rose-500 text-xl lg:text-2xl">${m.down.toLocaleString()}</td>
+                    <td class="px-4">
+                        <div class="flex items-center gap-3 justify-end">
+                            <div class="flex-1 bg-slate-100 h-3 lg:h-4 rounded-full overflow-hidden shadow-inner"><div class="h-full rounded-full ${parseFloat(m.oee) < 85 ? 'bg-rose-500' : 'bg-emerald-500'}" style="width: ${m.oee}%"></div></div>
+                            <span class="font-black text-xl lg:text-2xl w-16 lg:w-20 text-right ${parseFloat(m.oee) < 85 ? 'text-rose-500' : 'text-emerald-500'}">${m.oee}%</span>
                         </div>
                     </td>
                 </tr>`;
             });
             document.getElementById('registry-body').innerHTML = tHtml;
 
-            // v19.4 스타일 리스크 알림 (최장 비가동 시간)
-            const rMap = {};
-            fDown.forEach(d => { if(!rMap[d.equipment]) rMap[d.equipment] = {tot:0, reason:d.reason}; rMap[d.equipment].tot += d.minutes; });
-            const risks = Object.entries(rMap).map(([k,v])=>({name:k, ...v})).filter(r=>r.tot>0).sort((a,b)=>b.tot-a.tot).slice(0,3);
-            let rHtml = '';
-            if(risks.length > 0) {
-                risks.forEach(r => {
-                    rHtml += `<div class="bg-rose-50/50 p-3 rounded-2xl border border-rose-100 flex items-start gap-3">
-                        <div class="w-8 h-8 mt-1 bg-white rounded-xl flex items-center justify-center text-rose-500 shadow-sm border border-rose-100 text-sm"><i class="fa-solid fa-triangle-exclamation"></i></div>
-                        <div class="flex-1 overflow-hidden">
-                            <div class="flex justify-between items-center"><span class="text-[16px] font-black text-slate-800">${r.name}</span></div>
-                            <p class="text-[13px] text-slate-600 truncate font-bold mt-0.5">최장 장애: ${r.reason} <span class="text-rose-500 font-black ml-1">(${r.tot}분)</span></p>
-                        </div>
-                    </div>`;
-                });
-            } else { rHtml = '<div class="py-4 text-center text-slate-400 text-[16px] font-black uppercase">위험 요소 없음</div>'; }
-            document.getElementById('ai-risk-container').innerHTML = rHtml;
-
-            renderChart(cProd, cDown);
+            renderMainChart(cProd, cDown);
+            renderShapeDoughnut(fProd);
         }
 
-        function renderChart(cProd, cDown) {
+        // 메인 꺾은선/막대 복합 차트
+        function renderMainChart(cProd, cDown) {
             if(!window.Chart) return;
-            try {
-                const getWeekLabel = (dStr) => {
-                    const d = new Date(dStr); if(isNaN(d)) return dStr;
-                    const day = d.getDay(); const diff = d.getDate() - day + (day===0?-6:1);
-                    const mon = new Date(d); mon.setDate(diff); const sun = new Date(mon); sun.setDate(mon.getDate()+6);
-                    return `${mon.getMonth()+1}/${mon.getDate()} ~ ${sun.getMonth()+1}/${sun.getDate()}`;
-                };
+            const agg = {};
+            if(selectedDate === 'ALL') {
+                cProd.forEach(p => { if(!agg[p.date]) agg[p.date] = {l:p.date.substring(5), p:0, d:0, s:p.date}; agg[p.date].p += p.amount; });
+                cDown.forEach(p => { if(!agg[p.date]) agg[p.date] = {l:p.date.substring(5), p:0, d:0, s:p.date}; agg[p.date].d += p.minutes; });
+            } else {
+                cProd.filter(p=>p.date===selectedDate).forEach(p => { if(!agg[p.equipment]) agg[p.equipment] = {l:p.equipment, p:0, d:0, s:MACHINE_ORDER.indexOf(p.equipment)}; agg[p.equipment].p += p.amount; });
+                cDown.filter(p=>p.date===selectedDate).forEach(p => { if(!agg[p.equipment]) agg[p.equipment] = {l:p.equipment, p:0, d:0, s:MACHINE_ORDER.indexOf(p.equipment)}; agg[p.equipment].d += p.minutes; });
+            }
 
-                const agg = {};
-                if(selectedDate === 'ALL') {
-                    if(viewMode === 'WEEKLY') {
-                        cProd.forEach(p => { const w = getWeekLabel(p.date); if(!agg[w]) agg[w] = {l:w, p:0, d:0, s:p.date}; agg[w].p += p.amount; });
-                        cDown.forEach(p => { const w = getWeekLabel(p.date); if(!agg[w]) agg[w] = {l:w, p:0, d:0, s:p.date}; agg[w].d += p.minutes; });
-                    } else {
-                        cProd.forEach(p => { if(!agg[p.date]) agg[p.date] = {l:p.date.substring(5), p:0, d:0, s:p.date}; agg[p.date].p += p.amount; });
-                        cDown.forEach(p => { if(!agg[p.date]) agg[p.date] = {l:p.date.substring(5), p:0, d:0, s:p.date}; agg[p.date].d += p.minutes; });
-                    }
-                } else {
-                    cProd.filter(p=>p.date===selectedDate).forEach(p => { if(!agg[p.equipment]) agg[p.equipment] = {l:p.equipment, p:0, d:0, s:MACHINE_ORDER.indexOf(p.equipment)}; agg[p.equipment].p += p.amount; });
-                    cDown.filter(p=>p.date===selectedDate).forEach(p => { if(!agg[p.equipment]) agg[p.equipment] = {l:p.equipment, p:0, d:0, s:MACHINE_ORDER.indexOf(p.equipment)}; agg[p.equipment].d += p.minutes; });
-                }
+            const chartArr = Object.values(agg).sort((a,b) => selectedDate==='ALL' ? new Date(a.s)-new Date(b.s) : a.s-b.s);
+            const labels = chartArr.map(x=>x.l); const pData = chartArr.map(x=>(x.p/1000).toFixed(1)); const dData = chartArr.map(x=>x.d);
+            const activeDailyTarget = shiftMode === 'ALL' ? dailyTarget : dailyTarget / 2;
+            const tData = chartArr.map(() => activeDailyTarget);
 
-                const chartArr = Object.values(agg).sort((a,b) => selectedDate==='ALL' ? new Date(a.s)-new Date(b.s) : a.s-b.s);
-                const labels = chartArr.map(x=>x.l);
-                const pData = chartArr.map(x=>(x.p/1000).toFixed(1));
-                const dData = chartArr.map(x=>x.d);
-                const tData = chartArr.map(x => selectedDate === 'ALL' && viewMode === 'WEEKLY' ? dailyTarget * 7 : dailyTarget);
-
-                if(labels.length === 0) { labels.push("데이터 없음"); pData.push(0); dData.push(0); tData.push(dailyTarget); }
-
-                if(chartInstance) chartInstance.destroy();
-                const ctx = document.getElementById('mainChart').getContext('2d');
-                const gradient = ctx.createLinearGradient(0, 0, 0, 400);
-                gradient.addColorStop(0, 'rgba(79, 70, 229, 0.3)'); gradient.addColorStop(1, 'rgba(79, 70, 229, 0)');
-
-                chartInstance = new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: labels,
-                        datasets: [
-                            { type: 'line', label: '생산량 (TON)', data: pData, borderColor: '#4f46e5', backgroundColor: gradient, borderWidth: 4, pointBackgroundColor: '#4f46e5', pointBorderColor: '#fff', pointBorderWidth: 2, pointRadius: 5, fill: true, yAxisID: 'y' },
-                            { type: 'bar', label: '불가동시간 (MIN)', data: dData, backgroundColor: '#fb7185', borderRadius: 4, barThickness: selectedDate==='ALL'&&viewMode==='WEEKLY' ? 50 : 25, yAxisID: 'y1' },
-                            { type: 'line', label: '목표 (TON)', data: tData, borderColor: '#f59e0b', borderWidth: 3, borderDash: [5, 5], pointRadius: 0, fill: false, yAxisID: 'y' }
-                        ]
-                    },
-                    options: {
-                        responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false },
-                        plugins: { legend: { display: false }, tooltip: { backgroundColor: 'rgba(15,23,42,0.9)', titleFont: { size: 18, family: 'Malgun Gothic' }, bodyFont: { size: 18, weight: 'bold' }, padding: 16, cornerRadius: 10 } },
-                        scales: {
-                            x: { grid: { display: false }, ticks: { font: { weight: 'bold', family: 'Inter', size: 14 }, color: '#64748b' } },
-                            y: { position: 'left', beginAtZero: true, grid: { color: '#f1f5f9' }, ticks: { color: '#94a3b8', font: { size: 14 } } },
-                            y1: { position: 'right', beginAtZero: true, grid: { drawOnChartArea: false }, ticks: { color: '#fb7185', font: { size: 14 } } }
-                        }
-                    }
-                });
-            } catch(e) {}
+            if(chartInstance) chartInstance.destroy();
+            const ctx = document.getElementById('mainChart').getContext('2d');
+            
+            chartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: { labels: labels, datasets: [ { type: 'line', label: '생산량 (TON)', data: pData, borderColor: '#4f46e5', borderWidth: 3, pointRadius: 4, fill: false, yAxisID: 'y' }, { type: 'bar', label: '불가동 (MIN)', data: dData, backgroundColor: '#fb7185', borderRadius: 4, yAxisID: 'y1' }, { type: 'line', label: '목표 (TON)', data: tData, borderColor: '#f59e0b', borderWidth: 2, borderDash: [5, 5], pointRadius: 0, fill: false, yAxisID: 'y' } ] },
+                options: { responsive: true, maintainAspectRatio: false, scales: { x: { grid: { display: false } }, y: { beginAtZero: true }, y1: { position: 'right', beginAtZero: true, grid: { drawOnChartArea: false } } } }
+            });
         }
 
+        // 복원: 작업 형상별 도넛 차트
+        function renderShapeDoughnut(fProd) {
+            if(!window.Chart) return;
+            const shapeMap = {};
+            fProd.forEach(p => {
+                let s = p.shapeRaw || '원형';
+                if(!shapeMap[s]) shapeMap[s] = 0;
+                shapeMap[s] += p.amount;
+            });
+
+            const labels = Object.keys(shapeMap);
+            const data = Object.values(shapeMap).map(v => (v/1000).toFixed(1));
+            const colors = ['#4f46e5', '#f59e0b', '#10b981', '#f43f5e', '#8b5cf6', '#06b6d4'];
+
+            if(doughnutChartInstance) doughnutChartInstance.destroy();
+            const ctx = document.getElementById('shapeDoughnutChart').getContext('2d');
+
+            if(labels.length === 0) {
+                document.getElementById('shape-legend').innerHTML = '<div class="col-span-2 text-center text-slate-400">데이터 없음</div>';
+                return;
+            }
+
+            doughnutChartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: { labels: labels, datasets: [{ data: data, backgroundColor: colors.slice(0, labels.length) }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+            });
+
+            let legendHtml = '';
+            labels.forEach((l, i) => {
+                legendHtml += `<div class="flex items-center justify-between"><div class="flex items-center gap-1.5"><div class="w-3 h-3 rounded-full" style="background-color:${colors[i%colors.length]}"></div><span class="truncate max-w-[80px]">${l}</span></div><span class="font-mono font-black">${data[i]}T</span></div>`;
+            });
+            document.getElementById('shape-legend').innerHTML = legendHtml;
+        }
+
+        // =====================================================================
+        // 🌟 CD 생산성 분석 (Deep Dive Analytics Engine)
+        // =====================================================================
         function setAnalyticsGroup(group) {
             analyticsGroupBy = group;
-            document.getElementById('btn-aly-team').className = `px-4 py-2 text-sm font-black rounded-lg transition-all ${group === 'TEAM' ? 'bg-white shadow-sm text-rose-600 border border-slate-200' : 'text-slate-400'}`;
-            document.getElementById('btn-aly-machine').className = `px-4 py-2 text-sm font-black rounded-lg transition-all ${group === 'MACHINE' ? 'bg-white shadow-sm text-rose-600 border border-slate-200' : 'text-slate-400'}`;
-            
-            const machineContainer = document.getElementById('analytics-machine-container');
-            if (group === 'MACHINE') {
-                machineContainer.style.display = 'flex';
-            } else {
-                machineContainer.style.display = 'none';
-            }
-            
+            document.getElementById('btn-aly-team').className = `px-3 py-1.5 text-xs font-black rounded transition-all ${group === 'TEAM' ? 'bg-white shadow-sm text-rose-600 border border-slate-200' : 'text-slate-400'}`;
+            document.getElementById('btn-aly-machine').className = `px-3 py-1.5 text-xs font-black rounded transition-all ${group === 'MACHINE' ? 'bg-white shadow-sm text-rose-600 border border-slate-200' : 'text-slate-400'}`;
+            document.getElementById('analytics-machine-container').style.display = group === 'MACHINE' ? 'flex' : 'none';
             updateAnalytics();
         }
 
@@ -777,10 +778,11 @@
         function updateAnalytics() {
             if(prodData.length === 0) return;
 
+            // 1. 데이터에 포함된 월 리스트 생성
             const allDates = [...new Set([...prodData.map(d=>d.date), ...downData.map(d=>d.date)])].filter(d => d && d.length >= 7).sort();
             const months = [...new Set(allDates.map(d => d.substring(0, 7)))].sort().reverse();
-            
             let latestMonth = months.length > 0 ? months[0] : "";
+            
             const selMonth = document.getElementById('analytics-month-select');
             const currentVal = analyticsMonth;
             
@@ -789,207 +791,125 @@
             else { selMonth.value = latestMonth; analyticsMonth = latestMonth; }
 
             let targetMonth = analyticsMonth === 'LATEST' ? latestMonth : analyticsMonth;
-            
             let cProd = prodData.filter(d => d.date && d.date.startsWith(targetMonth));
             let cDown = downData.filter(d => d.date && d.date.startsWith(targetMonth));
 
+            // 호기별 필터링 처리
             const selMachine = document.getElementById('analytics-machine-select');
-            const availableMachines = [...new Set(cProd.map(d=>d.equipment))].filter(e=>e).sort((a,b) => {
-                const idxA = MACHINE_ORDER.indexOf(a); const idxB = MACHINE_ORDER.indexOf(b);
-                return (idxA === -1 ? 999 : idxA) - (idxB === -1 ? 999 : idxB);
-            });
+            const availableMachines = [...new Set(cProd.map(d=>d.equipment))].filter(e=>e).sort((a,b) => { const idxA = MACHINE_ORDER.indexOf(a); const idxB = MACHINE_ORDER.indexOf(b); return (idxA === -1 ? 999 : idxA) - (idxB === -1 ? 999 : idxB); });
 
             if (analyticsGroupBy === 'MACHINE') {
                 let currentMachineVal = selMachine.value;
-                if (!currentMachineVal || !availableMachines.includes(currentMachineVal)) {
-                    currentMachineVal = availableMachines.length > 0 ? availableMachines[0] : "";
-                }
+                if (!currentMachineVal || !availableMachines.includes(currentMachineVal)) currentMachineVal = availableMachines.length > 0 ? availableMachines[0] : "";
                 selMachine.innerHTML = availableMachines.map(m => `<option value="${m}">${m}</option>`).join('');
                 if(currentMachineVal) selMachine.value = currentMachineVal;
 
-                if (currentMachineVal) {
-                    cProd = cProd.filter(d => d.equipment === currentMachineVal);
-                    cDown = cDown.filter(d => d.equipment === currentMachineVal);
-                }
+                if (currentMachineVal) { cProd = cProd.filter(d => d.equipment === currentMachineVal); cDown = cDown.filter(d => d.equipment === currentMachineVal); }
             }
 
-            const map = {};
-            const groupKeys = ['A', 'B', 'C'];
-            
-            groupKeys.forEach(k => {
-                map[`${k}-원형`] = { group: k, shape: '원형', amt: 0, down: 0, workDays: new Set() };
-                map[`${k}-비원형`] = { group: k, shape: '비원형', amt: 0, down: 0, workDays: new Set() };
+            // 2. 조별 (A, B, C) 및 형상별 (원형/비원형) 집계
+            const map = {}; const groupKeys = ['A', 'B', 'C'];
+            groupKeys.forEach(k => { 
+                map[`${k}-원형`] = { group: k, shape: '원형', amt: 0, down: 0, workDays: new Set() }; 
+                map[`${k}-비원형`] = { group: k, shape: '비원형', amt: 0, down: 0, workDays: new Set() }; 
             });
 
             cProd.forEach(p => {
-                let team = (p.team || '').replace(/조/g, '').trim().toUpperCase();
-                if(!groupKeys.includes(team)) return;
-
-                const shapeCat = p.isCircle ? '원형' : '비원형';
-                const key = `${team}-${shapeCat}`;
+                let team = (p.team || '').replace(/조/g, '').trim().toUpperCase(); if(!groupKeys.includes(team)) return;
+                const shapeCat = p.isCircle ? '원형' : '비원형'; const key = `${team}-${shapeCat}`;
                 if(map[key]) { map[key].amt += p.amount; map[key].workDays.add(p.date); }
             });
 
             cDown.forEach(d => {
-                let team = (d.team || '').replace(/조/g, '').trim().toUpperCase();
-                if(!groupKeys.includes(team)) return;
-
-                const shapeCat = d.isCircle ? '원형' : '비원형';
-                const key = `${team}-${shapeCat}`;
+                let team = (d.team || '').replace(/조/g, '').trim().toUpperCase(); if(!groupKeys.includes(team)) return;
+                const shapeCat = d.isCircle ? '원형' : '비원형'; const key = `${team}-${shapeCat}`;
                 if(map[key]) map[key].down += d.minutes;
             });
 
             let totCircleAmt=0, totCircleMin=0, totNonAmt=0, totNonMin=0;
-            
             const res = Object.values(map).map(m => {
-                const minsPerDay = 720; // 작업조 12시간 교대 기준
+                const minsPerDay = 720; // 12시간 교대 기준
                 const totalWorkMin = m.workDays.size * minsPerDay; 
                 const netWorkMin = Math.max(0, totalWorkMin - m.down);
-                
                 const uph = netWorkMin > 0 ? (m.amt / 1000) / (netWorkMin / 60) : 0;
                 
                 if(m.shape === '원형') { totCircleAmt+=m.amt; totCircleMin+=netWorkMin; }
                 else { totNonAmt+=m.amt; totNonMin+=netWorkMin; }
-
                 return { ...m, netWorkMin, uph: uph.toFixed(2), amtTon: (m.amt/1000).toFixed(1) };
             });
 
-            const avgCircleUph = totCircleMin > 0 ? (totCircleAmt/1000)/(totCircleMin/60) : 0;
-            const avgNonUph = totNonMin > 0 ? (totNonAmt/1000)/(totNonMin/60) : 0;
-            document.getElementById('aly-circle-uph').innerText = avgCircleUph.toFixed(1);
-            document.getElementById('aly-noncircle-uph').innerText = avgNonUph.toFixed(1);
+            document.getElementById('aly-circle-uph').innerText = totCircleMin > 0 ? ((totCircleAmt/1000)/(totCircleMin/60)).toFixed(1) : "0.0";
+            document.getElementById('aly-noncircle-uph').innerText = totNonMin > 0 ? ((totNonAmt/1000)/(totNonMin/60)).toFixed(1) : "0.0";
 
-            let tHtml = '';
-            const sortedRes = [...res].sort((a,b) => a.group.localeCompare(b.group));
-
-            let headerPrefix = analyticsGroupBy === 'TEAM' ? '전체 설비 기준' : `${selMachine.value} 기준`;
-            document.getElementById('aly-table-header').innerHTML = `작업조 <span class="text-[11px] font-bold text-rose-500 bg-rose-50 border border-rose-100 px-2 py-1 rounded-md ml-2">${headerPrefix}</span>`;
+            let tHtml = ''; const sortedRes = [...res].sort((a,b) => a.group.localeCompare(b.group));
+            document.getElementById('aly-table-header').innerHTML = `작업조 <span class="text-[10px] font-bold text-rose-500 bg-rose-50 border border-rose-100 px-1.5 py-0.5 rounded ml-1">${analyticsGroupBy === 'TEAM' ? '전체 설비' : selMachine.value}</span>`;
 
             sortedRes.forEach(m => {
                 tHtml += `<tr class="hover:bg-slate-50">
-                    <td class="font-black text-slate-700 border-l-4 border-l-rose-500 pl-6 text-xl">${m.group}조</td>
-                    <td class="text-center font-bold text-slate-600 text-xl">${m.shape}</td>
-                    <td class="text-right font-black text-2xl text-slate-800">${m.amtTon}</td>
-                    <td class="text-right font-bold text-rose-500 text-2xl">${m.down}</td>
-                    <td class="text-right font-bold text-emerald-600 text-2xl">${m.netWorkMin}</td>
-                    <td class="text-right font-black text-indigo-600 text-3xl">${m.uph}</td>
+                    <td class="font-black text-slate-700 border-l-4 border-l-rose-500 pl-4 text-lg lg:text-xl">${m.group}조</td>
+                    <td class="text-center font-bold text-slate-600 text-lg lg:text-xl">${m.shape}</td>
+                    <td class="text-right font-black text-xl lg:text-2xl text-slate-800">${m.amtTon}</td>
+                    <td class="text-right font-bold text-rose-500 text-xl lg:text-2xl">${m.down}</td>
+                    <td class="text-right font-bold text-emerald-600 text-xl lg:text-2xl">${m.netWorkMin}</td>
+                    <td class="text-right font-black text-indigo-600 text-2xl lg:text-3xl">${m.uph}</td>
                 </tr>`;
-            });
-            document.getElementById('analytics-body').innerHTML = tHtml;
+            }); document.getElementById('analytics-body').innerHTML = tHtml;
 
             if(analyticsChartInstance) analyticsChartInstance.destroy();
             const ctx = document.getElementById('analyticsChart').getContext('2d');
-            
-            const labels = ['A조', 'B조', 'C조'];
-            const activeKeys = ['A', 'B', 'C'];
-            
-            const dataCircle = activeKeys.map(k => {
-                const found = res.find(r => r.group === k && r.shape === '원형');
-                return found ? found.uph : 0;
-            });
-            const dataNon = activeKeys.map(k => {
-                const found = res.find(r => r.group === k && r.shape === '비원형');
-                return found ? found.uph : 0;
-            });
+            const dataCircle = ['A', 'B', 'C'].map(k => res.find(r => r.group === k && r.shape === '원형')?.uph || 0);
+            const dataNon = ['A', 'B', 'C'].map(k => res.find(r => r.group === k && r.shape === '비원형')?.uph || 0);
 
-            document.getElementById('aly-chart-title').innerText = analyticsGroupBy === 'TEAM' ? '전체 설비 대상 조별 UPH 비교' : `[${selMachine.value}] 호기 대상 조별 UPH 비교`;
+            document.getElementById('aly-chart-title').innerText = analyticsGroupBy === 'TEAM' ? '전체 설비 조별 UPH 생산성 비교' : `[${selMachine.value}] 호기 조별 UPH 비교`;
 
             analyticsChartInstance = new Chart(ctx, {
                 type: 'bar',
-                data: {
-                    labels: labels,
-                    datasets: [
-                        { label: '원형 생산성 (UPH)', data: dataCircle, backgroundColor: '#4f46e5', borderRadius: 8, barPercentage: 0.6 },
-                        { label: '비원형 생산성 (UPH)', data: dataNon, backgroundColor: '#f59e0b', borderRadius: 8, barPercentage: 0.6 }
-                    ]
-                },
-                options: {
-                    responsive: true, maintainAspectRatio: false,
-                    plugins: { legend: { position: 'top', labels: { font: { size: 16, weight: 'bold', family: 'Malgun Gothic'} } } },
-                    scales: {
-                        x: { grid: { display: false }, ticks: { font: { weight: 'bold', size: 18 } } },
-                        y: { title: { display: true, text: 'TON / Hour', font: {weight:'bold'} }, ticks: { font: { size: 14 } } }
-                    }
-                }
+                data: { labels: ['A조', 'B조', 'C조'], datasets: [ { label: '원형 UPH (TON/Hr)', data: dataCircle, backgroundColor: '#4f46e5', borderRadius: 6 }, { label: '비원형 UPH (TON/Hr)', data: dataNon, backgroundColor: '#f59e0b', borderRadius: 6 } ] },
+                options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, title: { display: true, text: 'TON / Hour' } } } }
             });
         }
 
+        // 챗봇 입력 처리
         function handleChatEnter(e) { if (e.key === 'Enter') sendChat(); }
-
         function sendChat() {
-            const input = document.getElementById('chat-input');
-            const query = input.value.trim();
-            if (!query) return;
-
-            addMsg('user', query);
-            input.value = '';
-
-            setTimeout(() => {
-                const answer = processQuery(query);
-                addMsg('bot', answer);
-            }, 500); 
+            const input = document.getElementById('chat-input'); const query = input.value.trim(); if (!query) return;
+            addMsg('user', query); input.value = '';
+            setTimeout(() => { const answer = processQuery(query); addMsg('bot', answer); }, 300); 
         }
 
         function addMsg(type, text) {
-            const body = document.getElementById('chat-body');
-            const div = document.createElement('div');
-            div.className = type === 'bot' ? 'msg-bot' : 'msg-user';
-            div.innerHTML = text;
-            body.appendChild(div);
-            body.scrollTop = body.scrollHeight;
+            const body = document.getElementById('chat-body'); const div = document.createElement('div');
+            div.className = type === 'bot' ? 'msg-bot' : 'msg-user'; div.innerHTML = text;
+            body.appendChild(div); body.scrollTop = body.scrollHeight;
         }
 
         function processQuery(query) {
-            if (prodData.length === 0) return "아직 데이터가 로드되지 않았습니다.";
-            
+            if (prodData.length === 0) return "데이터가 로드되지 않았습니다.";
             const txt = query.toUpperCase();
             
-            let targetTeam = null;
-            if (txt.includes('A조')) targetTeam = 'A';
-            else if (txt.includes('B조')) targetTeam = 'B';
-            else if (txt.includes('C조')) targetTeam = 'C';
+            let targetTeam = null; if (txt.includes('A조')) targetTeam = 'A'; else if (txt.includes('B조')) targetTeam = 'B'; else if (txt.includes('C조')) targetTeam = 'C';
+            
+            if (txt.includes('포장')) {
+                const totPack = packData.reduce((a,c) => a + c.amount, 0) / 1000;
+                return `누적 **CD 포장 실적량**은 총 **${totPack.toLocaleString()} TON** 입니다.`;
+            }
 
-            let isCircle = null;
-            if (txt.includes('원형') && !txt.includes('비원형')) isCircle = true;
-            else if (txt.includes('비원형') || txt.includes('육각') || txt.includes('사각') || txt.includes('이형')) isCircle = false;
-
-            let targetEquip = null;
-            MACHINE_ORDER.forEach(m => { if(txt.includes(m)) targetEquip = m; });
-
-            if (txt.includes('최대') || txt.includes('최고') || txt.includes('가장 많이')) {
-                const teamAmt = { 'A':0, 'B':0, 'C':0 };
-                prodData.forEach(p => { if(teamAmt[p.team] !== undefined) teamAmt[p.team] += p.amount; });
+            if (txt.includes('최대') || txt.includes('최고')) {
+                const teamAmt = { 'A':0, 'B':0, 'C':0 }; prodData.forEach(p => { if(teamAmt[p.team] !== undefined) teamAmt[p.team] += p.amount; });
                 let bestTeam = 'A'; let maxAmt = teamAmt['A'];
                 ['B','C'].forEach(t => { if(teamAmt[t] > maxAmt) { maxAmt = teamAmt[t]; bestTeam = t; } });
-                return `현재 누적 기준으로 <b>${bestTeam}조</b>가 ${(maxAmt/1000).toLocaleString()} TON으로 가장 생산량이 높습니다!`;
+                return `현재 누적 기준 **${bestTeam}조**가 **${(maxAmt/1000).toLocaleString()} TON**으로 가장 높은 생산량을 기록 중입니다!`;
             }
 
             if (txt.includes('비가동') || txt.includes('정지')) {
-                let filtered = downData;
-                let desc = "전체";
-                if(targetTeam) { filtered = filtered.filter(d => d.team === targetTeam); desc = `${targetTeam}조`; }
-                if(targetEquip) { filtered = filtered.filter(d => d.equipment === targetEquip); desc = `${targetEquip}`; }
-                
+                let filtered = downData; if(targetTeam) filtered = filtered.filter(d => d.team === targetTeam);
                 const totalDown = filtered.reduce((a,c) => a + c.minutes, 0);
-                if(totalDown === 0) return `${desc}의 비가동 데이터가 없습니다.`;
-                
-                const rMap = {};
-                filtered.forEach(d => { rMap[d.reason] = (rMap[d.reason]||0) + d.minutes; });
-                const mainReason = Object.entries(rMap).sort((a,b)=>b[1]-a[1])[0];
-
-                return `${desc}의 총 비가동 시간은 <b>${totalDown.toLocaleString()}분</b>입니다.<br>가장 큰 원인은 [${mainReason[0]}] (${mainReason[1]}분) 입니다.`;
+                return `${targetTeam ? targetTeam + '조의 ' : ''}총 비가동 시간은 **${totalDown.toLocaleString()} 분** 입니다.`;
             }
 
-            let filtered = prodData;
-            let descStr = [];
-            if(targetTeam) { filtered = filtered.filter(p => p.team === targetTeam); descStr.push(`${targetTeam}조`); }
-            if(isCircle !== null) { filtered = filtered.filter(p => p.isCircle === isCircle); descStr.push(isCircle ? '원형' : '비원형'); }
-            if(targetEquip) { filtered = filtered.filter(p => p.equipment === targetEquip); descStr.push(`${targetEquip}`); }
-
-            if(descStr.length === 0) return "원하시는 조건(예: A조 비가동, B조 원형 생산량, PCD-3 생산량 등)을 구체적으로 말씀해주세요!";
-
+            let filtered = prodData; if(targetTeam) filtered = filtered.filter(p => p.team === targetTeam);
             const totalProd = filtered.reduce((a,c) => a + c.amount, 0) / 1000;
-            return `요청하신 <b>${descStr.join(' ')}</b>의 총 누적 생산량은 <b>${totalProd.toLocaleString()} TON</b> 입니다.`;
+            return `${targetTeam ? targetTeam + '조의 ' : '전체 '}누적 생산 실적은 **${totalProd.toLocaleString()} TON** 입니다.`;
         }
     </script>
 </body>
