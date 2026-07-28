@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PRO-INTEGRATOR | Tableau Executive Edition v27.1</title>
+    <title>PRO-INTEGRATOR | Tableau Executive Edition v28.0</title>
     
     <script>
         if (window.navigator.userAgent.indexOf('MSIE ') > 0 || window.navigator.userAgent.indexOf('Trident/') > 0) {
@@ -61,7 +61,7 @@
             transition: all 0.2s ease;
             display: flex;
             flex-direction: column;
-            justify-content: flex-start; /* 거대한 공백을 유발하던 space-between 수정 */
+            justify-content: flex-start;
             position: relative;
             overflow: hidden;
         }
@@ -115,7 +115,7 @@
 
         .toast { position: fixed; bottom: -100px; right: 30px; padding: 12px 20px; border-radius: 10px; color: white; font-weight: 800; font-size: 13px; z-index: 1000; transition: bottom 0.35s cubic-bezier(0.16, 1, 0.3, 1); box-shadow: 0 15px 25px rgba(0,0,0,0.25); display: flex; align-items: center; gap: 10px; border: 1px solid rgba(255,255,255,0.2); }
         
-        .chat-bot-window { display: none; position: fixed; bottom: 25px; right: 30px; width: 380px; height: 520px; background: #ffffff; border-radius: 1rem; box-shadow: 0 20px 50px rgba(0,0,0,0.25); z-index: 999; flex-direction: column; overflow: hidden; border: 1px solid #d1d5db; }
+        .chat-bot-window { display: none; position: fixed; bottom: 25px; right: 30px; width: 400px; height: 540px; background: #ffffff; border-radius: 1rem; box-shadow: 0 20px 50px rgba(0,0,0,0.25); z-index: 999; flex-direction: column; overflow: hidden; border: 1px solid #d1d5db; }
         .chat-header { background: var(--tableau-navy); padding: 12px 18px; color: white; display: flex; justify-content: space-between; align-items: center; }
         .chat-body { flex: 1; padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; background: #f9fafb; }
         .chat-input-area { padding: 12px; background: #ffffff; border-top: 1px solid #e5e7eb; display: flex; gap: 8px; }
@@ -156,6 +156,15 @@
             border-color: #1f77b4;
             box-shadow: 0 2px 6px rgba(31, 119, 180, 0.3);
         }
+
+        .top3-row-clickable {
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .top3-row-clickable:hover {
+            background-color: #fee2e2 !important;
+            transform: translateX(2px);
+        }
     </style>
 </head>
 <body id="app-body" class="split-mode-auto">
@@ -190,7 +199,7 @@
                 <div>
                     <h1 class="text-xl lg:text-2xl font-black tracking-tight text-slate-900 uppercase flex items-center gap-2.5">
                         <span class="w-2.5 h-6 bg-sky-600 rounded"></span>
-                        PRO-INTEGRATOR <span class="text-sky-700 font-semibold ml-0.5 text-base lg:text-lg">Tableau Edition v27.1</span>
+                        PRO-INTEGRATOR <span class="text-sky-700 font-semibold ml-0.5 text-base lg:text-lg">Tableau Edition v28.0</span>
                     </h1>
                     <p class="text-slate-500 font-bold text-[10px] uppercase tracking-wider mt-0.5 ml-4 flex items-center gap-2">
                         <span id="status-led" class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
@@ -570,15 +579,14 @@
                 </div>
             </div>
 
-            <!-- 누적 세로막대 UPH 비교 차트 패널 (여백 밀착 최적화) -->
+            <!-- 누적 세로막대 UPH 비교 차트 패널 -->
             <div class="glass-panel p-3 mb-2.5">
                 <div class="flex justify-between items-center mb-1 border-b border-slate-200 pb-1">
                     <h3 class="text-xs font-black text-slate-900 flex items-center gap-1.5">
-                        <i class="fa-solid fa-chart-column text-red-600 text-xs"></i> <span id="aly-chart-title">형상 세분화(원형·정육각·사각·이형) 누적 생산성 비교</span>
+                        <i class="fa-solid fa-chart-column text-red-600 text-xs"></i> <span id="aly-chart-title">작업조별 형상 세분화(원형·정육각·사각·이형) UPH 비교</span>
                     </h3>
-                    <span class="text-[8.5px] font-extrabold text-sky-800 bg-sky-50 px-1.5 py-0.5 rounded border border-sky-200">세부 형상별 UPH 누적</span>
+                    <span class="text-[8.5px] font-extrabold text-sky-800 bg-sky-50 px-1.5 py-0.5 rounded border border-sky-200" id="aly-chart-badge">작업조 세부 UPH 분석</span>
                 </div>
-                <!-- 1px 여백 낭비도 없도록 차트 바로 상착 -->
                 <div class="h-[200px] w-full relative"><canvas id="analyticsChart"></canvas></div>
             </div>
 
@@ -592,7 +600,7 @@
                     <table class="w-full text-xs">
                         <thead>
                             <tr class="bg-slate-100/80">
-                                <th id="aly-table-header" class="py-1 px-2.5 text-left font-black text-slate-700 text-[10.5px]">작업조 / 구변</th>
+                                <th id="aly-table-header" class="py-1 px-2.5 text-left font-black text-slate-700 text-[10.5px]">작업조 / 호기</th>
                                 <th class="py-1 px-2.5 text-center font-black text-slate-700 text-[10.5px]">작업 형상</th>
                                 <th class="py-1 px-2.5 text-right font-black text-slate-700 text-[10.5px]">총 생산량(TON)</th>
                                 <th class="py-1 px-2.5 text-right font-black text-red-600 text-[10.5px]">총 비가동(MIN)</th>
@@ -611,20 +619,82 @@
     <div id="pro-bot-window" class="chat-bot-window">
         <div class="chat-header">
             <div class="flex items-center gap-2.5">
-                <i class="fa-solid fa-robot text-lg text-amber-400"></i>
+                <i class="fa-solid fa-robot text-lg text-amber-400 animate-pulse"></i>
                 <div>
-                    <h3 class="font-black text-xs text-white">PRO-Bot Assistant</h3>
-                    <p class="text-[8.5px] text-slate-300 font-bold">Tableau Manufacturing Intelligence v27.1</p>
+                    <h3 class="font-black text-xs text-white">PRO-Bot AI Assistant</h3>
+                    <p class="text-[8.5px] text-slate-300 font-bold">Gemini Powered Manufacturing Intelligence v28.0</p>
                 </div>
             </div>
             <i class="fa-solid fa-xmark text-base cursor-pointer hover:text-red-400" onclick="toggleBot()"></i>
         </div>
         <div class="chat-body" id="chat-body">
-            <div class="msg-bot">안녕하세요! PRO-Bot입니다.<br>생산실적, 포장량, 비가동 사유에 대해 물어보세요.<br><br><span class="text-[9.5px] font-normal text-slate-500">예: 비가동 시간 제일 긴 항목 / A조 생산량 / 포장 실적 / PCD-4 비가동 시간</span></div>
+            <div class="msg-bot">안녕하세요! PRO-Bot AI입니다.<br>Gemini 인공지능 엔드포인트가 연결되었습니다.<br><br>생산실적, 작업조별 분석, 포장량, 비가동 사유에 대해 구체적으로 질문해주세요.<br><br><span class="text-[9.5px] font-normal text-slate-500">예: 7월 가장 많은 생산량을 보인 조는? / A,B,C조 생산량 보여줘 / PCD-4 비가동 사유 알려줘</span></div>
         </div>
         <div class="chat-input-area">
             <input type="text" id="chat-input" class="gs-input m-0" placeholder="질문을 입력하세요..." onkeypress="handleChatEnter(event)">
-            <button onclick="sendChat()" class="bg-sky-700 text-white px-3 rounded-md hover:bg-sky-800 transition-all"><i class="fa-solid fa-paper-plane text-xs"></i></button>
+            <button onclick="sendChat()" class="bg-sky-700 text-white px-3 rounded-md hover:bg-sky-800 transition-all flex items-center justify-center"><i class="fa-solid fa-paper-plane text-xs"></i></button>
+        </div>
+    </div>
+
+    <!-- 비가동 세부 상세 분석 모달 -->
+    <div id="down-detail-modal" class="modal-bg">
+        <div class="glass-panel w-full max-w-2xl overflow-hidden border border-slate-300 !justify-start">
+            <div class="p-4 border-b border-slate-200 flex justify-between items-center bg-red-700 text-white">
+                <div class="flex items-center gap-2.5">
+                    <div class="bg-white/20 p-2 rounded-md text-white"><i class="fa-solid fa-circle-exclamation text-lg"></i></div>
+                    <div>
+                        <h3 class="text-sm font-black text-white" id="modal-down-title">불가동 세부 이력 및 진단</h3>
+                        <p class="text-[9.5px] text-red-100 font-bold">Downtime Root Cause & Time Log Analysis</p>
+                    </div>
+                </div>
+                <i class="fa-solid fa-xmark text-lg text-white cursor-pointer hover:text-red-200" onclick="closeDownDetailModal()"></i>
+            </div>
+            
+            <div class="p-4 space-y-3">
+                <div class="grid grid-cols-3 gap-2 text-center">
+                    <div class="bg-red-50 p-2.5 rounded-lg border border-red-200">
+                        <span class="text-[9px] font-bold text-red-600 block mb-0.5">대상 설비 / 항목</span>
+                        <h4 id="modal-down-equip" class="text-sm font-black text-red-900">PCD-3</h4>
+                    </div>
+                    <div class="bg-amber-50 p-2.5 rounded-lg border border-amber-200">
+                        <span class="text-[9px] font-bold text-amber-700 block mb-0.5">누적 정지 시간</span>
+                        <h4 id="modal-down-min" class="text-sm font-black text-amber-900">0 MIN</h4>
+                    </div>
+                    <div class="bg-sky-50 p-2.5 rounded-lg border border-sky-200">
+                        <span class="text-[9px] font-bold text-sky-700 block mb-0.5">전체 비가동 점유율</span>
+                        <h4 id="modal-down-pct" class="text-sm font-black text-sky-900">0%</h4>
+                    </div>
+                </div>
+
+                <div>
+                    <h4 class="text-xs font-black text-slate-800 mb-1 flex items-center gap-1.5"><i class="fa-solid fa-list-check text-red-600"></i> 발생 일자별 세부 내역 타임라인</h4>
+                    <div class="max-h-[160px] overflow-y-auto border border-slate-200 rounded-lg p-1 bg-slate-50">
+                        <table class="w-full text-xs">
+                            <thead>
+                                <tr>
+                                    <th class="py-1 px-2 text-left">발생일자</th>
+                                    <th class="py-1 px-2 text-center">근무</th>
+                                    <th class="py-1 px-2 text-center">작업조</th>
+                                    <th class="py-1 px-2 text-left">세부 사유</th>
+                                    <th class="py-1 px-2 text-right text-red-600">정지시간(분)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="modal-down-history-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="bg-slate-100 p-3 rounded-lg border border-slate-300">
+                    <h5 class="text-[10px] font-black text-slate-700 mb-1 flex items-center gap-1"><i class="fa-solid fa-user-gear text-sky-700"></i> AI 보전 진단 가이드</h5>
+                    <p id="modal-down-ai-guide" class="text-[10.5px] font-bold text-slate-600 leading-relaxed">
+                        해당 항목은 공정 정지 시간을 크게 유발하는 요소입니다. 자산 수명 보전을 위해 정기 유지보수 점검 및 부품 예비재고 확보가 필요합니다.
+                    </p>
+                </div>
+            </div>
+
+            <div class="p-3 bg-slate-50 border-t border-slate-200 flex justify-end">
+                <button onclick="closeDownDetailModal()" class="px-4 py-1.5 rounded-md text-xs font-bold bg-slate-800 text-white hover:bg-slate-900">닫기</button>
+            </div>
         </div>
     </div>
 
@@ -875,7 +945,7 @@
         function saveLayout() {
             if (!grid) return;
             const layout = grid.save();
-            localStorage.setItem('PRO_DASHBOARD_GRID_LAYOUT_V27', JSON.stringify(layout));
+            localStorage.setItem('PRO_DASHBOARD_GRID_LAYOUT_V28', JSON.stringify(layout));
         }
 
         function sanitizeLayout(layoutArray) {
@@ -888,7 +958,7 @@
         }
 
         function loadSavedLayout() {
-            const saved = localStorage.getItem('PRO_DASHBOARD_GRID_LAYOUT_V27');
+            const saved = localStorage.getItem('PRO_DASHBOARD_GRID_LAYOUT_V28');
             if (saved && grid) {
                 try {
                     const parsed = JSON.parse(saved);
@@ -910,6 +980,7 @@
         }
 
         function resetLayout() {
+            localStorage.removeItem('PRO_DASHBOARD_GRID_LAYOUT_V28');
             localStorage.removeItem('PRO_DASHBOARD_GRID_LAYOUT_V27');
             localStorage.removeItem('PRO_DASHBOARD_GRID_LAYOUT');
             location.reload();
@@ -1040,7 +1111,8 @@
             }
         }
 
-        function sendChat() {
+        // --- 🚀 [NEW] AI Chatbot Gemini API Integration + Smart Fallback ---
+        async function sendChat() {
             const input = document.getElementById('chat-input');
             const text = input ? input.value.trim() : '';
             if (!text) return;
@@ -1048,8 +1120,12 @@
             appendChatMsg(text, 'user');
             input.value = '';
 
-            setTimeout(() => {
-                const response = getBotResponse(text);
+            const loadingId = appendChatMsg("PRO-Bot AI 분석 중...", 'bot-loading');
+
+            setTimeout(async () => {
+                const response = await getBotResponseGemini(text);
+                const loadingEl = document.getElementById(loadingId);
+                if (loadingEl) loadingEl.remove();
                 appendChatMsg(response, 'bot');
             }, 300);
         }
@@ -1058,59 +1134,164 @@
             const body = document.getElementById('chat-body');
             if (!body) return;
             const div = document.createElement('div');
-            div.className = type === 'user' ? 'msg-user' : 'msg-bot';
+            const msgId = 'msg-' + Date.now();
+            div.id = msgId;
+            if (type === 'user') {
+                div.className = 'msg-user';
+            } else if (type === 'bot-loading') {
+                div.className = 'msg-bot animate-pulse italic';
+            } else {
+                div.className = 'msg-bot';
+            }
             div.innerHTML = text;
             body.appendChild(div);
             body.scrollTop = body.scrollHeight;
+            return msgId;
         }
 
-        function getBotResponse(q) {
-            const query = q.toLowerCase();
+        async function getBotResponseGemini(userQuery) {
             const safeProd = Array.isArray(prodData) ? prodData : [];
             const safeDown = Array.isArray(downData) ? downData : [];
             const safePack = Array.isArray(packData) ? packData : [];
 
-            if (query.includes('비가동') || query.includes('정지') || query.includes('고장')) {
-                if (query.includes('항목') || query.includes('사유') || query.includes('원인') || query.includes('많은') || query.includes('긴') || query.includes('TOP')) {
-                    const reasonMap = {};
-                    safeDown.forEach(d => {
-                        const r = (d.reason || '기타 고장').trim();
-                        const equip = (d.equipment || '').trim();
-                        const key = `${equip} - ${r}`;
-                        reasonMap[key] = (reasonMap[key] || 0) + d.minutes;
-                    });
-                    const sorted = Object.entries(reasonMap).sort((a,b) => b[1] - a[1]);
-                    if (sorted.length > 0) {
-                        let res = `현재 집계된 <b>비가동 주요 원인 TOP 3</b>입니다:<br>`;
-                        sorted.slice(0, 3).forEach((item, idx) => {
-                            res += `<br><b>${idx + 1}위:</b> ${item[0]} (<b>${item[1].toLocaleString()}분</b>)`;
-                        });
-                        return res;
-                    }
+            // Calculate exact metrics for AI context
+            const totalProdKg = safeProd.reduce((a,c)=>a+c.amount,0);
+            const totalPackKg = safePack.reduce((a,c)=>a+c.amount,0);
+            const totalDownMin = safeDown.reduce((a,c)=>a+c.minutes,0);
+
+            const teamProd = { 'A': 0, 'B': 0, 'C': 0 };
+            safeProd.forEach(p => {
+                const t = (p.team || '').replace(/조/g, '').trim().toUpperCase();
+                if (teamProd[t] !== undefined) teamProd[t] += p.amount;
+            });
+
+            const downReasons = {};
+            safeDown.forEach(d => {
+                const k = `[${d.equipment || ''}] ${(d.reason || '').trim()}`;
+                downReasons[k] = (downReasons[k] || 0) + d.minutes;
+            });
+
+            const top3Down = Object.entries(downReasons).sort((a,b)=>b[1]-a[1]).slice(0,3);
+
+            const contextSummary = `
+[현재 공장 실시간 생산 데이터]
+- 총 생산 실적: ${(totalProdKg/1000).toFixed(1)} TON (${totalProdKg.toLocaleString()} kg)
+- 총 포장 실적: ${(totalPackKg/1000).toFixed(1)} TON
+- 총 불가동 시간: ${totalDownMin.toLocaleString()} 분
+- 작업조별 생산실적: A조 ${(teamProd.A/1000).toFixed(1)}TON, B조 ${(teamProd.B/1000).toFixed(1)}TON, C조 ${(teamProd.C/1000).toFixed(1)}TON
+- 불가동 주요 원인 TOP 3: ${top3Down.map((item,i)=>`${i+1}위 ${item[0]} (${item[1]}분)`).join(', ')}
+`;
+
+            const systemPrompt = `당신은 대한민국 최고 수준의 철강/선재 생산관리 AI 시스템인 'PRO-Bot Assistant'입니다. 
+제공된 [현재 공장 실시간 생산 데이터]를 토대로 사용자의 질문에 정확하고 명쾌하게 답변하세요. 
+작업조별(A, B, C조) 생산량, 포장량, 비가동 사유 질문 시 정확한 숫자와 결론을 2-3문장 이내로 확실하게 강조하세요.`;
+
+            const apiKey = "";
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: userQuery }] }],
+                        systemInstruction: { parts: [{ text: systemPrompt + "\n" + contextSummary }] }
+                    })
+                });
+                const result = await response.json();
+                const aiText = result.candidates?.[0]?.content?.parts?.[0]?.text;
+                if (aiText) return aiText.replace(/\n/g, '<br>');
+            } catch (err) {
+                console.warn("Gemini API call optional fallback executed:", err);
+            }
+
+            // High-precision local NLP fallback engine
+            return getLocalIntelligentResponse(userQuery, teamProd, totalProdKg, totalPackKg, totalDownMin, top3Down, safeProd, safeDown);
+        }
+
+        function getLocalIntelligentResponse(q, teamProd, totalProdKg, totalPackKg, totalDownMin, top3Down, safeProd, safeDown) {
+            const query = q.toLowerCase();
+
+            if (query.includes('조') || query.includes('생산량') || query.includes('실적')) {
+                if (query.includes('가장') || query.includes('높은') || query.includes('1위') || query.includes('보인')) {
+                    const maxTeam = Object.entries(teamProd).sort((a,b)=>b[1]-a[1])[0];
+                    return `현재 가장 많은 생산량을 보인 작업조는 <b>${maxTeam[0]}조</b>로 총 <b>${(maxTeam[1]/1000).toFixed(1)} TON</b>을 달성했습니다.<br><br><b>[작업조별 누적 실적]</b><br>• A조: ${(teamProd.A/1000).toFixed(1)} TON<br>• B조: ${(teamProd.B/1000).toFixed(1)} TON<br>• C조: ${(teamProd.C/1000).toFixed(1)} TON`;
                 }
-                const totalDown = safeDown.reduce((a,c) => a + c.minutes, 0);
-                return `총 누적 불가동시간은 <b>${totalDown.toLocaleString()} 분</b>입니다.`;
+                return `<b>[작업조별 누적 생산실적]</b><br>• <b>A조:</b> ${(teamProd.A/1000).toFixed(1)} TON<br>• <b>B조:</b> ${(teamProd.B/1000).toFixed(1)} TON<br>• <b>C조:</b> ${(teamProd.C/1000).toFixed(1)} TON<br>• <b>전체 총계:</b> ${(totalProdKg/1000).toFixed(1)} TON`;
+            }
+
+            if (query.includes('비가동') || query.includes('정지') || query.includes('고장')) {
+                if (top3Down.length > 0) {
+                    let res = `현재 집계된 <b>주요 비가동 원인 TOP 3</b>입니다:<br>`;
+                    top3Down.forEach((item, idx) => {
+                        res += `<br><b>${idx + 1}위:</b> ${item[0]} (<b>${item[1].toLocaleString()}분</b>)`;
+                    });
+                    res += `<br><br>총 누적 비가동시간은 <b>${totalDownMin.toLocaleString()} 분</b>입니다.`;
+                    return res;
+                }
+                return `총 누적 불가동시간은 <b>${totalDownMin.toLocaleString()} 분</b>입니다.`;
             }
 
             if (query.includes('포장')) {
-                const totalPack = safePack.reduce((a,c) => a + c.amount, 0);
-                return `총 CD 포장 실적량은 <b>${Math.round(totalPack / 1000).toLocaleString()} TON</b>입니다.`;
+                return `총 CD 포장 실적량은 <b>${(totalPackKg/1000).toFixed(1)} TON</b> (포장률 ${totalProdKg > 0 ? ((totalPackKg/totalProdKg)*100).toFixed(1) : 0}%) 입니다.`;
             }
 
-            if (query.includes('생산') || query.includes('실적') || query.includes('톤') || query.includes('ton')) {
-                const totalProd = safeProd.reduce((a,c) => a + c.amount, 0);
-                return `현재 누적 총 생산실적은 <b>${Math.round(totalProd / 1000).toLocaleString()} TON</b>입니다.`;
+            return `<b>[생산 종합 현황]</b><br>• 누적 생산실적: <b>${(totalProdKg/1000).toFixed(1)} TON</b><br>• 누적 포장실적: <b>${(totalPackKg/1000).toFixed(1)} TON</b><br>• 누적 비가동시간: <b>${totalDownMin.toLocaleString()} 분</b><br><br>필요하신 세부 항목(예: A조 생산량, PCD-4 비가동)을 자유롭게 물어보세요!`;
+        }
+
+        // --- 🚀 [NEW] Downtime Detail Interactive Modal Logic ---
+        function openDownDetailModal(equip, reason) {
+            const modal = document.getElementById('down-detail-modal');
+            const titleEl = document.getElementById('modal-down-title');
+            const equipEl = document.getElementById('modal-down-equip');
+            const minEl = document.getElementById('modal-down-min');
+            const pctEl = document.getElementById('modal-down-pct');
+            const bodyEl = document.getElementById('modal-down-history-body');
+            const aiEl = document.getElementById('modal-down-ai-guide');
+
+            const safeDown = Array.isArray(downData) ? downData : [];
+            const totalDownAll = safeDown.reduce((a,c)=>a+c.minutes,0);
+
+            const filtered = safeDown.filter(d => {
+                const matchesEquip = equip ? d.equipment === equip : true;
+                const matchesReason = reason ? d.reason === reason : true;
+                return matchesEquip && matchesReason;
+            });
+
+            const itemDownTotal = filtered.reduce((a,c)=>a+c.minutes,0);
+            const pct = totalDownAll > 0 ? ((itemDownTotal / totalDownAll) * 100).toFixed(1) : 0;
+
+            if (titleEl) titleEl.innerText = `[${equip || '전체'}] ${reason || '비가동 분석'}`;
+            if (equipEl) equipEl.innerText = `${equip || '전체설비'} / ${reason || '종합'}`;
+            if (minEl) minEl.innerText = `${itemDownTotal.toLocaleString()} MIN`;
+            if (pctEl) pctEl.innerText = `${pct}%`;
+
+            let rowsHtml = '';
+            if (filtered.length > 0) {
+                filtered.forEach(item => {
+                    rowsHtml += `<tr class="border-b border-slate-200 hover:bg-red-50/50">
+                        <td class="py-1 px-2 font-mono text-slate-800">${item.date}</td>
+                        <td class="py-1 px-2 text-center font-bold text-slate-600">${item.shift || '전체'}</td>
+                        <td class="py-1 px-2 text-center font-bold text-sky-700">${item.team ? item.team + '조' : '-'}</td>
+                        <td class="py-1 px-2 font-extrabold text-slate-800">${item.reason}</td>
+                        <td class="py-1 px-2 text-right font-mono font-black text-red-600">${item.minutes} 분</td>
+                    </tr>`;
+                });
+            } else {
+                rowsHtml = `<tr><td colspan="5" class="text-center py-3 text-slate-400">발생 이력이 없습니다.</td></tr>`;
+            }
+            if (bodyEl) bodyEl.innerHTML = rowsHtml;
+
+            if (aiEl) {
+                aiEl.innerHTML = `<b>${equip || '설비'} 진단:</b> 해당 비가동 항목은 공정 병목을 유발하여 총 <b>${itemDownTotal}분 (${pct}%)</b>의 손실을 발생시켰습니다. ${reason ? `'${reason}'` : '해당 원인'}에 대한 보전팀 정기점검 가이드 준수 및 예비 부품 선확보를 권장합니다.`;
             }
 
-            const pcdMatch = query.match(/pcd-[0-9a-z-]+/i);
-            if (pcdMatch) {
-                const eq = pcdMatch[0].toUpperCase();
-                const eqProd = safeProd.filter(d => d.equipment.toUpperCase() === eq).reduce((a,c) => a + c.amount, 0);
-                const eqDown = safeDown.filter(d => d.equipment.toUpperCase() === eq).reduce((a,c) => a + c.minutes, 0);
-                return `<b>${eq} 설비 현황</b>:<br>• 누적 생산량: <b>${Math.round(eqProd/1000)} TON</b><br>• 누적 불가동: <b>${eqDown} 분</b>`;
-            }
+            if (modal) modal.style.display = 'flex';
+        }
 
-            return `질문을 이해하였습니다.<br>생산실적: <b>${Math.round(safeProd.reduce((a,c)=>a+c.amount,0)/1000)} TON</b><br>불가동시간: <b>${safeDown.reduce((a,c)=>a+c.minutes,0)} 분</b><br>필요하신 세부 항목을 구체적으로 질문해주세요!`;
+        function closeDownDetailModal() {
+            const modal = document.getElementById('down-detail-modal');
+            if (modal) modal.style.display = 'none';
         }
 
         function openModal() {
@@ -1373,6 +1554,7 @@
 
             if(document.getElementById('kpi-down')) document.getElementById('kpi-down').innerText = totDown.toLocaleString();
 
+            // --- 🚀 [NEW] TOP 3 Downtime with Clickable Detail Trigger ---
             const reasonMap = {};
             fDown.forEach(d => {
                 const r = (d.reason || '기타 고장').trim();
@@ -1388,12 +1570,15 @@
                 const rankBadges = ['bg-red-600 text-white', 'bg-amber-500 text-white', 'bg-slate-600 text-white'];
                 sortedTop3.forEach((item, idx) => {
                     const dispText = item.equip ? `${item.equip} - ${item.reason}` : item.reason;
-                    top3Html += `<div class="flex items-center justify-between text-[9px] leading-tight font-bold text-slate-800 py-[1.5px] px-1 hover:bg-red-50/60 rounded transition-all">
-                        <div class="flex items-center gap-1.5 truncate max-w-[72%]" title="${dispText}">
+                    top3Html += `<div class="flex items-center justify-between text-[9px] leading-tight font-bold text-slate-800 py-[2px] px-1.5 top3-row-clickable rounded border border-transparent hover:border-red-200" onclick="openDownDetailModal('${item.equip}', '${item.reason}')">
+                        <div class="flex items-center gap-1.5 truncate max-w-[70%]" title="클릭하여 상세 세부내역 보기: ${dispText}">
                             <span class="text-[8px] font-black px-1 py-[0.5px] rounded shrink-0 ${rankBadges[idx]}">${idx+1}위</span>
                             <span class="truncate text-slate-800 font-extrabold text-[9.5px]">${dispText}</span>
                         </div>
-                        <span class="font-mono-num font-black text-red-600 text-[10px] shrink-0 ml-1">${item.min.toLocaleString()}<span class="text-[8px] font-normal text-slate-500 ml-0.5">분</span></span>
+                        <div class="flex items-center gap-1 shrink-0">
+                            <span class="font-mono-num font-black text-red-600 text-[10px]">${item.min.toLocaleString()}<span class="text-[8px] font-normal text-slate-500 ml-0.5">분</span></span>
+                            <span class="bg-red-100 text-red-700 px-1 py-[0.5px] rounded text-[8px] font-bold hover:bg-red-600 hover:text-white transition-all"><i class="fa-solid fa-magnifying-glass-plus"></i></span>
+                        </div>
                     </div>`;
                 });
             } else {
@@ -1653,6 +1838,7 @@
             updateAnalytics();
         }
 
+        // --- 🚀 [NEW] Enhanced CD Productivity Deep Dive Analytics (Team breakdown for specific machines) ---
         function updateAnalytics() {
             if(prodData.length === 0) return;
 
@@ -1676,17 +1862,23 @@
             const selMachine = document.getElementById('analytics-machine-select');
             const availableMachines = [...new Set(cProd.map(d=>d.equipment))].filter(e=>e).sort((a,b) => { const idxA = MACHINE_ORDER.indexOf(a); const idxB = MACHINE_ORDER.indexOf(b); return (idxA === -1 ? 999 : idxA) - (idxB === -1 ? 999 : idxB); });
 
-            if (analyticsGroupBy === 'MACHINE' && selMachine) {
-                let currentMachineVal = selMachine.value;
-                if (!currentMachineVal || !availableMachines.includes(currentMachineVal)) currentMachineVal = availableMachines.length > 0 ? availableMachines[0] : "";
-                selMachine.innerHTML = availableMachines.map(m => `<option value="${m}">${m}</option>`).join('');
-                if(currentMachineVal) selMachine.value = currentMachineVal;
+            let selectedMachineVal = "";
 
-                if (currentMachineVal) { cProd = cProd.filter(d => d.equipment === currentMachineVal); cDown = cDown.filter(d => d.equipment === currentMachineVal); }
+            if (analyticsGroupBy === 'MACHINE' && selMachine) {
+                selectedMachineVal = selMachine.value;
+                if (!selectedMachineVal || !availableMachines.includes(selectedMachineVal)) selectedMachineVal = availableMachines.length > 0 ? availableMachines[0] : "";
+                selMachine.innerHTML = availableMachines.map(m => `<option value="${m}">${m}</option>`).join('');
+                if(selectedMachineVal) selMachine.value = selectedMachineVal;
+
+                if (selectedMachineVal) {
+                    cProd = cProd.filter(d => d.equipment === selectedMachineVal);
+                    cDown = cDown.filter(d => d.equipment === selectedMachineVal);
+                }
             }
 
             const map = {}; 
-            const groupKeys = analyticsGroupBy === 'MACHINE' ? availableMachines : ['A', 'B', 'C'];
+            // When grouped by MACHINE, break down X-axis by A, B, C Teams for that specific machine!
+            const groupKeys = ['A', 'B', 'C'];
             const SHAPES = ['원형', '정육각', '사각', '이형'];
 
             groupKeys.forEach(k => { 
@@ -1696,7 +1888,7 @@
             });
 
             cProd.forEach(p => {
-                let grp = analyticsGroupBy === 'MACHINE' ? p.equipment : (p.team || '').replace(/조/g, '').trim().toUpperCase();
+                let grp = (p.team || '').replace(/조/g, '').trim().toUpperCase();
                 if(!groupKeys.includes(grp)) return;
 
                 let sh = p.shapeRaw || '원형';
@@ -1710,7 +1902,7 @@
             });
 
             cDown.forEach(d => {
-                let grp = analyticsGroupBy === 'MACHINE' ? d.equipment : (d.team || '').replace(/조/g, '').trim().toUpperCase();
+                let grp = (d.team || '').replace(/조/g, '').trim().toUpperCase();
                 if(!groupKeys.includes(grp)) return;
 
                 let sh = d.isCircle ? '원형' : '정육각';
@@ -1728,10 +1920,24 @@
                 '이형': 'bg-rose-100 text-rose-800 border-rose-300'
             };
 
+            const headerTitleEl = document.getElementById('aly-table-header');
+            if (headerTitleEl) {
+                headerTitleEl.innerText = analyticsGroupBy === 'MACHINE' ? `[${selectedMachineVal}] 작업조` : '작업조 구분';
+            }
+
+            const chartTitleEl = document.getElementById('aly-chart-title');
+            const chartBadgeEl = document.getElementById('aly-chart-badge');
+            if (chartTitleEl) {
+                chartTitleEl.innerText = analyticsGroupBy === 'MACHINE' 
+                    ? `[${selectedMachineVal}] 호기별 A·B·C 작업조 형상 세분화 UPH 비교`
+                    : '작업조별(전체) 형상 세분화(원형·정육각·사각·이형) UPH 비교';
+            }
+            if (chartBadgeEl) {
+                chartBadgeEl.innerText = analyticsGroupBy === 'MACHINE' ? `[${selectedMachineVal}] 조별 세부 UPH` : '전체 작업조 세부 UPH';
+            }
+
             groupKeys.forEach((k) => {
-                const teamBadge = analyticsGroupBy === 'MACHINE' 
-                    ? `bg-slate-200 text-slate-800 border-slate-300`
-                    : (k === 'A' ? 'bg-indigo-100 text-indigo-800 border-indigo-300' : k === 'B' ? 'bg-amber-100 text-amber-800 border-amber-300' : 'bg-emerald-100 text-emerald-800 border-emerald-300');
+                const teamBadge = (k === 'A' ? 'bg-indigo-100 text-indigo-800 border-indigo-300' : k === 'B' ? 'bg-amber-100 text-amber-800 border-amber-300' : 'bg-emerald-100 text-emerald-800 border-emerald-300');
 
                 SHAPES.forEach((sh, sIdx) => {
                     const item = map[`${k}-${sh}`];
@@ -1748,7 +1954,7 @@
                     const borderStyle = sIdx === 0 ? 'border-t-2 border-slate-300' : 'border-t border-slate-100';
 
                     tBodyHtml += `<tr class="hover:bg-sky-50/60 ${borderStyle}">
-                        <td class="font-bold py-1 px-2.5">${sIdx === 0 ? `<span class="px-2 py-0.5 rounded text-[10px] font-black border ${teamBadge}">${k}${analyticsGroupBy === 'TEAM' ? '조' : ''}</span>` : ''}</td>
+                        <td class="font-bold py-1 px-2.5">${sIdx === 0 ? `<span class="px-2 py-0.5 rounded text-[10px] font-black border ${teamBadge}">${k}조</span>` : ''}</td>
                         <td class="text-center font-bold py-1 px-2.5"><span class="px-1.5 py-0.2 rounded text-[9.5px] font-extrabold border ${shapeBadgeStyles[sh]}">${sh}</span></td>
                         <td class="text-right font-mono-num font-black text-slate-900 py-1 px-2.5">${tons.toFixed(1)}</td>
                         <td class="text-right font-mono-num font-extrabold text-red-600 py-1 px-2.5">${item.down.toLocaleString()}</td>
@@ -1768,6 +1974,7 @@
             renderAnalyticsChart(map, groupKeys);
         }
 
+        // --- 🚀 [NEW] Slimmer, Sharp-Contrasting UPH Chart Rendering ---
         function renderAnalyticsChart(map, groupKeys) {
             if(!window.Chart) return;
             const canvas = document.getElementById('analyticsChart');
@@ -1776,13 +1983,13 @@
             if(analyticsChartInstance) analyticsChartInstance.destroy();
             const ctx = canvas.getContext('2d');
 
-            const labels = groupKeys.map(k => analyticsGroupBy === 'MACHINE' ? k : `${k}조`);
+            const labels = groupKeys.map(k => `${k}조`);
             const SHAPES = ['원형', '정육각', '사각', '이형'];
             const shapeColors = {
-                '원형': 'rgba(31, 119, 180, 0.85)',
-                '정육각': 'rgba(255, 127, 14, 0.85)',
-                '사각': 'rgba(148, 103, 189, 0.85)',
-                '이형': 'rgba(214, 39, 40, 0.85)'
+                '원형': '#1f77b4',
+                '정육각': '#ff7f0e',
+                '사각': '#9467bd',
+                '이형': '#d62728'
             };
 
             const datasets = SHAPES.map(sh => {
@@ -1798,7 +2005,12 @@
                     label: `${sh} UPH (TON/Hr)`,
                     data: data,
                     backgroundColor: shapeColors[sh],
-                    borderRadius: 3
+                    borderWidth: 1,
+                    borderColor: '#ffffff',
+                    borderRadius: 4,
+                    maxBarThickness: 32, // Slimmer bars for crisp contrast!
+                    categoryPercentage: 0.5,
+                    barPercentage: 0.8
                 };
             });
 
@@ -1812,11 +2024,23 @@
                     responsive: true,
                     maintainAspectRatio: false,
                     scales: {
-                        x: { stacked: true, grid: { display: false }, ticks: { font: { size: 10, weight: 'bold' } } },
-                        y: { stacked: true, beginAtZero: true, ticks: { font: { size: 9.5 } }, grid: { color: 'rgba(0,0,0,0.06)' } }
+                        x: { stacked: true, grid: { display: false }, ticks: { font: { size: 11, weight: 'bold' } } },
+                        y: { 
+                            stacked: true, 
+                            beginAtZero: true, 
+                            ticks: { font: { size: 10, weight: 'bold' }, stepSize: 2 }, 
+                            grid: { color: 'rgba(0,0,0,0.06)' } 
+                        }
                     },
                     plugins: { 
-                        legend: { position: 'top', labels: { font: { size: 9.5, weight: 'bold' }, boxWidth: 12 } } 
+                        legend: { position: 'top', labels: { font: { size: 10, weight: 'bold' }, boxWidth: 14 } },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return ` ${context.dataset.label}: ${context.raw} TON/Hr`;
+                                }
+                            }
+                        }
                     }
                 }
             });
