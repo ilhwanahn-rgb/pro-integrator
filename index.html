@@ -282,10 +282,10 @@
 
             <!-- GridStack 자유 드래그 & 리사이즈 대시보드 영역 -->
             <div class="grid-stack mb-6">
-                <!-- Widget 1: 날씨 & 시계 위젯 -->
+                <!-- Widget 1: 날씨 & 시계 위젯 (w=3) -->
                 <div class="grid-stack-item" gs-id="widget-clock" gs-x="0" gs-y="0" gs-w="3" gs-h="2">
                     <div class="grid-stack-item-content">
-                        <div class="glass-panel p-3">
+                        <div class="glass-panel p-3 h-full">
                             <div class="widget-drag-handle">
                                 <span><i class="fa-solid fa-grip-dots-vertical mr-1"></i> 시계/단추형 지역 예보</span>
                                 <i class="fa-solid fa-xmark cursor-pointer hover:text-red-500" onclick="removeWidget('widget-clock')"></i>
@@ -310,10 +310,10 @@
                     </div>
                 </div>
 
-                <!-- Widget 2: 당월 생산 실적 -->
+                <!-- Widget 2: 당월 생산 실적 (w=2) -->
                 <div class="grid-stack-item" gs-id="widget-prod" gs-x="3" gs-y="0" gs-w="2" gs-h="2">
                     <div class="grid-stack-item-content">
-                        <div class="glass-panel p-3.5">
+                        <div class="glass-panel p-3.5 h-full">
                             <div class="widget-drag-handle">
                                 <span><i class="fa-solid fa-grip-dots-vertical mr-1"></i> 생산실적 KPI</span>
                                 <i class="fa-solid fa-xmark cursor-pointer hover:text-red-500" onclick="removeWidget('widget-prod')"></i>
@@ -323,17 +323,17 @@
                                 <span id="kpi-reach" class="text-[9.5px] font-extrabold px-2 py-0.5 rounded-md border bg-sky-50 text-sky-800 border-sky-200">달성률 0%</span>
                             </div>
                             <div>
-                                <p class="text-[10px] font-extrabold text-slate-500 uppercase tracking-widest mb-0.5 kpi-title">당월 생산 실적</p>
-                                <div class="flex items-baseline gap-1"><h4 id="kpi-tons" class="text-xl lg:text-2xl font-black text-slate-900 font-mono-num kpi-val">0</h4><span class="text-[10px] font-bold text-slate-500">TON</span></div>
+                                <p class="text-[10px] font-extrabold text-slate-500 uppercase tracking-widest mb-0.5">당월 생산 실적</p>
+                                <div class="flex items-baseline gap-1"><h4 id="kpi-tons" class="text-xl lg:text-2xl font-black text-slate-900 font-mono-num">0</h4><span class="text-[10px] font-bold text-slate-500">TON</span></div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Widget 3: CD 포장 실적량 -->
+                <!-- Widget 3: CD 포장 실적량 (w=2) -->
                 <div class="grid-stack-item" gs-id="widget-pack" gs-x="5" gs-y="0" gs-w="2" gs-h="2">
                     <div class="grid-stack-item-content">
-                        <div class="glass-panel p-3.5">
+                        <div class="glass-panel p-3.5 h-full">
                             <div class="widget-drag-handle">
                                 <span><i class="fa-solid fa-grip-dots-vertical mr-1"></i> 포장실적 KPI</span>
                                 <i class="fa-solid fa-xmark cursor-pointer hover:text-red-500" onclick="removeWidget('widget-pack')"></i>
@@ -343,17 +343,17 @@
                                 <span id="kpi-pack-ratio" class="text-[9.5px] font-extrabold px-2 py-0.5 rounded-md border bg-teal-50 text-teal-800 border-teal-200">포장달성률 0%</span>
                             </div>
                             <div>
-                                <p class="text-[10px] font-extrabold text-slate-500 uppercase tracking-widest mb-0.5 kpi-title">CD 포장 실적량</p>
-                                <div class="flex items-baseline gap-1"><h4 id="kpi-pack-tons" class="text-xl lg:text-2xl font-black text-slate-900 font-mono-num kpi-val">0</h4><span class="text-[10px] font-bold text-slate-500">TON</span></div>
+                                <p class="text-[10px] font-extrabold text-slate-500 uppercase tracking-widest mb-0.5">CD 포장 실적량</p>
+                                <div class="flex items-baseline gap-1"><h4 id="kpi-pack-tons" class="text-xl lg:text-2xl font-black text-slate-900 font-mono-num">0</h4><span class="text-[10px] font-bold text-slate-500">TON</span></div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Widget 4: 총 불가동시간 및 TOP 3 사유 -->
-                <div class="grid-stack-item" gs-id="widget-down" gs-x="7" gs-y="0" gs-w="2.5" gs-h="2">
+                <!-- Widget 4: 총 불가동시간 및 TOP 3 (w=2) -->
+                <div class="grid-stack-item" gs-id="widget-down" gs-x="7" gs-y="0" gs-w="2" gs-h="2">
                     <div class="grid-stack-item-content">
-                        <div class="glass-panel p-2.5 flex flex-col justify-between">
+                        <div class="glass-panel p-2.5 flex flex-col justify-between h-full">
                             <div class="widget-drag-handle">
                                 <span><i class="fa-solid fa-grip-dots-vertical mr-1"></i> 불가동 TOP 3</span>
                                 <i class="fa-solid fa-xmark cursor-pointer hover:text-red-500" onclick="removeWidget('widget-down')"></i>
@@ -376,8 +376,8 @@
                     </div>
                 </div>
 
-                <!-- Widget 5: 월별 불가동 잔디밭 차트 (GitHub Heatmap Style) -->
-                <div class="grid-stack-item" gs-id="widget-oee" gs-x="9.5" gs-y="0" gs-w="2.5" gs-h="2">
+                <!-- Widget 5: 월별 불가동 잔디밭 차트 (w=3) -->
+                <div class="grid-stack-item" gs-id="widget-oee" gs-x="9" gs-y="0" gs-w="3" gs-h="2">
                     <div class="grid-stack-item-content">
                         <div class="glass-panel p-2.5 flex flex-col justify-between h-full bg-white">
                             <div class="widget-drag-handle">
@@ -413,10 +413,10 @@
                     </div>
                 </div>
 
-                <!-- Widget 6: 메인 생산/포장/불가동 복합 차트 -->
+                <!-- Widget 6: 메인 생산/포장/불가동 복합 차트 (w=7) -->
                 <div class="grid-stack-item" gs-id="widget-main-chart" gs-x="0" gs-y="2" gs-w="7" gs-h="5">
                     <div class="grid-stack-item-content">
-                        <div class="glass-panel p-4">
+                        <div class="glass-panel p-4 h-full">
                             <div class="widget-drag-handle">
                                 <span><i class="fa-solid fa-grip-dots-vertical mr-1"></i> 생산/포장/불가동 복합 차트</span>
                                 <i class="fa-solid fa-xmark cursor-pointer hover:text-red-500" onclick="removeWidget('widget-main-chart')"></i>
@@ -438,10 +438,10 @@
                     </div>
                 </div>
 
-                <!-- Widget 7: 생산 비율 3D 도넛 차트 -->
+                <!-- Widget 7: 생산 비율 3D 도넛 차트 (w=5) -->
                 <div class="grid-stack-item" gs-id="widget-ratio-charts" gs-x="7" gs-y="2" gs-w="5" gs-h="5">
                     <div class="grid-stack-item-content">
-                        <div class="glass-panel p-3.5">
+                        <div class="glass-panel p-3.5 h-full">
                             <div class="widget-drag-handle">
                                 <span><i class="fa-solid fa-grip-dots-vertical mr-1"></i> 생산 비율 3D 종합 분석</span>
                                 <i class="fa-solid fa-xmark cursor-pointer hover:text-red-500" onclick="removeWidget('widget-ratio-charts')"></i>
@@ -479,10 +479,10 @@
                     </div>
                 </div>
 
-                <!-- Widget 8: 통합 자산 제어 레지스트리 표 -->
+                <!-- Widget 8: 통합 자산 제어 레지스트리 표 (w=12) -->
                 <div class="grid-stack-item" gs-id="widget-registry" gs-x="0" gs-y="7" gs-w="12" gs-h="4">
                     <div class="grid-stack-item-content">
-                        <div class="glass-panel overflow-hidden">
+                        <div class="glass-panel overflow-hidden h-full">
                             <div class="widget-drag-handle">
                                 <span><i class="fa-solid fa-grip-dots-vertical mr-1"></i> 자산 제어 레지스트리</span>
                                 <i class="fa-solid fa-xmark cursor-pointer hover:text-red-500" onclick="removeWidget('widget-registry')"></i>
@@ -794,12 +794,13 @@
             { id: 'widget-registry', name: '통합 자산 제어 레지스트리', icon: 'fa-microchip' }
         ];
 
+        // 12컬럼 최적화 배치 선언
         const DEFAULT_GRID_LAYOUT = [
             { id: 'widget-clock', x: 0, y: 0, w: 3, h: 2 },
             { id: 'widget-prod', x: 3, y: 0, w: 2, h: 2 },
             { id: 'widget-pack', x: 5, y: 0, w: 2, h: 2 },
-            { id: 'widget-down', x: 7, y: 0, w: 2.5, h: 2 },
-            { id: 'widget-oee', x: 9.5, y: 0, w: 2.5, h: 2 },
+            { id: 'widget-down', x: 7, y: 0, w: 2, h: 2 },
+            { id: 'widget-oee', x: 9, y: 0, w: 3, h: 2 },
             { id: 'widget-main-chart', x: 0, y: 2, w: 7, h: 5 },
             { id: 'widget-ratio-charts', x: 7, y: 2, w: 5, h: 5 },
             { id: 'widget-registry', x: 0, y: 7, w: 12, h: 4 }
@@ -878,7 +879,6 @@
             { date: "2026-09-29", equipment: "PCD-5", team: "C", isCircle: true, steelType: "STS강", shapeRaw: "원형", heatTreat: "열처리재", shift: "2근", amount: 39800, speed: 170, wire: 3.2 }
         ];
 
-        // 1월~12월 연간 샘플 불가동 데이터 (다양한 색상 발색용)
         const SAMPLE_DOWN_DATA = [
             { date: "2026-01-15", equipment: "PCD-1", team: "A", isCircle: true, shift: "1근", minutes: 110, reason: "정기 점검" },
             { date: "2026-03-20", equipment: "PCD-2-2", team: "B", isCircle: true, shift: "2근", minutes: 230, reason: "다이스 교체" },
@@ -976,7 +976,7 @@
         function saveLayout() {
             if (!grid) return;
             const layout = grid.save();
-            localStorage.setItem('PRO_DASHBOARD_GRID_LAYOUT_V30', JSON.stringify(layout));
+            localStorage.setItem('PRO_DASHBOARD_GRID_LAYOUT_V31', JSON.stringify(layout));
         }
 
         function sanitizeLayout(layoutArray) {
@@ -989,7 +989,7 @@
         }
 
         function loadSavedLayout() {
-            const saved = localStorage.getItem('PRO_DASHBOARD_GRID_LAYOUT_V30');
+            const saved = localStorage.getItem('PRO_DASHBOARD_GRID_LAYOUT_V31');
             if (saved && grid) {
                 try {
                     const parsed = JSON.parse(saved);
@@ -1011,9 +1011,9 @@
         }
 
         function resetLayout() {
+            localStorage.removeItem('PRO_DASHBOARD_GRID_LAYOUT_V31');
             localStorage.removeItem('PRO_DASHBOARD_GRID_LAYOUT_V30');
             localStorage.removeItem('PRO_DASHBOARD_GRID_LAYOUT_V29');
-            localStorage.removeItem('PRO_DASHBOARD_GRID_LAYOUT_V28');
             location.reload();
         }
 
@@ -1060,8 +1060,8 @@
                 let w = 4, h = 3;
                 if (widgetId.includes('clock')) { w = 3; h = 2; }
                 else if (widgetId.includes('prod') || widgetId.includes('pack')) { w = 2; h = 2; }
-                else if (widgetId.includes('down')) { w = 2.5; h = 2; }
-                else if (widgetId.includes('oee')) { w = 2.5; h = 2; }
+                else if (widgetId.includes('down')) { w = 2; h = 2; }
+                else if (widgetId.includes('oee')) { w = 3; h = 2; }
                 else if (widgetId.includes('main')) { w = 7; h = 5; }
                 else if (widgetId.includes('ratio')) { w = 5; h = 5; }
                 else if (widgetId.includes('registry')) { w = 12; h = 4; }
@@ -1075,7 +1075,6 @@
             openWidgetManager();
         }
 
-        // 완벽한 HTML 구조를 복원하는 템플릿 생성기
         function getWidgetHtmlTemplate(widgetId) {
             const div = document.createElement('div');
             div.setAttribute('gs-id', widgetId);
@@ -1113,11 +1112,13 @@
                     </div>
                 </div>`;
             } else if (widgetId === 'widget-prod') {
-                html = `<div class="grid-stack-item-content"><div class="glass-panel p-3.5"><div class="widget-drag-handle"><span>생산실적 KPI</span><i class="fa-solid fa-xmark cursor-pointer" onclick="removeWidget('widget-prod')"></i></div><div class="flex justify-between items-start mb-1"><div class="p-2 rounded-lg bg-sky-50 border border-sky-200 text-sky-700"><i class="fa-solid fa-industry text-sm"></i></div><span id="kpi-reach" class="text-[9.5px] font-extrabold px-2 py-0.5 rounded-md border bg-sky-50 text-sky-800 border-sky-200">달성률 0%</span></div><div><p class="text-[10px] font-extrabold text-slate-500 uppercase tracking-widest mb-0.5">당월 생산 실적</p><div class="flex items-baseline gap-1"><h4 id="kpi-tons" class="text-xl lg:text-2xl font-black text-slate-900 font-mono-num">0</h4><span class="text-[10px] font-bold text-slate-500">TON</span></div></div></div></div>`;
+                html = `<div class="grid-stack-item-content"><div class="glass-panel p-3.5 h-full"><div class="widget-drag-handle"><span>생산실적 KPI</span><i class="fa-solid fa-xmark cursor-pointer" onclick="removeWidget('widget-prod')"></i></div><div class="flex justify-between items-start mb-1"><div class="p-2 rounded-lg bg-sky-50 border border-sky-200 text-sky-700"><i class="fa-solid fa-industry text-sm"></i></div><span id="kpi-reach" class="text-[9.5px] font-extrabold px-2 py-0.5 rounded-md border bg-sky-50 text-sky-800 border-sky-200">달성률 0%</span></div><div><p class="text-[10px] font-extrabold text-slate-500 uppercase tracking-widest mb-0.5">당월 생산 실적</p><div class="flex items-baseline gap-1"><h4 id="kpi-tons" class="text-xl lg:text-2xl font-black text-slate-900 font-mono-num">0</h4><span class="text-[10px] font-bold text-slate-500">TON</span></div></div></div></div>`;
             } else if (widgetId === 'widget-pack') {
-                html = `<div class="grid-stack-item-content"><div class="glass-panel p-3.5"><div class="widget-drag-handle"><span>포장실적 KPI</span><i class="fa-solid fa-xmark cursor-pointer" onclick="removeWidget('widget-pack')"></i></div><div class="flex justify-between items-start mb-1"><div class="p-2 rounded-lg bg-teal-50 border border-teal-200 text-teal-700"><i class="fa-solid fa-box-open text-sm"></i></div><span id="kpi-pack-ratio" class="text-[9.5px] font-extrabold px-2 py-0.5 rounded-md border bg-teal-50 text-teal-800 border-teal-200">포장달성률 0%</span></div><div><p class="text-[10px] font-extrabold text-slate-500 uppercase tracking-widest mb-0.5">CD 포장 실적량</p><div class="flex items-baseline gap-1"><h4 id="kpi-pack-tons" class="text-xl lg:text-2xl font-black text-slate-900 font-mono-num">0</h4><span class="text-[10px] font-bold text-slate-500">TON</span></div></div></div></div>`;
+                html = `<div class="grid-stack-item-content"><div class="glass-panel p-3.5 h-full"><div class="widget-drag-handle"><span>포장실적 KPI</span><i class="fa-solid fa-xmark cursor-pointer" onclick="removeWidget('widget-pack')"></i></div><div class="flex justify-between items-start mb-1"><div class="p-2 rounded-lg bg-teal-50 border border-teal-200 text-teal-700"><i class="fa-solid fa-box-open text-sm"></i></div><span id="kpi-pack-ratio" class="text-[9.5px] font-extrabold px-2 py-0.5 rounded-md border bg-teal-50 text-teal-800 border-teal-200">포장달성률 0%</span></div><div><p class="text-[10px] font-extrabold text-slate-500 uppercase tracking-widest mb-0.5">CD 포장 실적량</p><div class="flex items-baseline gap-1"><h4 id="kpi-pack-tons" class="text-xl lg:text-2xl font-black text-slate-900 font-mono-num">0</h4><span class="text-[10px] font-bold text-slate-500">TON</span></div></div></div></div>`;
+            } else if (widgetId === 'widget-down') {
+                html = `<div class="grid-stack-item-content"><div class="glass-panel p-2.5 flex flex-col justify-between h-full"><div class="widget-drag-handle"><span>불가동 TOP 3</span><i class="fa-solid fa-xmark cursor-pointer hover:text-red-500" onclick="removeWidget('widget-down')"></i></div><div class="flex justify-between items-center mb-1"><div class="flex items-center gap-1.5"><div class="p-1 rounded-lg bg-red-50 border border-red-200 text-red-600"><i class="fa-solid fa-clock text-xs"></i></div><span class="text-[9.5px] font-extrabold text-slate-500 uppercase tracking-widest">총 불가동시간</span></div><div class="flex items-baseline gap-1"><h4 id="kpi-down" class="text-base lg:text-lg font-black text-red-600 font-mono-num">0</h4><span class="text-[8.5px] font-bold text-slate-500">MIN</span></div></div><div id="kpi-down-top3" class="pt-1 border-t border-slate-200 flex flex-col justify-center flex-1 gap-1 overflow-y-auto no-scrollbar"><div class="text-center text-slate-400 text-[9px] font-bold py-0.5">분석 중...</div></div></div></div>`;
             } else {
-                html = `<div class="grid-stack-item-content"><div class="glass-panel p-3.5"><div class="widget-drag-handle"><span>위젯</span><i class="fa-solid fa-xmark cursor-pointer" onclick="removeWidget('${widgetId}')"></i></div><div class="text-center p-4">위젯 내용</div></div></div>`;
+                html = `<div class="grid-stack-item-content"><div class="glass-panel p-3.5 h-full"><div class="widget-drag-handle"><span>위젯</span><i class="fa-solid fa-xmark cursor-pointer" onclick="removeWidget('${widgetId}')"></i></div><div class="text-center p-4">위젯 요소</div></div></div>`;
             }
 
             div.innerHTML = html;
