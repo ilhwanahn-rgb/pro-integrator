@@ -794,7 +794,7 @@
             { id: 'widget-registry', name: '통합 자산 제어 레지스트리', icon: 'fa-microchip' }
         ];
 
-        // 12컬럼 최적화 배치 선언
+        // 정수 단위 12컬럼 완벽 레이아웃
         const DEFAULT_GRID_LAYOUT = [
             { id: 'widget-clock', x: 0, y: 0, w: 3, h: 2 },
             { id: 'widget-prod', x: 3, y: 0, w: 2, h: 2 },
@@ -976,7 +976,7 @@
         function saveLayout() {
             if (!grid) return;
             const layout = grid.save();
-            localStorage.setItem('PRO_DASHBOARD_GRID_LAYOUT_V31', JSON.stringify(layout));
+            localStorage.setItem('PRO_DASHBOARD_GRID_LAYOUT_V32', JSON.stringify(layout));
         }
 
         function sanitizeLayout(layoutArray) {
@@ -989,7 +989,7 @@
         }
 
         function loadSavedLayout() {
-            const saved = localStorage.getItem('PRO_DASHBOARD_GRID_LAYOUT_V31');
+            const saved = localStorage.getItem('PRO_DASHBOARD_GRID_LAYOUT_V32');
             if (saved && grid) {
                 try {
                     const parsed = JSON.parse(saved);
@@ -1011,6 +1011,7 @@
         }
 
         function resetLayout() {
+            localStorage.removeItem('PRO_DASHBOARD_GRID_LAYOUT_V32');
             localStorage.removeItem('PRO_DASHBOARD_GRID_LAYOUT_V31');
             localStorage.removeItem('PRO_DASHBOARD_GRID_LAYOUT_V30');
             localStorage.removeItem('PRO_DASHBOARD_GRID_LAYOUT_V29');
