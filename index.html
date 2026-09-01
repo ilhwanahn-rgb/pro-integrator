@@ -231,14 +231,21 @@
 
                     <div class="flex gap-2.5 border-r border-slate-300 pr-2.5 pl-1">
                         <div class="flex flex-col">
-                            <span class="text-[8.5px] font-extrabold text-slate-500 uppercase tracking-widest">운영계획(월)</span>
+                            <span class="text-[8.5px] font-extrabold text-slate-500 uppercase tracking-widest">CDM운영계획</span>
                             <div class="flex items-center gap-1">
                                 <input type="number" id="inp-monthly" class="target-input text-sky-700" value="3330" onchange="updateTargets()">
                                 <span class="text-[8.5px] font-bold text-slate-500">TON</span>
                             </div>
                         </div>
                         <div class="flex flex-col">
-                            <span class="text-[8.5px] font-extrabold text-slate-500 uppercase tracking-widest">일일목표(일)</span>
+                            <span class="text-[8.5px] font-extrabold text-slate-500 uppercase tracking-widest">포장운영계획</span>
+                            <div class="flex items-center gap-1">
+                                <input type="number" id="inp-pack-monthly" class="target-input text-teal-700" value="3700" onchange="updateTargets()">
+                                <span class="text-[8.5px] font-bold text-slate-500">TON</span>
+                            </div>
+                        </div>
+                        <div class="flex flex-col">
+                            <span class="text-[8.5px] font-extrabold text-slate-500 uppercase tracking-widest">일 생산량</span>
                             <div class="flex items-center gap-1">
                                 <input type="number" id="inp-daily" class="target-input text-amber-600" value="129" onchange="updateTargets()">
                                 <span class="text-[8.5px] font-bold text-slate-500">TON</span>
@@ -333,7 +340,7 @@
                             </div>
                             <div class="flex justify-between items-start mb-1">
                                 <div class="p-2 rounded-lg bg-teal-50 border border-teal-200 text-teal-700"><i class="fa-solid fa-box-open text-sm"></i></div>
-                                <span id="kpi-pack-ratio" class="text-[9.5px] font-extrabold px-2 py-0.5 rounded-md border bg-teal-50 text-teal-800 border-teal-200">포장률 0%</span>
+                                <span id="kpi-pack-ratio" class="text-[9.5px] font-extrabold px-2 py-0.5 rounded-md border bg-teal-50 text-teal-800 border-teal-200">포장달성률 0%</span>
                             </div>
                             <div>
                                 <p class="text-[10px] font-extrabold text-slate-500 uppercase tracking-widest mb-0.5 kpi-title">CD 포장 실적량</p>
@@ -369,21 +376,39 @@
                     </div>
                 </div>
 
-                <!-- Widget 5: OEE 종합설비효율 -->
+                <!-- Widget 5: 월별 불가동 잔디밭 차트 (GitHub Heatmap Style) -->
                 <div class="grid-stack-item" gs-id="widget-oee" gs-x="10" gs-y="0" gs-w="2" gs-h="2">
                     <div class="grid-stack-item-content">
-                        <div id="card-oee" class="glass-panel p-3.5 transition-all duration-300">
+                        <div class="glass-panel p-2.5 flex flex-col justify-between h-full">
                             <div class="widget-drag-handle">
-                                <span><i class="fa-solid fa-grip-dots-vertical mr-1"></i> OEE 설비효율</span>
+                                <span><i class="fa-solid fa-grip-dots-vertical mr-1"></i> 월별 불가동 히트맵</span>
                                 <i class="fa-solid fa-xmark cursor-pointer hover:text-red-500" onclick="removeWidget('widget-oee')"></i>
                             </div>
                             <div>
-                                <div class="flex justify-between items-start mb-1">
-                                    <div id="icon-oee" class="p-2 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-700"><i class="fa-solid fa-gears text-sm"></i></div>
-                                    <span id="badge-oee" class="text-[8.5px] font-extrabold px-1.5 py-0.5 rounded hidden bg-red-600 text-white animate-pulse">EMERGENCY</span>
+                                <div class="flex justify-between items-center mb-1">
+                                    <span class="text-[9.5px] font-extrabold text-slate-800 uppercase flex items-center gap-1">
+                                        <i class="fa-solid fa-square-poll-vertical text-red-600"></i> 월별 불가동 잔디밭
+                                    </span>
+                                    <span id="max-down-month-badge" class="text-[8px] font-black px-1.5 py-0.5 rounded bg-red-100 text-red-700">최대: -</span>
                                 </div>
-                                <p class="text-[10px] font-extrabold text-slate-500 uppercase tracking-widest mb-0.5 kpi-title">OEE [종합설비효율]</p>
-                                <div class="flex items-baseline gap-1"><h4 id="kpi-oee" class="text-xl lg:text-2xl font-black text-emerald-700 font-mono-num kpi-val">0.0</h4><span class="text-[10px] font-bold text-slate-500">%</span></div>
+                                <p class="text-[8.5px] font-bold text-slate-400 mb-1">월별 불가동시간 현황 (1월~12월)</p>
+                            </div>
+
+                            <!-- 12개월 잔디밭 그리드 (4열 x 3행) -->
+                            <div id="downtime-heatmap-grid" class="grid grid-cols-4 gap-1 my-auto">
+                                <!-- JS에서 동적 생성 -->
+                            </div>
+
+                            <div class="flex items-center justify-between text-[8px] text-slate-400 font-bold pt-1 border-t border-slate-100">
+                                <span>Less</span>
+                                <div class="flex gap-0.5">
+                                    <span class="w-2 h-2 rounded-xs bg-slate-200" title="0분"></span>
+                                    <span class="w-2 h-2 rounded-xs bg-emerald-300" title="낮음"></span>
+                                    <span class="w-2 h-2 rounded-xs bg-amber-300" title="보통"></span>
+                                    <span class="w-2 h-2 rounded-xs bg-orange-400" title="높음"></span>
+                                    <span class="w-2 h-2 rounded-xs bg-red-600" title="심각"></span>
+                                </div>
+                                <span>More</span>
                             </div>
                         </div>
                     </div>
@@ -764,7 +789,7 @@
             { id: 'widget-prod', name: '당월 생산 실적 KPI', icon: 'fa-industry' },
             { id: 'widget-pack', name: 'CD 포장 실적량 KPI', icon: 'fa-box-open' },
             { id: 'widget-down', name: '총 불가동시간 & TOP 3', icon: 'fa-clock' },
-            { id: 'widget-oee', name: 'OEE 종합설비효율', icon: 'fa-gears' },
+            { id: 'widget-oee', name: '월별 불가동 히트맵 (GitHub 잔디밭)', icon: 'fa-square-poll-vertical' },
             { id: 'widget-main-chart', name: '생산/포장/불가동 복합 차트 (일간/주간)', icon: 'fa-chart-line' },
             { id: 'widget-ratio-charts', name: '생산 비율 3종 분석 (강종/형상/열처리)', icon: 'fa-pie-chart' },
             { id: 'widget-registry', name: '통합 자산 제어 레지스트리', icon: 'fa-microchip' }
@@ -843,34 +868,36 @@
         }
 
         const SAMPLE_PROD_DATA = [
-            { date: "2026-07-01", equipment: "PCD-4", team: "A", isCircle: true, steelType: "탄소강", shapeRaw: "원형", heatTreat: "비열처리재", shift: "1근", amount: 48500, speed: 180, wire: 3.5 },
-            { date: "2026-07-02", equipment: "PCD-2-2", team: "B", isCircle: false, steelType: "STS강", shapeRaw: "정육각", heatTreat: "열처리재", shift: "2근", amount: 22100, speed: 150, wire: 4.0 },
-            { date: "2026-07-05", equipment: "PCD-5", team: "C", isCircle: true, steelType: "합금강", shapeRaw: "원형", heatTreat: "비열처리재", shift: "1근", amount: 38400, speed: 165, wire: 2.8 },
-            { date: "2026-07-09", equipment: "PCD-1", team: "A", isCircle: true, steelType: "STS강", shapeRaw: "원형", heatTreat: "열처리재", shift: "1근", amount: 41200, speed: 175, wire: 3.0 },
-            { date: "2026-07-12", equipment: "PCD-3", team: "B", isCircle: false, steelType: "쾌삭강", shapeRaw: "이형", heatTreat: "비열처리재", shift: "2근", amount: 25400, speed: 140, wire: 5.2 },
-            { date: "2026-07-16", equipment: "PCD-4", team: "C", isCircle: true, steelType: "합금강", shapeRaw: "원형", heatTreat: "열처리재", shift: "2근", amount: 51200, speed: 185, wire: 3.5 },
-            { date: "2026-07-20", equipment: "PCD-0-2", team: "A", isCircle: false, steelType: "탄소강", shapeRaw: "사각", heatTreat: "비열처리재", shift: "1근", amount: 28200, speed: 155, wire: 4.2 },
-            { date: "2026-07-24", equipment: "PCD-2-2", team: "B", isCircle: true, steelType: "탄소강", shapeRaw: "원형", heatTreat: "비열처리재", shift: "1근", amount: 44100, speed: 160, wire: 3.8 },
-            { date: "2026-07-29", equipment: "PCD-5", team: "C", isCircle: true, steelType: "STS강", shapeRaw: "원형", heatTreat: "열처리재", shift: "2근", amount: 39800, speed: 170, wire: 3.2 }
+            { date: "2026-09-01", equipment: "PCD-4", team: "A", isCircle: true, steelType: "탄소강", shapeRaw: "원형", heatTreat: "비열처리재", shift: "1근", amount: 48500, speed: 180, wire: 3.5 },
+            { date: "2026-09-02", equipment: "PCD-2-2", team: "B", isCircle: false, steelType: "STS강", shapeRaw: "정육각", heatTreat: "열처리재", shift: "2근", amount: 22100, speed: 150, wire: 4.0 },
+            { date: "2026-09-05", equipment: "PCD-5", team: "C", isCircle: true, steelType: "합금강", shapeRaw: "원형", heatTreat: "비열처리재", shift: "1근", amount: 38400, speed: 165, wire: 2.8 },
+            { date: "2026-09-09", equipment: "PCD-1", team: "A", isCircle: true, steelType: "STS강", shapeRaw: "원형", heatTreat: "열처리재", shift: "1근", amount: 41200, speed: 175, wire: 3.0 },
+            { date: "2026-09-12", equipment: "PCD-3", team: "B", isCircle: false, steelType: "쾌삭강", shapeRaw: "이형", heatTreat: "비열처리재", shift: "2근", amount: 25400, speed: 140, wire: 5.2 },
+            { date: "2026-09-16", equipment: "PCD-4", team: "C", isCircle: true, steelType: "합금강", shapeRaw: "원형", heatTreat: "열처리재", shift: "2근", amount: 51200, speed: 185, wire: 3.5 },
+            { date: "2026-09-20", equipment: "PCD-0-2", team: "A", isCircle: false, steelType: "탄소강", shapeRaw: "사각", heatTreat: "비열처리재", shift: "1근", amount: 28200, speed: 155, wire: 4.2 },
+            { date: "2026-09-24", equipment: "PCD-2-2", team: "B", isCircle: true, steelType: "탄소강", shapeRaw: "원형", heatTreat: "비열처리재", shift: "1근", amount: 44100, speed: 160, wire: 3.8 },
+            { date: "2026-09-29", equipment: "PCD-5", team: "C", isCircle: true, steelType: "STS강", shapeRaw: "원형", heatTreat: "열처리재", shift: "2근", amount: 39800, speed: 170, wire: 3.2 }
         ];
 
         const SAMPLE_DOWN_DATA = [
-            { date: "2026-07-02", equipment: "PCD-3", team: "A", isCircle: true, shift: "1근", minutes: 120, reason: "CD Cutting M/C 고장" },
-            { date: "2026-07-10", equipment: "PCD-1", team: "B", isCircle: true, shift: "2근", minutes: 85, reason: "전원부 점검" },
-            { date: "2026-07-18", equipment: "PCD-4", team: "C", isCircle: true, shift: "1근", minutes: 45, reason: "신선 유압 호스 교체" },
-            { date: "2026-07-25", equipment: "PCD-0-2", team: "A", isCircle: false, shift: "2근", minutes: 90, reason: "사각 다이스 세팅 지연" }
+            { date: "2026-07-12", equipment: "PCD-1", team: "A", isCircle: true, shift: "1근", minutes: 180, reason: "모터 세팅 지연" },
+            { date: "2026-08-05", equipment: "PCD-2-2", team: "B", isCircle: true, shift: "2근", minutes: 340, reason: "유압 호스 파손" },
+            { date: "2026-09-02", equipment: "PCD-3", team: "A", isCircle: true, shift: "1근", minutes: 120, reason: "CD Cutting M/C 고장" },
+            { date: "2026-09-10", equipment: "PCD-1", team: "B", isCircle: true, shift: "2근", minutes: 85, reason: "전원부 점검" },
+            { date: "2026-09-18", equipment: "PCD-4", team: "C", isCircle: true, shift: "1근", minutes: 45, reason: "신선 유압 호스 교체" },
+            { date: "2026-09-25", equipment: "PCD-0-2", team: "A", isCircle: false, shift: "2근", minutes: 90, reason: "사각 다이스 세팅 지연" }
         ];
 
         const SAMPLE_PACK_DATA = [
-            { date: "2026-07-01", equipment: "PCD-4", team: "A", shift: "1근", amount: 47000 },
-            { date: "2026-07-02", equipment: "PCD-2-2", team: "B", shift: "2근", amount: 21500 },
-            { date: "2026-07-05", equipment: "PCD-5", team: "C", shift: "1근", amount: 37500 },
-            { date: "2026-07-09", equipment: "PCD-1", team: "A", shift: "1근", amount: 40100 },
-            { date: "2026-07-12", equipment: "PCD-3", team: "B", shift: "2근", amount: 24800 },
-            { date: "2026-07-16", equipment: "PCD-4", team: "C", shift: "2근", amount: 50000 },
-            { date: "2026-07-20", equipment: "PCD-0-2", team: "A", shift: "1근", amount: 27500 },
-            { date: "2026-07-24", equipment: "PCD-2-2", team: "B", shift: "1근", amount: 43000 },
-            { date: "2026-07-29", equipment: "PCD-5", team: "C", shift: "2근", amount: 38900 }
+            { date: "2026-09-01", equipment: "PCD-4", team: "A", shift: "1근", amount: 47000 },
+            { date: "2026-09-02", equipment: "PCD-2-2", team: "B", shift: "2근", amount: 21500 },
+            { date: "2026-09-05", equipment: "PCD-5", team: "C", shift: "1근", amount: 37500 },
+            { date: "2026-09-09", equipment: "PCD-1", team: "A", shift: "1근", amount: 40100 },
+            { date: "2026-09-12", equipment: "PCD-3", team: "B", shift: "2근", amount: 24800 },
+            { date: "2026-09-16", equipment: "PCD-4", team: "C", shift: "2근", amount: 50000 },
+            { date: "2026-09-20", equipment: "PCD-0-2", team: "A", shift: "1근", amount: 27500 },
+            { date: "2026-09-24", equipment: "PCD-2-2", team: "B", shift: "1근", amount: 43000 },
+            { date: "2026-09-29", equipment: "PCD-5", team: "C", shift: "2근", amount: 38900 }
         ];
 
         let prodData = SAMPLE_PROD_DATA; 
@@ -879,7 +906,7 @@
 
         let selectedMonth = 'LATEST';
         let selectedDate = 'ALL'; let viewMode = 'DAILY'; let shiftMode = 'ALL';
-        let monthlyTarget = 4170; let dailyTarget = 119;
+        let monthlyTarget = 3330; let packMonthlyTarget = 3700; let dailyTarget = 129;
         
         let chartInstance = null;
         let chartSteelInstance = null;
@@ -1111,7 +1138,6 @@
             }
         }
 
-        // --- 🚀 [NEW] AI Chatbot Gemini API Integration + Smart Fallback ---
         async function sendChat() {
             const input = document.getElementById('chat-input');
             const text = input ? input.value.trim() : '';
@@ -1205,7 +1231,6 @@
                 console.warn("Gemini API call optional fallback executed:", err);
             }
 
-            // High-precision local NLP fallback engine
             return getLocalIntelligentResponse(userQuery, teamProd, totalProdKg, totalPackKg, totalDownMin, top3Down, safeProd, safeDown);
         }
 
@@ -1239,7 +1264,6 @@
             return `<b>[생산 종합 현황]</b><br>• 누적 생산실적: <b>${(totalProdKg/1000).toFixed(1)} TON</b><br>• 누적 포장실적: <b>${(totalPackKg/1000).toFixed(1)} TON</b><br>• 누적 비가동시간: <b>${totalDownMin.toLocaleString()} 분</b><br><br>필요하신 세부 항목(예: A조 생산량, PCD-4 비가동)을 자유롭게 물어보세요!`;
         }
 
-        // --- 🚀 [NEW] Downtime Detail Interactive Modal Logic ---
         function openDownDetailModal(equip, reason) {
             const modal = document.getElementById('down-detail-modal');
             const titleEl = document.getElementById('modal-down-title');
@@ -1465,7 +1489,12 @@
 
         fetchGoogleSheetsData();
 
-        function updateTargets() { monthlyTarget = parseFloat(document.getElementById('inp-monthly').value)||0; dailyTarget = parseFloat(document.getElementById('inp-daily').value)||0; updateDashboard(); }
+        function updateTargets() { 
+            monthlyTarget = parseFloat(document.getElementById('inp-monthly').value)||0; 
+            packMonthlyTarget = parseFloat(document.getElementById('inp-pack-monthly').value)||0; 
+            dailyTarget = parseFloat(document.getElementById('inp-daily').value)||0; 
+            updateDashboard(); 
+        }
         function onMonthChange() { selectedMonth = document.getElementById('month-select').value; selectedDate = 'ALL'; updateDashboard(); }
         function onDateChange() { selectedDate = document.getElementById('date-select').value; document.getElementById('view-mode-container').style.display = selectedDate === 'ALL' ? 'flex' : 'none'; updateDashboard(); }
         
@@ -1486,6 +1515,66 @@
                 } 
             }); 
             updateDashboard(); 
+        }
+
+        // --- 🚀 [NEW] 월별 불가동 잔디밭 (GitHub Heatmap) 랜더링 함수 ---
+        function renderDowntimeHeatmap() {
+            const container = document.getElementById('downtime-heatmap-grid');
+            if (!container) return;
+
+            const safeDown = Array.isArray(downData) ? downData : [];
+            const monthlyDownMap = {};
+            for (let m = 1; m <= 12; m++) {
+                const monthKey = String(m).padStart(2, '0');
+                monthlyDownMap[monthKey] = 0;
+            }
+
+            safeDown.forEach(d => {
+                if (d.date && d.date.length >= 7) {
+                    const monthKey = d.date.substring(5, 7);
+                    if (monthlyDownMap[monthKey] !== undefined) {
+                        monthlyDownMap[monthKey] += (d.minutes || 0);
+                    }
+                }
+            });
+
+            const values = Object.values(monthlyDownMap);
+            const maxVal = Math.max(...values, 1);
+            let maxMonthStr = "";
+            let maxMonthVal = -1;
+
+            let html = '';
+            for (let m = 1; m <= 12; m++) {
+                const monthKey = String(m).padStart(2, '0');
+                const val = monthlyDownMap[monthKey];
+
+                if (val > maxMonthVal && val > 0) {
+                    maxMonthVal = val;
+                    maxMonthStr = `${m}월 (${val.toLocaleString()}분)`;
+                }
+
+                // GitHub Heatmap Color Scale
+                let bgColor = "bg-slate-100 text-slate-500 border border-slate-200";
+                if (val > 0) {
+                    const ratio = val / maxVal;
+                    if (ratio < 0.25) bgColor = "bg-emerald-300 text-emerald-950 font-extrabold border border-emerald-400";
+                    else if (ratio < 0.55) bgColor = "bg-amber-300 text-amber-950 font-extrabold border border-amber-400";
+                    else if (ratio < 0.8) bgColor = "bg-orange-400 text-white font-black border border-orange-500";
+                    else bgColor = "bg-red-600 text-white font-black border border-red-700 animate-pulse";
+                }
+
+                html += `
+                <div class="${bgColor} rounded-md py-1 px-0.5 text-center transition-all hover:scale-110 cursor-pointer shadow-xs" title="${m}월 총 불가동: ${val.toLocaleString()}분">
+                    <div class="text-[8px] leading-tight opacity-90">${m}월</div>
+                    <div class="text-[9.5px] font-mono-num leading-tight">${val > 0 ? (val >= 60 ? Math.round(val/60)+'h' : val+'m') : '-'}</div>
+                </div>`;
+            }
+
+            container.innerHTML = html;
+            const maxBadge = document.getElementById('max-down-month-badge');
+            if (maxBadge) {
+                maxBadge.innerText = maxMonthVal > 0 ? `최대: ${maxMonthStr}` : '불가동 없음';
+            }
         }
 
         function updateDashboard() {
@@ -1545,16 +1634,16 @@
             const totDown = fDown.reduce((a,c)=>a+c.minutes, 0);
 
             const activeMonthlyTarget = shiftMode === 'ALL' ? monthlyTarget : monthlyTarget / 2;
+            const activePackMonthlyTarget = shiftMode === 'ALL' ? packMonthlyTarget : packMonthlyTarget / 2;
 
             if(document.getElementById('kpi-tons')) document.getElementById('kpi-tons').innerText = Math.round(totKg/1000).toLocaleString();
             if(document.getElementById('kpi-reach')) document.getElementById('kpi-reach').innerText = `달성률 ${activeMonthlyTarget > 0 ? ((totKg/1000/activeMonthlyTarget)*100).toFixed(1) : 0}%`;
             
             if(document.getElementById('kpi-pack-tons')) document.getElementById('kpi-pack-tons').innerText = Math.round(totPackKg/1000).toLocaleString();
-            if(document.getElementById('kpi-pack-ratio')) document.getElementById('kpi-pack-ratio').innerText = `포장률 ${totKg > 0 ? ((totPackKg/totKg)*100).toFixed(1) : 0}%`;
+            if(document.getElementById('kpi-pack-ratio')) document.getElementById('kpi-pack-ratio').innerText = `포장달성률 ${activePackMonthlyTarget > 0 ? ((totPackKg/1000/activePackMonthlyTarget)*100).toFixed(1) : 0}%`;
 
             if(document.getElementById('kpi-down')) document.getElementById('kpi-down').innerText = totDown.toLocaleString();
 
-            // --- 🚀 [NEW] TOP 3 Downtime with Clickable Detail Trigger ---
             const reasonMap = {};
             fDown.forEach(d => {
                 const r = (d.reason || '기타 고장').trim();
@@ -1603,22 +1692,6 @@
                 ...m, oee: totalMin > 0 ? Math.max(0, ((totalMin - m.down)/totalMin * 100)).toFixed(1) : "0.0", avgSpd: m.spdCnt > 0 ? (m.spdSum/m.spdCnt).toFixed(1) : "0.0", wr: m.minW === Infinity ? "기록없음" : `${m.minW} - ${m.maxW}`
             })).sort((a,b) => { const idxA = MACHINE_ORDER.indexOf(a.name); const idxB = MACHINE_ORDER.indexOf(b.name); return (idxA === -1 ? 999 : idxA) - (idxB === -1 ? 999 : idxB); });
 
-            const avgOee = mList.length > 0 ? (mList.reduce((a,c)=>a+parseFloat(c.oee), 0) / mList.length).toFixed(1) : "0.0";
-            
-            const oeeVal = document.getElementById('kpi-oee'); const oeeIcon = document.getElementById('icon-oee'); const oeeBadge = document.getElementById('badge-oee'); const overlay = document.getElementById('emergency-overlay');
-            if(oeeVal) oeeVal.innerText = avgOee;
-            if (mList.length > 0 && parseFloat(avgOee) < 80) {
-                if(overlay) overlay.classList.add('emergency-active'); 
-                if(oeeVal) oeeVal.classList.add('text-red-600'); 
-                if(oeeIcon) { oeeIcon.classList.replace('bg-emerald-50', 'bg-red-600'); oeeIcon.classList.replace('text-emerald-700', 'text-white'); }
-                if(oeeBadge) oeeBadge.classList.remove('hidden');
-            } else {
-                if(overlay) overlay.classList.remove('emergency-active'); 
-                if(oeeVal) oeeVal.classList.remove('text-red-600'); 
-                if(oeeIcon) { oeeIcon.classList.replace('bg-red-600', 'bg-emerald-50'); oeeIcon.classList.replace('text-white', 'text-emerald-700'); }
-                if(oeeBadge) oeeBadge.classList.add('hidden');
-            }
-
             let tHtml = '';
             mList.forEach(m => {
                 tHtml += `<tr class="group hover:bg-slate-100 transition-all">
@@ -1637,6 +1710,7 @@
             });
             if(document.getElementById('registry-body')) document.getElementById('registry-body').innerHTML = tHtml;
 
+            renderDowntimeHeatmap();
             renderMainChart(cProd, cDown, cPack);
             renderRatioDoughnuts(fProd);
         }
@@ -1838,7 +1912,6 @@
             updateAnalytics();
         }
 
-        // --- 🚀 [NEW] Enhanced CD Productivity Deep Dive Analytics (Team breakdown for specific machines) ---
         function updateAnalytics() {
             if(prodData.length === 0) return;
 
@@ -1877,7 +1950,6 @@
             }
 
             const map = {}; 
-            // When grouped by MACHINE, break down X-axis by A, B, C Teams for that specific machine!
             const groupKeys = ['A', 'B', 'C'];
             const SHAPES = ['원형', '정육각', '사각', '이형'];
 
@@ -1974,7 +2046,6 @@
             renderAnalyticsChart(map, groupKeys);
         }
 
-        // --- 🚀 [NEW] Slimmer, Sharp-Contrasting UPH Chart Rendering ---
         function renderAnalyticsChart(map, groupKeys) {
             if(!window.Chart) return;
             const canvas = document.getElementById('analyticsChart');
@@ -2008,9 +2079,9 @@
                     borderWidth: 1,
                     borderColor: '#ffffff',
                     borderRadius: 4,
-                    maxBarThickness: 32, // Slimmer bars for crisp contrast!
-                    categoryPercentage: 0.5,
-                    barPercentage: 0.8
+                    maxBarThickness: 60,
+                    categoryPercentage: 0.8,
+                    barPercentage: 0.9
                 };
             });
 
