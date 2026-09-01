@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PRO-INTEGRATOR | Tableau Executive Edition v28.0</title>
+    <title>포항공장 봉강생산팀 생산실적 및 불가동 현황</title>
     
     <script>
         if (window.navigator.userAgent.indexOf('MSIE ') > 0 || window.navigator.userAgent.indexOf('Trident/') > 0) {
@@ -199,7 +199,7 @@
                 <div>
                     <h1 class="text-xl lg:text-2xl font-black tracking-tight text-slate-900 uppercase flex items-center gap-2.5">
                         <span class="w-2.5 h-6 bg-sky-600 rounded"></span>
-                        PRO-INTEGRATOR <span class="text-sky-700 font-semibold ml-0.5 text-base lg:text-lg">Tableau Edition v28.0</span>
+                        포항공장 봉강생산팀 <span class="text-sky-700 font-semibold ml-0.5 text-base lg:text-lg">생산실적 및 불가동 현황</span>
                     </h1>
                     <p class="text-slate-500 font-bold text-[10px] uppercase tracking-wider mt-0.5 ml-4 flex items-center gap-2">
                         <span id="status-led" class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
@@ -233,14 +233,14 @@
                         <div class="flex flex-col">
                             <span class="text-[8.5px] font-extrabold text-slate-500 uppercase tracking-widest">운영계획(월)</span>
                             <div class="flex items-center gap-1">
-                                <input type="number" id="inp-monthly" class="target-input text-sky-700" value="4170" onchange="updateTargets()">
+                                <input type="number" id="inp-monthly" class="target-input text-sky-700" value="3,330" onchange="updateTargets()">
                                 <span class="text-[8.5px] font-bold text-slate-500">TON</span>
                             </div>
                         </div>
                         <div class="flex flex-col">
                             <span class="text-[8.5px] font-extrabold text-slate-500 uppercase tracking-widest">일일목표(일)</span>
                             <div class="flex items-center gap-1">
-                                <input type="number" id="inp-daily" class="target-input text-amber-600" value="119" onchange="updateTargets()">
+                                <input type="number" id="inp-daily" class="target-input text-amber-600" value="129" onchange="updateTargets()">
                                 <span class="text-[8.5px] font-bold text-slate-500">TON</span>
                             </div>
                         </div>
@@ -628,7 +628,7 @@
             <i class="fa-solid fa-xmark text-base cursor-pointer hover:text-red-400" onclick="toggleBot()"></i>
         </div>
         <div class="chat-body" id="chat-body">
-            <div class="msg-bot">안녕하세요! PRO-Bot AI입니다.<br>Gemini 인공지능 엔드포인트가 연결되었습니다.<br><br>생산실적, 작업조별 분석, 포장량, 비가동 사유에 대해 구체적으로 질문해주세요.<br><br><span class="text-[9.5px] font-normal text-slate-500">예: 7월 가장 많은 생산량을 보인 조는? / A,B,C조 생산량 보여줘 / PCD-4 비가동 사유 알려줘</span></div>
+            <div class="msg-bot">안녕하세요! PRO-Bot AI입니다.<br>Gemini 인공지능 엔드포인트가 연결되었습니다.<br><br>생산실적, 작업조별 분석, 포장량, 비가동 사유에 대해 구체적으로 질문해주세요.<br><br><span class="text-[9.5px] font-normal text-slate-500">예: 9월 가장 많은 생산량을 보인 조는? / A,B,C조 생산량 보여줘 / PCD-4 비가동 사유 알려줘</span></div>
         </div>
         <div class="chat-input-area">
             <input type="text" id="chat-input" class="gs-input m-0" placeholder="질문을 입력하세요..." onkeypress="handleChatEnter(event)">
