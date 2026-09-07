@@ -168,7 +168,7 @@
 
         /* CYCLE TIME 전용 서식 */
         .cycle-table th, .cycle-table td {
-            padding: 4px 6px !important;
+            padding: 3px 5px !important;
             font-size: 11px !important;
             text-align: center;
         }
@@ -645,7 +645,7 @@
             </div>
         </main>
 
-        <!-- 🚀 TAB 3: CDM CYCLE TIME 분석 (NEW!) -->
+        <!-- TAB 3: CDM CYCLE TIME 분석 (ENHANCED - 개별 달 비교 & 품종 제약조건) -->
         <main class="flex-1 p-2.5 lg:p-4 overflow-y-auto h-screen relative z-10 tab-content" id="tab-cycle">
             <header class="flex flex-col xl:flex-row justify-between items-start xl:items-end gap-2 mb-3">
                 <div>
@@ -657,11 +657,18 @@
                 </div>
 
                 <div class="flex flex-wrap items-center gap-2 glass-panel p-1.5 !flex-row !h-auto border border-slate-300">
+                    <div class="flex items-center gap-1 border-r border-slate-300 pr-2 mr-1">
+                        <i class="fa-solid fa-calendar text-sky-700 text-xs"></i>
+                        <span class="text-[10px] font-black text-slate-700">조회 월:</span>
+                        <select id="cycle-month-select" class="bg-slate-100 border border-slate-300 text-[11px] font-bold text-slate-800 py-0.5 px-2 rounded-md outline-none cursor-pointer" onchange="renderCycleTable()">
+                        </select>
+                    </div>
+
                     <span class="text-[10px] font-black text-slate-600 mr-1"><i class="fa-solid fa-palette text-sky-600 mr-1"></i> 범례 색상:</span>
                     <span class="px-2 py-0.5 text-[9.5px] font-bold rounded cell-plain-circle">일반 원형</span>
-                    <span class="px-2 py-0.5 text-[9.5px] font-bold rounded cell-plain-other">일반 육각/기타</span>
+                    <span class="px-2 py-0.5 text-[9.5px] font-bold rounded cell-plain-other">일반 육각</span>
                     <span class="px-2 py-0.5 text-[9.5px] font-bold rounded cell-sts-circle">STS 원형</span>
-                    <span class="px-2 py-0.5 text-[9.5px] font-bold rounded cell-sts-other">STS 육각/기타</span>
+                    <span class="px-2 py-0.5 text-[9.5px] font-bold rounded cell-sts-other">STS 육각</span>
                     <span class="px-2 py-0.5 text-[9.5px] font-bold rounded cell-coil-qt">COIL QT</span>
                 </div>
             </header>
@@ -673,7 +680,7 @@
                     <h4 class="text-xs font-black text-slate-800">AI CYCLE 패턴 진단 및 다음 작업시점 예측</h4>
                 </div>
                 <p id="cycle-ai-prediction" class="text-[11px] font-bold text-slate-700 leading-relaxed">
-                    분석 중... 최근 3개월 가동 데이터 패턴을 계산하고 있습니다.
+                    분석 중... 최근 가동 데이터 패턴을 계산하고 있습니다.
                 </p>
             </div>
 
@@ -688,21 +695,8 @@
                 <div class="overflow-x-auto p-1.5 no-scrollbar">
                     <table class="w-full text-xs cycle-table border-collapse">
                         <thead>
-                            <tr class="bg-slate-100 text-slate-700">
-                                <th class="border border-slate-200 font-black">설비</th>
-                                <th class="border border-slate-200 font-black">운영계획</th>
-                                <th class="border border-slate-200 font-black">생산량</th>
-                                <th class="border border-slate-200 font-black">진도율</th>
-                                <th class="border border-slate-200 font-black">강종</th>
-                                <th class="border border-slate-200 font-black">형상</th>
-                                <th class="border border-slate-200 font-black">202606</th>
-                                <th class="border border-slate-200 font-black">202607</th>
-                                <th class="border border-slate-200 font-black">202608</th>
-                                <th class="border border-slate-200 font-black bg-sky-50 text-sky-900">3M 평균</th>
-                                <th class="border border-slate-200 font-black bg-amber-50 text-amber-900">202609</th>
-                                <th class="border border-slate-200 font-black">진도율</th>
-                                <!-- 1일 ~ 30일 매트릭스 헤더 (동적 생성) -->
-                                <th id="cycle-days-header" colspan="31" class="border border-slate-200 font-black">일자별 생산 실적 (2026-09)</th>
+                            <tr id="cycle-header-row" class="bg-slate-100 text-slate-700">
+                                <!-- JS에서 동적 헤더 생성 -->
                             </tr>
                         </thead>
                         <tbody id="cycle-table-body">
@@ -1051,7 +1045,7 @@
         function saveLayout() {
             if (!grid) return;
             const layout = grid.save();
-            localStorage.setItem('PRO_DASHBOARD_GRID_LAYOUT_V33', JSON.stringify(layout));
+            localStorage.setItem('PRO_DASHBOARD_GRID_LAYOUT_V35', JSON.stringify(layout));
         }
 
         function sanitizeLayout(layoutArray) {
@@ -1064,7 +1058,7 @@
         }
 
         function loadSavedLayout() {
-            const saved = localStorage.getItem('PRO_DASHBOARD_GRID_LAYOUT_V33');
+            const saved = localStorage.getItem('PRO_DASHBOARD_GRID_LAYOUT_V35');
             if (saved && grid) {
                 try {
                     const parsed = JSON.parse(saved);
@@ -1086,8 +1080,8 @@
         }
 
         function resetLayout() {
-            localStorage.removeItem('PRO_DASHBOARD_GRID_LAYOUT_V33');
-            localStorage.removeItem('PRO_DASHBOARD_GRID_LAYOUT_V32');
+            localStorage.removeItem('PRO_DASHBOARD_GRID_LAYOUT_V35');
+            localStorage.removeItem('PRO_DASHBOARD_GRID_LAYOUT_V34');
             location.reload();
         }
 
@@ -1235,7 +1229,6 @@
             setTimeout(resizeAllCharts, 150);
         }
 
-        // 3개 탭 전환 함수
         function switchTab(tabId) {
             ['main', 'analytics', 'cycle'].forEach(id => {
                 const tabEl = document.getElementById(`tab-${id}`);
@@ -2240,23 +2233,71 @@
             });
         }
 
-        // 🚀 [NEW] CDM CYCLE TIME 매트릭스 표 랜더링 로직
+        // 🚀 [ENHANCED] CDM CYCLE TIME 분석 매트릭스 표 랜더링 로직 (개별 월 1:1 비교 & 시인성 개선)
         function renderCycleTable() {
             const tbody = document.getElementById('cycle-table-body');
-            const daysHeader = document.getElementById('cycle-days-header');
-            if (!tbody) return;
+            const headerRow = document.getElementById('cycle-header-row');
+            const monthSelect = document.getElementById('cycle-month-select');
+            if (!tbody || !headerRow) return;
 
             const safeProd = Array.isArray(prodData) ? prodData : [];
-            const daysInMonth = 30; // 9월 기준 30일
 
-            // 동적 1일~30일 매트릭스 헤더 생성
-            let daysHeaderHtml = '';
-            for (let d = 1; m = d <= daysInMonth; d++) {
-                daysHeaderHtml += `<th class="border border-slate-200 font-bold px-1 text-[10px] w-[26px]">9/${d}</th>`;
+            // 사용 가능한 전체 월 목록 추출 및 드롭다운 채우기
+            const allMonths = [...new Set(safeProd.map(d => d.date ? d.date.substring(0,7) : null).filter(m => m && m.includes('-')))].sort().reverse();
+            if (allMonths.length === 0) allMonths.push('2026-09');
+
+            let targetYM = monthSelect ? monthSelect.value : '2026-09';
+            if (!targetYM || !allMonths.includes(targetYM)) {
+                targetYM = allMonths.includes('2026-09') ? '2026-09' : allMonths[0];
             }
-            if (daysHeader) daysHeader.outerHTML = daysHeaderHtml;
 
-            // 설비별 목표계획 매핑
+            if (monthSelect && monthSelect.options.length === 0) {
+                monthSelect.innerHTML = allMonths.map(m => `<option value="${m}">${m} 분석</option>`).join('');
+                monthSelect.value = targetYM;
+            }
+
+            const parts = targetYM.split('-');
+            const year = parseInt(parts[0], 10);
+            const month = parseInt(parts[1], 10);
+            const daysInMonth = new Date(year, month, 0).getDate();
+
+            // 직전 3개 개별 월 계산 (M-3, M-2, M-1)
+            const getPrevMonthStr = (offset) => {
+                const d = new Date(year, month - 1 - offset, 1);
+                const y = d.getFullYear();
+                const m = String(d.getMonth() + 1).padStart(2, '0');
+                return `${y}-${m}`;
+            };
+
+            const m3Str = getPrevMonthStr(3);
+            const m2Str = getPrevMonthStr(2);
+            const m1Str = getPrevMonthStr(1);
+
+            const m3Code = m3Str.replace('-', '');
+            const m2Code = m2Str.replace('-', '');
+            const m1Code = m1Str.replace('-', '');
+            const m0Code = targetYM.replace('-', '');
+
+            // 1. 헤더 생성 (3M 평균 대신 개별 달을 나란히 배치)
+            let headerHtml = `
+                <th class="border border-slate-200 font-black">설비</th>
+                <th class="border border-slate-200 font-black">운영계획</th>
+                <th class="border border-slate-200 font-black">생산량</th>
+                <th class="border border-slate-200 font-black">진도율</th>
+                <th class="border border-slate-200 font-black">강종</th>
+                <th class="border border-slate-200 font-black">형상</th>
+                <th class="border border-slate-200 font-black text-slate-600 bg-slate-50">${m3Code}</th>
+                <th class="border border-slate-200 font-black text-slate-600 bg-slate-50">${m2Code}</th>
+                <th class="border border-slate-200 font-black text-slate-800 bg-slate-100">${m1Code} (전월)</th>
+                <th class="border border-slate-200 font-black bg-amber-100 text-amber-900">${m0Code} (당월)</th>
+                <th class="border border-slate-200 font-black">진도율</th>
+            `;
+
+            for (let day = 1; day <= daysInMonth; day++) {
+                headerHtml += `<th class="border border-slate-200 font-bold px-1 text-[9.5px] w-[24px] bg-slate-50">${month}/${day}</th>`;
+            }
+            headerRow.innerHTML = headerHtml;
+
             const machinePlans = {
                 'PCD-0-2': 40,
                 'PCD-0-3': 160,
@@ -2267,29 +2308,41 @@
                 'PCD-4': 1140
             };
 
-            // 품종별 카테고리
-            const categories = [
-                { steel: '일반강', shape: '원형', name: '일반 원형', class: 'cell-plain-circle' },
-                { steel: '일반강', shape: '원형外', name: '일반 육각', class: 'cell-plain-other' },
-                { steel: 'STS', shape: '원형', name: 'STS 원형', class: 'cell-sts-circle' },
-                { steel: 'STS', shape: '원형外', name: 'STS 육각', class: 'cell-sts-other' },
-                { steel: 'COIL QT', shape: '원형', name: 'COIL QT', class: 'cell-coil-qt' }
-            ];
+            const getCategoriesForMachine = (mName) => {
+                const cats = [
+                    { steel: '일반강', shape: '원형', name: '일반 원형', class: 'cell-plain-circle' },
+                    { steel: '일반강', shape: '원형外', name: '일반 육각', class: 'cell-plain-other' },
+                    { steel: 'STS', shape: '원형', name: 'STS 원형', class: 'cell-sts-circle' },
+                    { steel: 'STS', shape: '원형外', name: 'STS 육각', class: 'cell-sts-other' },
+                    { steel: 'COIL QT', shape: '원형', name: 'COIL QT', class: 'cell-coil-qt' }
+                ];
 
-            let html = '';
+                return cats.filter(c => {
+                    if (c.steel === 'COIL QT' && !['PCD-0-3', 'PCD-5'].includes(mName)) return false;
+                    if (c.shape === '원형外' && ['PCD-0-2', 'PCD-0-3'].includes(mName)) return false;
+                    return true;
+                });
+            };
+
+            let bodyHtml = '';
             let grandPlanTotal = 3330;
             let grandMonthTotal = 0;
 
+            const catTotals = {
+                '합계': { m3: 0, m2: 0, m1: 0, m0: 0, days: Array(daysInMonth + 1).fill(0) },
+                'STS': { m3: 0, m2: 0, m1: 0, m0: 0, days: Array(daysInMonth + 1).fill(0) },
+                '원형外': { m3: 0, m2: 0, m1: 0, m0: 0, days: Array(daysInMonth + 1).fill(0) }
+            };
+
             MACHINE_ORDER.forEach(mName => {
                 const mPlan = machinePlans[mName] || 0;
+                const mCategories = getCategoriesForMachine(mName);
                 
-                // 당월 및 과거 3개월 실적 집계
                 const mData = safeProd.filter(p => p.equipment === mName);
-                const monthCurrentSum = mData.filter(p => p.date.startsWith('2026-09')).reduce((a,c)=>a+c.amount, 0) / 1000;
+                const monthCurrentSum = mData.filter(p => p.date && p.date.startsWith(targetYM)).reduce((a,c)=>a+c.amount, 0) / 1000;
                 grandMonthTotal += monthCurrentSum;
 
-                categories.forEach((cat, cIdx) => {
-                    // 해당 강종/형상 필터링
+                mCategories.forEach((cat, cIdx) => {
                     const filterFn = (p) => {
                         const isSts = p.steelType === 'STS강';
                         const isCircle = p.shapeRaw === '원형';
@@ -2297,63 +2350,96 @@
                         if (cat.steel === '일반강' && cat.shape === '원형外') return !isSts && !isCircle;
                         if (cat.steel === 'STS' && cat.shape === '원형') return isSts && isCircle;
                         if (cat.steel === 'STS' && cat.shape === '원형外') return isSts && !isCircle;
+                        if (cat.steel === 'COIL QT') return p.heatTreat === '열처리재';
                         return false;
                     };
 
                     const catData = mData.filter(filterFn);
                     
-                    const sum06 = Math.round(catData.filter(p => p.date.startsWith('2026-06')).reduce((a,c)=>a+c.amount, 0) / 1000);
-                    const sum07 = Math.round(catData.filter(p => p.date.startsWith('2026-07')).reduce((a,c)=>a+c.amount, 0) / 1000);
-                    const sum08 = Math.round(catData.filter(p => p.date.startsWith('2026-08')).reduce((a,c)=>a+c.amount, 0) / 1000);
-                    const avg3M = Math.round((sum06 + sum07 + sum08) / 3);
-
-                    const sum09 = Math.round(catData.filter(p => p.date.startsWith('2026-09')).reduce((a,c)=>a+c.amount, 0) / 1000);
-                    const progressRatio = mPlan > 0 ? Math.round((sum09 / mPlan) * 100) : 0;
-
-                    html += `<tr class="hover:bg-slate-100/80 border-b border-slate-200">`;
+                    const sumM3 = Math.round(catData.filter(p => p.date && p.date.startsWith(m3Str)).reduce((a,c)=>a+c.amount, 0) / 1000);
+                    const sumM2 = Math.round(catData.filter(p => p.date && p.date.startsWith(m2Str)).reduce((a,c)=>a+c.amount, 0) / 1000);
+                    const sumM1 = Math.round(catData.filter(p => p.date && p.date.startsWith(m1Str)).reduce((a,c)=>a+c.amount, 0) / 1000);
+                    const sumM0 = Math.round(catData.filter(p => p.date && p.date.startsWith(targetYM)).reduce((a,c)=>a+c.amount, 0) / 1000);
                     
-                    // 설비명 (첫 행만 병합)
+                    const progressRatio = mPlan > 0 ? Math.round((sumM0 / mPlan) * 100) : 0;
+
+                    catTotals['합계'].m3 += sumM3; catTotals['합계'].m2 += sumM2; catTotals['합계'].m1 += sumM1; catTotals['합계'].m0 += sumM0;
+                    if (cat.steel === 'STS') { catTotals['STS'].m3 += sumM3; catTotals['STS'].m2 += sumM2; catTotals['STS'].m1 += sumM1; catTotals['STS'].m0 += sumM0; }
+                    if (cat.shape === '원형外') { catTotals['원형外'].m3 += sumM3; catTotals['원형外'].m2 += sumM2; catTotals['원형外'].m1 += sumM1; catTotals['원형外'].m0 += sumM0; }
+
+                    bodyHtml += `<tr class="hover:bg-slate-100/80 border-b border-slate-200">`;
+                    
                     if (cIdx === 0) {
                         const mRatio = mPlan > 0 ? Math.round((monthCurrentSum / mPlan) * 100) : 0;
-                        html += `<td rowspan="${categories.length}" class="border border-slate-200 font-black text-slate-900 bg-slate-50 uppercase">${mName}</td>
-                                 <td rowspan="${categories.length}" class="border border-slate-200 font-bold text-slate-700 font-mono-num">${mPlan.toLocaleString()}</td>
-                                 <td rowspan="${categories.length}" class="border border-slate-200 font-black text-sky-800 font-mono-num">${Math.round(monthCurrentSum).toLocaleString()}</td>
-                                 <td rowspan="${categories.length}" class="border border-slate-200 font-extrabold text-sky-700 bg-sky-50">${mRatio}%</td>`;
+                        bodyHtml += `<td rowspan="${mCategories.length}" class="border border-slate-200 font-black text-slate-900 bg-slate-50 uppercase">${mName}</td>
+                                     <td rowspan="${mCategories.length}" class="border border-slate-200 font-bold text-slate-700 font-mono-num">${mPlan.toLocaleString()}</td>
+                                     <td rowspan="${mCategories.length}" class="border border-slate-200 font-black text-sky-800 font-mono-num">${Math.round(monthCurrentSum).toLocaleString()}</td>
+                                     <td rowspan="${mCategories.length}" class="border border-slate-200 font-extrabold text-sky-700 bg-sky-50">${mRatio}%</td>`;
                     }
 
-                    html += `<td class="border border-slate-200 font-bold">${cat.steel}</td>
-                             <td class="border border-slate-200 font-bold">${cat.shape}</td>
-                             <td class="border border-slate-200 font-mono-num text-slate-600">${sum06 || '-'}</td>
-                             <td class="border border-slate-200 font-mono-num text-slate-600">${sum07 || '-'}</td>
-                             <td class="border border-slate-200 font-mono-num text-slate-600">${sum08 || '-'}</td>
-                             <td class="border border-slate-200 font-mono-num font-black text-sky-900 bg-sky-50/50">${avg3M || '-'}</td>
-                             <td class="border border-slate-200 font-mono-num font-black text-amber-800 bg-amber-50/50">${sum09 || '-'}</td>
-                             <td class="border border-slate-200 font-bold text-slate-600">${progressRatio > 0 ? progressRatio + '%' : '-'}</td>`;
+                    bodyHtml += `<td class="border border-slate-200 font-bold">${cat.steel}</td>
+                                 <td class="border border-slate-200 font-bold">${cat.shape}</td>
+                                 <td class="border border-slate-200 font-mono-num text-slate-500">${sumM3 || '-'}</td>
+                                 <td class="border border-slate-200 font-mono-num text-slate-500">${sumM2 || '-'}</td>
+                                 <td class="border border-slate-200 font-mono-num font-extrabold text-slate-800 bg-slate-50">${sumM1 || '-'}</td>
+                                 <td class="border border-slate-200 font-mono-num font-black text-amber-800 bg-amber-50/50">${sumM0 || '-'}</td>
+                                 <td class="border border-slate-200 font-bold text-slate-600">${progressRatio > 0 ? progressRatio + '%' : '-'}</td>`;
 
-                    // 1일 ~ 30일 매트릭스 셀 생성
+                    // 일자별 셀 매트릭스 생성
                     for (let day = 1; day <= daysInMonth; day++) {
-                        const dateStr = `2026-09-${String(day).padStart(2, '0')}`;
+                        const dateStr = `${targetYM}-${String(day).padStart(2, '0')}`;
                         const dayVal = catData.filter(p => p.date === dateStr).reduce((a,c)=>a+c.amount, 0) / 1000;
 
                         if (dayVal > 0) {
-                            html += `<td class="border border-slate-200 font-mono-num ${cat.class}" title="${mName} (${cat.name}) ${day}일: ${dayVal.toFixed(1)}T">${dayVal < 10 ? dayVal.toFixed(1) : Math.round(dayVal)}</td>`;
+                            catTotals['합계'].days[day] += dayVal;
+                            if (cat.steel === 'STS') catTotals['STS'].days[day] += dayVal;
+                            if (cat.shape === '원형外') catTotals['원형外'].days[day] += dayVal;
+
+                            bodyHtml += `<td class="border border-slate-200 font-mono-num ${cat.class} shadow-xs" title="${mName} (${cat.name}) ${day}일: ${dayVal.toFixed(1)}T">${dayVal < 10 ? dayVal.toFixed(1) : Math.round(dayVal)}</td>`;
                         } else {
-                            html += `<td class="border border-slate-200 font-mono-num text-slate-300">-</td>`;
+                            bodyHtml += `<td class="border border-slate-100 font-mono-num text-slate-300">-</td>`;
                         }
                     }
 
-                    html += `</tr>`;
+                    bodyHtml += `</tr>`;
                 });
             });
 
-            tbody.innerHTML = html;
+            // 하단 요약 행
+            const addSummaryRow = (label, totalsObj, bgStyle) => {
+                const ratio = grandPlanTotal > 0 ? Math.round((totalsObj.m0 / grandPlanTotal) * 100) : 0;
 
-            // AI 작업 예측 요약 브리핑 업데이트
+                let rowHtml = `<tr class="${bgStyle} font-black border-t-2 border-slate-400">
+                    <td colspan="4" class="border border-slate-300 text-slate-900">${label}</td>
+                    <td class="border border-slate-300 text-slate-700">${label === '합계' ? '전체' : label}</td>
+                    <td class="border border-slate-300 text-slate-700">-</td>
+                    <td class="border border-slate-300 font-mono-num">${totalsObj.m3.toLocaleString()}</td>
+                    <td class="border border-slate-300 font-mono-num">${totalsObj.m2.toLocaleString()}</td>
+                    <td class="border border-slate-300 font-mono-num">${totalsObj.m1.toLocaleString()}</td>
+                    <td class="border border-slate-300 font-mono-num text-amber-900">${totalsObj.m0.toLocaleString()}</td>
+                    <td class="border border-slate-300 font-bold">${ratio}%</td>`;
+
+                for (let day = 1; day <= daysInMonth; day++) {
+                    const val = totalsObj.days[day];
+                    rowHtml += `<td class="border border-slate-300 font-mono-num ${val > 0 ? 'text-slate-900 font-extrabold bg-slate-200/80' : 'text-slate-300'}">${val > 0 ? Math.round(val) : '-'}</td>`;
+                }
+
+                rowHtml += `</tr>`;
+                return rowHtml;
+            };
+
+            bodyHtml += addSummaryRow('합계', catTotals['합계'], 'bg-slate-100');
+            bodyHtml += addSummaryRow('STS 합계', catTotals['STS'], 'bg-emerald-50/60');
+            bodyHtml += addSummaryRow('원형外 합계', catTotals['원형外'], 'bg-amber-50/60');
+
+            tbody.innerHTML = bodyHtml;
+
+            // AI 진단 브리핑
             const aiGuideEl = document.getElementById('cycle-ai-prediction');
             if (aiGuideEl) {
                 const overallRatio = Math.round((grandMonthTotal / grandPlanTotal) * 100);
-                aiGuideEl.innerHTML = `현재 CDM 전체 누적 진도율은 <b>${overallRatio}% (${Math.round(grandMonthTotal).toLocaleString()} / ${grandPlanTotal.toLocaleString()} TON)</b>입니다.<br>
-                💡 <b>작업 예측:</b> <code>PCD-4</code> 설비는 [일반강 육각] 생산 후 약 5~7일 간격으로 [STS 원형] 공정이 교대 진행되는 정기 CYCLE 패턴을 보입니다. 차기 [STS 원형] 권장 교체 시점은 <b>9월 11일~12일경</b>입니다.`;
+                aiGuideEl.innerHTML = `선택하신 <b>[${targetYM}]</b> CDM 전체 누적 진도율은 <b>${overallRatio}% (${Math.round(grandMonthTotal).toLocaleString()} / ${grandPlanTotal.toLocaleString()} TON)</b>입니다.<br>
+                💡 <b>월별 이월/변동 진단:</b> 개별 월별 추이(${m3Code} → ${m2Code} → ${m1Code} → ${m0Code})를 1:1로 비교하여, 전월(${m1Code}) 미달성 물량의 당월(${m0Code}) 이월 반영 여부 및 설비별 작업 주기 패턴을 한눈에 확인하실 수 있습니다.`;
             }
         }
     </script>
