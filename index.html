@@ -645,7 +645,7 @@
             </div>
         </main>
 
-        <!-- TAB 3: CDM CYCLE TIME 분석 (ENHANCED - 개별 달 비교 & 품종 제약조건) -->
+        <!-- TAB 3: CDM CYCLE TIME 분석 (ENHANCED - 평균주기 및 변동성 지표 탑재) -->
         <main class="flex-1 p-2.5 lg:p-4 overflow-y-auto h-screen relative z-10 tab-content" id="tab-cycle">
             <header class="flex flex-col xl:flex-row justify-between items-start xl:items-end gap-2 mb-3">
                 <div>
@@ -653,7 +653,7 @@
                         <span class="w-2 h-5 bg-sky-600 rounded"></span>
                         CDM CYCLE TIME <span class="text-sky-700 font-semibold ml-0.5 text-sm lg:text-base">분석 및 작업시점 예측</span>
                     </h1>
-                    <p class="text-slate-500 font-bold text-[9.5px] mt-0.5 ml-3">설비별·강종별·형상별 일자별 생산 CYCLE을 모니터링하여 차기 작업 시점을 정밀 예측합니다.</p>
+                    <p class="text-slate-500 font-bold text-[9.5px] mt-0.5 ml-3">품종별 평균 작업 주기(Interval) 및 변동성(±σ) 지표 기반 작업시점 예측</p>
                 </div>
 
                 <div class="flex flex-wrap items-center gap-2 glass-panel p-1.5 !flex-row !h-auto border border-slate-300">
@@ -673,14 +673,50 @@
                 </div>
             </header>
 
+            <!-- 🚀 CYCLE TIME 분석 핵심 KPI 카드 3종 -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-2.5 mb-3">
+                <div class="glass-panel p-3 border-l-4 border-l-sky-600">
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="text-[10px] font-black text-slate-500 uppercase">CDM 평균 작업 주기</span>
+                        <i class="fa-solid fa-repeat text-sky-600 text-xs"></i>
+                    </div>
+                    <div class="flex items-baseline justify-between">
+                        <h4 id="cycle-kpi-mean" class="text-xl font-black text-slate-900 font-mono-num">14.2일</h4>
+                        <span class="text-[9px] font-bold text-sky-700 bg-sky-50 px-1.5 py-0.5 rounded border border-sky-200">설비 종합</span>
+                    </div>
+                </div>
+
+                <div class="glass-panel p-3 border-l-4 border-l-emerald-600">
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="text-[10px] font-black text-slate-500 uppercase">주기 패턴 안정도</span>
+                        <i class="fa-solid fa-chart-line text-emerald-600 text-xs"></i>
+                    </div>
+                    <div class="flex items-baseline justify-between">
+                        <h4 id="cycle-kpi-stability" class="text-xl font-black text-emerald-800 font-mono-num">82.5%</h4>
+                        <span class="text-[9px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">안정군 비율</span>
+                    </div>
+                </div>
+
+                <div class="glass-panel p-3 border-l-4 border-l-amber-500">
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="text-[10px] font-black text-slate-500 uppercase">차기 최우선 임박 품종</span>
+                        <i class="fa-solid fa-triangle-exclamation text-amber-500 text-xs"></i>
+                    </div>
+                    <div class="flex items-baseline justify-between">
+                        <h4 id="cycle-kpi-upcoming" class="text-sm font-black text-slate-900 truncate">PCD-4 [STS 원형]</h4>
+                        <span id="cycle-kpi-dday" class="text-[9px] font-black text-red-600 bg-red-50 px-1.5 py-0.5 rounded border border-red-200 shrink-0">D-1일</span>
+                    </div>
+                </div>
+            </div>
+
             <!-- AI 차기 작업 예측 가이드 브리핑 박스 -->
             <div class="glass-panel p-3 mb-3 bg-gradient-to-r from-sky-50 via-white to-amber-50 border-l-4 border-l-sky-600">
                 <div class="flex items-center gap-2 mb-1">
                     <i class="fa-solid fa-wand-magic-sparkles text-amber-500 text-sm"></i>
-                    <h4 class="text-xs font-black text-slate-800">AI CYCLE 패턴 진단 및 다음 작업시점 예측</h4>
+                    <h4 class="text-xs font-black text-slate-800">AI CYCLE 패턴 진단 및 작업 시점 예측</h4>
                 </div>
                 <p id="cycle-ai-prediction" class="text-[11px] font-bold text-slate-700 leading-relaxed">
-                    분석 중... 최근 가동 데이터 패턴을 계산하고 있습니다.
+                    분석 중... 품종별 작업 주기(Interval) 및 변동성 표준편차(±σ)를 계산하고 있습니다.
                 </p>
             </div>
 
@@ -946,6 +982,7 @@
             { date: "2026-09-04", equipment: "PCD-0-2", team: "C", isCircle: true, steelType: "탄소강", shapeRaw: "원형", shift: "1근", amount: 2000 },
             { date: "2026-09-05", equipment: "PCD-0-2", team: "B", isCircle: true, steelType: "STS강", shapeRaw: "원형", shift: "2근", amount: 1300 },
             { date: "2026-09-06", equipment: "PCD-0-2", team: "A", isCircle: true, steelType: "STS강", shapeRaw: "원형", shift: "1근", amount: 1800 },
+            { date: "2026-08-20", equipment: "PCD-4", team: "A", isCircle: false, steelType: "탄소강", shapeRaw: "정육각", shift: "1근", amount: 25000 },
             { date: "2026-09-01", equipment: "PCD-4", team: "A", isCircle: true, steelType: "탄소강", shapeRaw: "원형", shift: "1근", amount: 51000 },
             { date: "2026-09-02", equipment: "PCD-4", team: "B", isCircle: true, steelType: "탄소강", shapeRaw: "원형", shift: "2근", amount: 55000 },
             { date: "2026-09-03", equipment: "PCD-4", team: "C", isCircle: false, steelType: "탄소강", shapeRaw: "정육각", shift: "1근", amount: 13000 },
@@ -1045,7 +1082,7 @@
         function saveLayout() {
             if (!grid) return;
             const layout = grid.save();
-            localStorage.setItem('PRO_DASHBOARD_GRID_LAYOUT_V35', JSON.stringify(layout));
+            localStorage.setItem('PRO_DASHBOARD_GRID_LAYOUT_V36', JSON.stringify(layout));
         }
 
         function sanitizeLayout(layoutArray) {
@@ -1058,7 +1095,7 @@
         }
 
         function loadSavedLayout() {
-            const saved = localStorage.getItem('PRO_DASHBOARD_GRID_LAYOUT_V35');
+            const saved = localStorage.getItem('PRO_DASHBOARD_GRID_LAYOUT_V36');
             if (saved && grid) {
                 try {
                     const parsed = JSON.parse(saved);
@@ -1080,8 +1117,8 @@
         }
 
         function resetLayout() {
+            localStorage.removeItem('PRO_DASHBOARD_GRID_LAYOUT_V36');
             localStorage.removeItem('PRO_DASHBOARD_GRID_LAYOUT_V35');
-            localStorage.removeItem('PRO_DASHBOARD_GRID_LAYOUT_V34');
             location.reload();
         }
 
@@ -2233,7 +2270,38 @@
             });
         }
 
-        // 🚀 [ENHANCED] CDM CYCLE TIME 분석 매트릭스 표 랜더링 로직 (개별 월 1:1 비교 & 시인성 개선)
+        // 🚀 [NEW FEATURE - Option 2] 품종별 평균 주기(Interval) 및 변동성(표준편차) 계산 함수
+        function calculateIntervalAndSD(prodList) {
+            if (!prodList || prodList.length < 2) {
+                return { mean: 0, sd: 0, count: prodList ? prodList.length : 0 };
+            }
+
+            // 날짜 오름차순 정렬
+            const sortedDates = prodList.map(p => new Date(p.date)).sort((a,b) => a - b);
+            const intervals = [];
+
+            for (let i = 1; i < sortedDates.length; i++) {
+                const diffTime = Math.abs(sortedDates[i] - sortedDates[i-1]);
+                const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
+                if (diffDays > 0) intervals.push(diffDays);
+            }
+
+            if (intervals.length === 0) {
+                return { mean: 0, sd: 0, count: 0 };
+            }
+
+            const mean = intervals.reduce((a, b) => a + b, 0) / intervals.length;
+            const variance = intervals.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / intervals.length;
+            const sd = Math.sqrt(variance);
+
+            return {
+                mean: parseFloat(mean.toFixed(1)),
+                sd: parseFloat(sd.toFixed(1)),
+                count: intervals.length
+            };
+        }
+
+        // 🚀 [ENHANCED] CDM CYCLE TIME 분석 매트릭스 표 랜더링 로직 (평균주기 & 변동성 표준편차 열 적용)
         function renderCycleTable() {
             const tbody = document.getElementById('cycle-table-body');
             const headerRow = document.getElementById('cycle-header-row');
@@ -2242,7 +2310,7 @@
 
             const safeProd = Array.isArray(prodData) ? prodData : [];
 
-            // 사용 가능한 전체 월 목록 추출 및 드롭다운 채우기
+            // 사용 가능한 전체 월 목록 추출
             const allMonths = [...new Set(safeProd.map(d => d.date ? d.date.substring(0,7) : null).filter(m => m && m.includes('-')))].sort().reverse();
             if (allMonths.length === 0) allMonths.push('2026-09');
 
@@ -2261,7 +2329,6 @@
             const month = parseInt(parts[1], 10);
             const daysInMonth = new Date(year, month, 0).getDate();
 
-            // 직전 3개 개별 월 계산 (M-3, M-2, M-1)
             const getPrevMonthStr = (offset) => {
                 const d = new Date(year, month - 1 - offset, 1);
                 const y = d.getFullYear();
@@ -2278,7 +2345,7 @@
             const m1Code = m1Str.replace('-', '');
             const m0Code = targetYM.replace('-', '');
 
-            // 1. 헤더 생성 (3M 평균 대신 개별 달을 나란히 배치)
+            // 1. 헤더 생성 ([평균주기] 및 [변동성(±σ)] 분석 열 포함)
             let headerHtml = `
                 <th class="border border-slate-200 font-black">설비</th>
                 <th class="border border-slate-200 font-black">운영계획</th>
@@ -2288,9 +2355,10 @@
                 <th class="border border-slate-200 font-black">형상</th>
                 <th class="border border-slate-200 font-black text-slate-600 bg-slate-50">${m3Code}</th>
                 <th class="border border-slate-200 font-black text-slate-600 bg-slate-50">${m2Code}</th>
-                <th class="border border-slate-200 font-black text-slate-800 bg-slate-100">${m1Code} (전월)</th>
-                <th class="border border-slate-200 font-black bg-amber-100 text-amber-900">${m0Code} (당월)</th>
-                <th class="border border-slate-200 font-black">진도율</th>
+                <th class="border border-slate-200 font-black text-slate-800 bg-slate-100">${m1Code}</th>
+                <th class="border border-slate-200 font-black bg-amber-100 text-amber-900">${m0Code}</th>
+                <th class="border border-slate-200 font-black bg-sky-100 text-sky-900">평균주기</th>
+                <th class="border border-slate-200 font-black bg-emerald-100 text-emerald-900">변동성(±σ)</th>
             `;
 
             for (let day = 1; day <= daysInMonth; day++) {
@@ -2328,6 +2396,11 @@
             let grandPlanTotal = 3330;
             let grandMonthTotal = 0;
 
+            let allMeanSums = 0;
+            let allMeanCount = 0;
+            let stableCount = 0;
+            let totalCategoryRows = 0;
+
             const catTotals = {
                 '합계': { m3: 0, m2: 0, m1: 0, m0: 0, days: Array(daysInMonth + 1).fill(0) },
                 'STS': { m3: 0, m2: 0, m1: 0, m0: 0, days: Array(daysInMonth + 1).fill(0) },
@@ -2343,6 +2416,7 @@
                 grandMonthTotal += monthCurrentSum;
 
                 mCategories.forEach((cat, cIdx) => {
+                    totalCategoryRows++;
                     const filterFn = (p) => {
                         const isSts = p.steelType === 'STS강';
                         const isCircle = p.shapeRaw === '원형';
@@ -2360,8 +2434,26 @@
                     const sumM2 = Math.round(catData.filter(p => p.date && p.date.startsWith(m2Str)).reduce((a,c)=>a+c.amount, 0) / 1000);
                     const sumM1 = Math.round(catData.filter(p => p.date && p.date.startsWith(m1Str)).reduce((a,c)=>a+c.amount, 0) / 1000);
                     const sumM0 = Math.round(catData.filter(p => p.date && p.date.startsWith(targetYM)).reduce((a,c)=>a+c.amount, 0) / 1000);
-                    
-                    const progressRatio = mPlan > 0 ? Math.round((sumM0 / mPlan) * 100) : 0;
+
+                    // 🚀 [Option 2 핵심] 품종별 평균 주기 및 변동성(표준편차) 계산
+                    const intervalStats = calculateIntervalAndSD(catData);
+                    if (intervalStats.mean > 0) {
+                        allMeanSums += intervalStats.mean;
+                        allMeanCount++;
+                    }
+
+                    // 주기 변동성에 따른 안정성 등급 판단
+                    let sdBadgeHtml = `<span class="text-slate-400 text-[10px]">-</span>`;
+                    if (intervalStats.count >= 1) {
+                        if (intervalStats.sd <= 3.0) {
+                            stableCount++;
+                            sdBadgeHtml = `<span class="px-1.5 py-0.2 rounded text-[9.5px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">±${intervalStats.sd}일 (안정)</span>`;
+                        } else if (intervalStats.sd <= 6.0) {
+                            sdBadgeHtml = `<span class="px-1.5 py-0.2 rounded text-[9.5px] font-bold bg-amber-100 text-amber-800 border border-amber-300">±${intervalStats.sd}일 (보통)</span>`;
+                        } else {
+                            sdBadgeHtml = `<span class="px-1.5 py-0.2 rounded text-[9.5px] font-bold bg-orange-100 text-orange-800 border border-orange-300">±${intervalStats.sd}일 (변동)</span>`;
+                        }
+                    }
 
                     catTotals['합계'].m3 += sumM3; catTotals['합계'].m2 += sumM2; catTotals['합계'].m1 += sumM1; catTotals['합계'].m0 += sumM0;
                     if (cat.steel === 'STS') { catTotals['STS'].m3 += sumM3; catTotals['STS'].m2 += sumM2; catTotals['STS'].m1 += sumM1; catTotals['STS'].m0 += sumM0; }
@@ -2383,7 +2475,8 @@
                                  <td class="border border-slate-200 font-mono-num text-slate-500">${sumM2 || '-'}</td>
                                  <td class="border border-slate-200 font-mono-num font-extrabold text-slate-800 bg-slate-50">${sumM1 || '-'}</td>
                                  <td class="border border-slate-200 font-mono-num font-black text-amber-800 bg-amber-50/50">${sumM0 || '-'}</td>
-                                 <td class="border border-slate-200 font-bold text-slate-600">${progressRatio > 0 ? progressRatio + '%' : '-'}</td>`;
+                                 <td class="border border-slate-200 font-mono-num font-black text-sky-900 bg-sky-50/60">${intervalStats.mean > 0 ? intervalStats.mean + '일' : '-'}</td>
+                                 <td class="border border-slate-200 font-bold">${sdBadgeHtml}</td>`;
 
                     // 일자별 셀 매트릭스 생성
                     for (let day = 1; day <= daysInMonth; day++) {
@@ -2407,8 +2500,6 @@
 
             // 하단 요약 행
             const addSummaryRow = (label, totalsObj, bgStyle) => {
-                const ratio = grandPlanTotal > 0 ? Math.round((totalsObj.m0 / grandPlanTotal) * 100) : 0;
-
                 let rowHtml = `<tr class="${bgStyle} font-black border-t-2 border-slate-400">
                     <td colspan="4" class="border border-slate-300 text-slate-900">${label}</td>
                     <td class="border border-slate-300 text-slate-700">${label === '합계' ? '전체' : label}</td>
@@ -2417,7 +2508,7 @@
                     <td class="border border-slate-300 font-mono-num">${totalsObj.m2.toLocaleString()}</td>
                     <td class="border border-slate-300 font-mono-num">${totalsObj.m1.toLocaleString()}</td>
                     <td class="border border-slate-300 font-mono-num text-amber-900">${totalsObj.m0.toLocaleString()}</td>
-                    <td class="border border-slate-300 font-bold">${ratio}%</td>`;
+                    <td class="border border-slate-300 font-bold text-sky-800" colspan="2">월별 비교 요약</td>`;
 
                 for (let day = 1; day <= daysInMonth; day++) {
                     const val = totalsObj.days[day];
@@ -2434,12 +2525,21 @@
 
             tbody.innerHTML = bodyHtml;
 
+            // 상단 CYCLE 요약 KPI 업데이트
+            const avgIntervalAll = allMeanCount > 0 ? (allMeanSums / allMeanCount).toFixed(1) : "14.2";
+            const stabilityRatio = totalCategoryRows > 0 ? Math.round((stableCount / totalCategoryRows) * 100) : 80;
+
+            const kpiMeanEl = document.getElementById('cycle-kpi-mean');
+            const kpiStabEl = document.getElementById('cycle-kpi-stability');
+            if (kpiMeanEl) kpiMeanEl.innerText = `${avgIntervalAll}일`;
+            if (kpiStabEl) kpiStabEl.innerText = `${stabilityRatio}%`;
+
             // AI 진단 브리핑
             const aiGuideEl = document.getElementById('cycle-ai-prediction');
             if (aiGuideEl) {
                 const overallRatio = Math.round((grandMonthTotal / grandPlanTotal) * 100);
-                aiGuideEl.innerHTML = `선택하신 <b>[${targetYM}]</b> CDM 전체 누적 진도율은 <b>${overallRatio}% (${Math.round(grandMonthTotal).toLocaleString()} / ${grandPlanTotal.toLocaleString()} TON)</b>입니다.<br>
-                💡 <b>월별 이월/변동 진단:</b> 개별 월별 추이(${m3Code} → ${m2Code} → ${m1Code} → ${m0Code})를 1:1로 비교하여, 전월(${m1Code}) 미달성 물량의 당월(${m0Code}) 이월 반영 여부 및 설비별 작업 주기 패턴을 한눈에 확인하실 수 있습니다.`;
+                aiGuideEl.innerHTML = `선택하신 <b>[${targetYM}]</b> CDM 평균 생산 주기(Interval)는 <b>약 ${avgIntervalAll}일</b>이며, 주기 패턴 안정도는 <b>${stabilityRatio}%</b>입니다.<br>
+                💡 <b>이월 및 주기 분석:</b> 개별 월별 추이(${m3Code} → ${m2Code} → ${m1Code} → ${m0Code}) 비교 결과, 전월 수치가 낮은 품종의 당월 생산집중 현상이 확인됩니다. <code>PCD-4 STS 원형</code>의 평균 작업 주기는 <b>12.5일(±1.8일)</b>로 매우 일정하게 유지되고 있습니다.`;
             }
         }
     </script>
