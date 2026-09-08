@@ -934,7 +934,6 @@
             const el = document.getElementById('weather-card-display');
             if (!el) return;
             const w = CITY_WEATHER[selectedCity] || CITY_WEATHER.pohang;
-            
             el.innerHTML = `
                 <div class="bg-white p-1.5 rounded border border-slate-200 flex flex-col items-center">
                     <span class="font-black text-sky-700 flex items-center gap-1"><i class="fa-solid fa-calendar-day text-[9px]"></i> 오늘 (${w.name})</span>
@@ -1075,7 +1074,7 @@
         function saveLayout() {
             if (!grid) return;
             const layout = grid.save();
-            localStorage.setItem('PRO_DASHBOARD_GRID_LAYOUT_V39', JSON.stringify(layout));
+            localStorage.setItem('PRO_DASHBOARD_GRID_LAYOUT_V40', JSON.stringify(layout));
         }
 
         function sanitizeLayout(layoutArray) {
@@ -1088,7 +1087,7 @@
         }
 
         function loadSavedLayout() {
-            const saved = localStorage.getItem('PRO_DASHBOARD_GRID_LAYOUT_V39');
+            const saved = localStorage.getItem('PRO_DASHBOARD_GRID_LAYOUT_V40');
             if (saved && grid) {
                 try {
                     const parsed = JSON.parse(saved);
@@ -1110,8 +1109,8 @@
         }
 
         function resetLayout() {
+            localStorage.removeItem('PRO_DASHBOARD_GRID_LAYOUT_V40');
             localStorage.removeItem('PRO_DASHBOARD_GRID_LAYOUT_V39');
-            localStorage.removeItem('PRO_DASHBOARD_GRID_LAYOUT_V38');
             location.reload();
         }
 
@@ -1282,11 +1281,137 @@
 
         const safeNum = (val) => parseFloat((val || '0').toString().replace(/,/g, '')) || 0;
 
+        function extractDataFromAOA(aoa, dataType) {
+            let headerIdx = -1; let headers = [];
+            for (let i = 0; i < Math.min(20, aoa.length); i++) {
+                if(!aoa[i]) continue;
+                const rowStr = aoa[i].join('').replace(/\s/g, '').toLowerCase();
+                if (['일자', '날짜', 'date', '시간'].some(k => rowStr.includes(k)) || ['설비', '호기', '기계', 'equip'].some(k => rowStr.includes(k))) {
+                    headerIdx = i; headers = aoa[i].map(h => h ? String(h).trim().replace(/\s/g, '').replace('\ufeff', '').toUpperCase() : ''); break;
+                }
+            }
+            if (headerIdx === -1 && aoa.length > 0) { headerIdx = 0; headers = aoa[0].map(h => h ? String(h).trim().replace(/\s/g, '').replace('\ufeff', '').toUpperCase() : ''); }
+            if (headerIdx === -1) return []; 
+
+            const getVal = (row, keywords) => {
+                for (const k of keywords) {
+                    const searchKey = k.toUpperCase();
+                    let idx = headers.indexOf(searchKey); if(idx !== -1 && row[idx] !== undefined) return row[idx];
+                    idx = headers.findIndex(h => h.includes(searchKey)); if(idx !== -1 && row[idx] !== undefined) return row[idx];
+                } return null;
+            };
+
+            const parsed = [];
+            for (let i = headerIdx + 1; i < aoa.length; i++) {
+                const row = aoa[i]; if (!row || row.length === 0 || !row.join('').trim()) continue; 
+                
+                let date = normalizeDate(getVal(row, ['작업일자', '일자', '날짜', '생산일', '포장일', 'DATE']));
+                let equip = String(getVal(row, ['작업설비', '설비', '호기', '기계', 'EQUIPMENT']) || '미분류').trim();
+                let team = String(getVal(row, ['작업조', '조명', 'TEAM', '조']) || '').trim().replace('조','');
+                
+                let rawSteel = String(getVal(row, ['강종', '재질', '강종구분', 'STEEL', 'MATERIAL', '품명', '강종명']) || '').trim().toUpperCase();
+                let steelType = "탄소강";
+                if (rawSteel.includes("STS") || rawSteel.includes("스텐") || rawSteel.includes("304") || rawSteel.includes("316") || rawSteel.includes("STAINLESS")) steelType = "STS강";
+                else if (rawSteel.includes("합금") || rawSteel.includes("SCM") || rawSteel.includes("SNCM") || rawSteel.includes("ALLOY")) steelType = "합금강";
+                else if (rawSteel.includes("쾌삭") || rawSteel.includes("SUM") || rawSteel.includes("FREE")) steelType = "쾌삭강";
+                else steelType = "탄소강";
+
+                let rawShape = String(getVal(row, ['형상', '품종', '모양', 'SHAPE', '단면', '제품형상']) || '원형').trim().toUpperCase();
+                let shapeRaw = "원형";
+                if (rawShape.includes("육각") || rawShape.includes("HEX") || rawShape.includes("6각")) shapeRaw = "정육각";
+                else if (rawShape.includes("사각") || rawShape.includes("SQUARE") || rawShape.includes("4각")) shapeRaw = "사각";
+                else if (rawShape.includes("이형") || rawShape.includes("SPECIAL") || rawShape.includes("프로파일")) shapeRaw = "이형";
+                else shapeRaw = "원형";
+
+                let isCircle = shapeRaw === "원형";
+
+                let rawHeat = String(getVal(row, ['열처리', '열처리여부', 'ANNEAL', 'HEAT', '열처리구분', '열처리유무']) || '').trim().toUpperCase();
+                let heatTreat = (rawHeat.includes("열처리") && !rawHeat.includes("비열처리")) || rawHeat.includes("Y") || rawHeat.includes("QT") || rawHeat.includes("ANNEAL") || rawHeat.includes("열처리재") ? "열처리재" : "비열처리재";
+                if (rawHeat.includes("비열처리") || rawHeat.includes("N") || rawHeat.includes("OFF")) heatTreat = "비열처리재";
+
+                let shiftVal = String(getVal(row, ['주야간', '주야', '근무', '구분', 'SHIFT']) || '').trim();
+
+                if (!date) continue;
+
+                if (dataType === 'PROD') {
+                    if (EXCLUDED_EQUIPS.includes(equip.toUpperCase().trim())) continue;
+                    parsed.push({ 
+                        date, equipment: equip, team, isCircle, steelType, shapeRaw, heatTreat, shift: shiftVal, 
+                        amount: safeNum(getVal(row, ['작업량', '생산량', '중량', '실적', '수량'])), 
+                        speed: safeNum(getVal(row, ['선속', '속도', 'RPM', '신선선속'])), 
+                        wire: safeNum(getVal(row, ['작업선경', '선경', '두께', 'WIRE'])) 
+                    });
+                } else if (dataType === 'DOWN') {
+                    if (EXCLUDED_EQUIPS.includes(equip.toUpperCase().trim())) continue;
+                    parsed.push({ date, equipment: equip, team, isCircle, shift: shiftVal, minutes: safeNum(getVal(row, ['세부불가동', '불가동시간', '정지시간', '시간'])), reason: String(getVal(row, ['불가동명', '사유', '원인', '내역']) || '기타 고장') });
+                } else if (dataType === 'PACK') {
+                    parsed.push({ date, equipment: equip, team, shift: shiftVal, amount: safeNum(getVal(row, ['포장량', '포장중량', '실적', '작업량', '수량'])) });
+                }
+            } return parsed;
+        }
+
+        // 🚀 [안정적 동기화 로직] timeout 및 try-finally 구문 적용으로 멈춤 현상 원천 방지
         async function fetchGoogleSheetsData() {
             updateLed('connecting', '동기화 진행 중...');
-            updateDashboard();
-            if(document.getElementById('tab-analytics').classList.contains('active')) updateAnalytics();
-            if(document.getElementById('tab-cycle').classList.contains('active')) renderCycleTable();
+            let loadedFlags = [];
+
+            const fetchWithTimeout = async (url, timeout = 4000) => {
+                const controller = new AbortController();
+                const id = setTimeout(() => controller.abort(), timeout);
+                try {
+                    const res = await fetch(url, { signal: controller.signal });
+                    clearTimeout(id);
+                    return res;
+                } catch (e) {
+                    clearTimeout(id);
+                    return null;
+                }
+            };
+
+            try {
+                if (SHARED_PROD_URL) {
+                    const pRes = await fetchWithTimeout(getSafeCsvUrl(SHARED_PROD_URL));
+                    if (pRes && pRes.ok) {
+                        const text = await pRes.text();
+                        const aoa = Papa.parse(text, { skipEmptyLines: true }).data;
+                        const parsed = extractDataFromAOA(aoa, 'PROD');
+                        if (parsed.length > 0) { prodData = parsed; loadedFlags.push(`생산:${parsed.length}`); }
+                    }
+                }
+
+                if (SHARED_DOWN_URL) {
+                    const dRes = await fetchWithTimeout(getSafeCsvUrl(SHARED_DOWN_URL));
+                    if (dRes && dRes.ok) {
+                        const text = await dRes.text();
+                        const aoa = Papa.parse(text, { skipEmptyLines: true }).data;
+                        const parsed = extractDataFromAOA(aoa, 'DOWN');
+                        if (parsed.length > 0) { downData = parsed; loadedFlags.push(`불가동:${parsed.length}`); }
+                    }
+                }
+
+                if (SHARED_PACK_URL) {
+                    const pkRes = await fetchWithTimeout(getSafeCsvUrl(SHARED_PACK_URL));
+                    if (pkRes && pkRes.ok) {
+                        const text = await pkRes.text();
+                        const aoa = Papa.parse(text, { skipEmptyLines: true }).data;
+                        const parsed = extractDataFromAOA(aoa, 'PACK');
+                        if (parsed.length > 0) { packData = parsed; loadedFlags.push(`포장:${parsed.length}`); }
+                    }
+                }
+            } catch (err) {
+                console.warn("Sync fetch error:", err);
+            } finally {
+                if (loadedFlags.length > 0) {
+                    showToast(`클라우드 동기화 성공! (${loadedFlags.join(', ')})`);
+                    updateLed('synced', 'Live Sync Active');
+                } else {
+                    updateLed('synced', 'Live Sync Active (Demo Data)');
+                }
+
+                updateDashboard();
+                if (document.getElementById('tab-analytics')?.classList.contains('active')) updateAnalytics();
+                if (document.getElementById('tab-cycle')?.classList.contains('active')) renderCycleTable();
+            }
         }
 
         fetchGoogleSheetsData();
@@ -1297,7 +1422,7 @@
         function setViewMode(mode) { viewMode = mode; updateDashboard(); }
         function setShiftMode(mode) { shiftMode = mode; updateDashboard(); }
 
-        // 🚀 [NEW] 월별 불가동 클릭시 해당 월 TOP 5 불가동 상세 내역 모달 구현
+        // 🚀 [요구사항 1] 월별 불가동 클릭시 해당 월 TOP 5 불가동 상세 내역 모달 구현
         function openMonthDownDetailModal(monthStr) {
             const modal = document.getElementById('down-detail-modal');
             const titleEl = document.getElementById('modal-down-title');
@@ -1311,7 +1436,6 @@
             const monthFiltered = safeDown.filter(d => d.date && d.date.includes(`-${monthStr}-`));
             const totalMonthDownMin = monthFiltered.reduce((a,c)=>a+(c.minutes||0), 0);
 
-            // 원인/설비별 그룹핑
             const reasonGroup = {};
             monthFiltered.forEach(d => {
                 const k = `[${d.equipment || '설비'}] ${(d.reason || '기타 고장').trim()}`;
@@ -1352,7 +1476,6 @@
             if (modal) modal.style.display = 'flex';
         }
 
-        // 🚀 [ENHANCED] 월별 불가동 히트맵 클릭 이벤트 연동
         function renderDowntimeHeatmap() {
             const container = document.getElementById('downtime-heatmap-grid');
             if (!container) return;
