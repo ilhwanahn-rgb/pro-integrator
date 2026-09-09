@@ -669,7 +669,7 @@
                     <span class="px-2 py-0.5 text-[9.5px] font-bold rounded cell-plain-other">일반 육각</span>
                     <span class="px-2 py-0.5 text-[9.5px] font-bold rounded cell-sts-circle">STS 원형</span>
                     <span class="px-2 py-0.5 text-[9.5px] font-bold rounded cell-sts-other">STS 육각</span>
-                    <span class="px-2 py-0.5 text-[9.5px] font-bold rounded cell-coil-qt">COIL QT</span>
+                    <span class="px-2 py-0.5 text-[9.5px] font-bold rounded cell-coil-qt" title="PCD-0-3 / PCD-5 실적 중 실공정(T열)에 '코일외주'가 포함된 건만 집계 (타 품종행과 중복 없음)">COIL QT <span class="opacity-70">(코일외주)</span></span>
                 </div>
             </header>
 
@@ -938,6 +938,10 @@
         const MACHINE_ORDER = ['PCD-0-2', 'PCD-0-3', 'PCD-1', 'PCD-5', 'PCD-2-2', 'PCD-3', 'PCD-4'];
         const CHANGEOVER_LOSS_MIN = 30; // 품종 전환(다이스·세팅 교체) 1회당 표준 공정 LOSS 추정치(분)
         const EXCLUDED_EQUIPS = ['미분류', 'PCD-W11', 'PCD-W8']; 
+        // ✅ COIL QT 판정 기준 : 작업설비가 PCD-0-3 / PCD-5 이면서 실공정(T열)에 '코일외주' 포함
+        const COIL_QT_EQUIPS = ['PCD-0-3', 'PCD-5'];
+        const COIL_QT_KEYWORD = '코일외주';
+        const COIL_QT_COL_IDX = 19; // T열 (헤더 매칭 실패 시 폴백)
 
         const WIDGET_DEFINITIONS = [
             { id: 'widget-clock', name: '시계 & 다지역 예보 위젯', icon: 'fa-cloud-sun' },
@@ -1736,12 +1740,18 @@
 
                 let shiftVal = String(getVal(row, ['주야간', '주야', '근무', '구분', 'SHIFT']) || '').trim();
 
+                // ✅ 실공정(T열) : COIL QT 판정용 원본 텍스트
+                let rawProc = String(getVal(row, ['실공정', '실공정명', 'REALPROCESS']) || '').trim();
+                if (!rawProc && row[COIL_QT_COL_IDX] !== undefined && row[COIL_QT_COL_IDX] !== null) rawProc = String(row[COIL_QT_COL_IDX]).trim();
+                const equipKey = equip.toUpperCase().replace(/\s/g, '');
+                const isCoilQt = COIL_QT_EQUIPS.includes(equipKey) && rawProc.replace(/\s/g, '').includes(COIL_QT_KEYWORD);
+
                 if (!date) continue;
 
                 if (dataType === 'PROD') {
                     if (EXCLUDED_EQUIPS.includes(equip.toUpperCase().trim())) continue;
                     parsed.push({ 
-                        date, equipment: equip, team, isCircle, steelType, shapeRaw, heatTreat, shift: shiftVal, 
+                        date, equipment: equip, team, isCircle, steelType, shapeRaw, heatTreat, realProc: rawProc, isCoilQt, shift: shiftVal, 
                         amount: safeNum(getVal(row, ['작업량', '생산량', '중량', '실적', '수량'])), 
                         speed: safeNum(getVal(row, ['선속', '속도', 'RPM', '신선선속'])), 
                         wire: safeNum(getVal(row, ['작업선경', '선경', '두께', 'WIRE'])) 
@@ -1755,50 +1765,85 @@
             } return parsed;
         }
 
-        async function fetchGoogleSheetsData() {
-            updateLed('connecting', '동기화 진행 중...');
-            let loadedFlags = [];
-            
+        // ✅ [FIX] 동기화가 "진행 중..."에서 멈추던 병목 해소
+        //  ① 시트 응답을 기다리지 않고 화면을 먼저 그린다 → 빈 화면·멈춤 없음
+        //  ② 시트별 15초 타임아웃(AbortController) → 응답 없는 시트에서 무한 대기 방지
+        //  ③ 3개 시트 병렬 호출 → 순차 대기 제거
+        //  ④ finally 에서 반드시 화면·LED 갱신 → 상태표시 고착 방지
+        const SYNC_TIMEOUT_MS = 15000;
+        let isSyncing = false;
+
+        function safeRenderAll() {
+            try { updateDashboard(); } catch (e) { console.error('updateDashboard error', e); }
             try {
-                const pRes = await fetch(getSafeCsvUrl(SHARED_PROD_URL));
-                if (pRes.ok) {
-                    const text = await pRes.text(); const aoa = Papa.parse(text, { skipEmptyLines: true }).data;
-                    const parsed = extractDataFromAOA(aoa, 'PROD');
-                    if(parsed.length > 0) { prodData = parsed; loadedFlags.push(`생산:${parsed.length}`); }
-                }
-            } catch(e) { console.error("PROD fetch error", e); }
-
+                const aTab = document.getElementById('tab-analytics');
+                if (aTab && aTab.classList.contains('active')) updateAnalytics();
+            } catch (e) { console.error('updateAnalytics error', e); }
             try {
-                const dRes = await fetch(getSafeCsvUrl(SHARED_DOWN_URL));
-                if (dRes.ok) {
-                    const text = await dRes.text(); const aoa = Papa.parse(text, { skipEmptyLines: true }).data;
-                    const parsed = extractDataFromAOA(aoa, 'DOWN');
-                    if(parsed.length > 0) { downData = parsed; loadedFlags.push(`불가동:${parsed.length}`); }
-                }
-            } catch(e) { console.error("DOWN fetch error", e); }
-
-            try {
-                const pkRes = await fetch(getSafeCsvUrl(SHARED_PACK_URL));
-                if (pkRes.ok) {
-                    const text = await pkRes.text(); const aoa = Papa.parse(text, { skipEmptyLines: true }).data;
-                    const parsed = extractDataFromAOA(aoa, 'PACK');
-                    if(parsed.length > 0) { packData = parsed; loadedFlags.push(`포장:${parsed.length}`); }
-                }
-            } catch(e) { console.error("PACK fetch error", e); }
-
-            if(loadedFlags.length > 0) {
-                showToast(`클라우드 동기화 성공! (${loadedFlags.join(', ')})`);
-                updateLed('synced', 'Live Sync Active');
-            } else {
-                updateLed('synced', 'Demo Data Active');
-            }
-
-            updateDashboard();
-            if(document.getElementById('tab-analytics').classList.contains('active')) updateAnalytics();
-            if(document.getElementById('tab-cycle').classList.contains('active')) renderCycleTable();
+                const cTab = document.getElementById('tab-cycle');
+                if (cTab && cTab.classList.contains('active')) renderCycleTable();
+            } catch (e) { console.error('renderCycleTable error', e); }
         }
 
-        fetchGoogleSheetsData();
+        async function fetchOneSheet(url, dataType) {
+            if (!url || !url.trim()) return null;
+            const controller = new AbortController();
+            const timer = setTimeout(() => controller.abort(), SYNC_TIMEOUT_MS);
+            try {
+                const res = await fetch(getSafeCsvUrl(url), { signal: controller.signal, cache: 'no-store' });
+                if (!res.ok) return null;
+                const text = await res.text();
+                if (typeof Papa === 'undefined') { console.warn('PapaParse 미로딩 - CSV 파싱 생략'); return null; }
+                const aoa = Papa.parse(text, { skipEmptyLines: true }).data;
+                const parsed = extractDataFromAOA(aoa, dataType);
+                return (parsed && parsed.length > 0) ? parsed : null;
+            } catch (e) {
+                if (e && e.name === 'AbortError') console.warn(dataType + ' 시트 응답 없음 (' + (SYNC_TIMEOUT_MS / 1000) + '초 초과)');
+                else console.error(dataType + ' fetch error', e);
+                return null;
+            } finally {
+                clearTimeout(timer);
+            }
+        }
+
+        async function fetchGoogleSheetsData() {
+            if (isSyncing) { showToast('이미 동기화가 진행 중입니다.', 'danger'); return; }
+            isSyncing = true;
+            updateLed('connecting', '동기화 진행 중...');
+
+            const loadedFlags = [];
+            const failed = [];
+
+            try {
+                const [prodRes, downRes, packRes] = await Promise.all([
+                    fetchOneSheet(SHARED_PROD_URL, 'PROD'),
+                    fetchOneSheet(SHARED_DOWN_URL, 'DOWN'),
+                    fetchOneSheet(SHARED_PACK_URL, 'PACK')
+                ]);
+
+                if (prodRes) { prodData = prodRes; loadedFlags.push('생산:' + prodRes.length); } else failed.push('생산');
+                if (downRes) { downData = downRes; loadedFlags.push('불가동:' + downRes.length); } else failed.push('불가동');
+                if (packRes) { packData = packRes; loadedFlags.push('포장:' + packRes.length); } else failed.push('포장');
+            } catch (e) {
+                console.error('동기화 처리 오류', e);
+            } finally {
+                isSyncing = false;
+
+                if (loadedFlags.length > 0) {
+                    updateLed('synced', 'Live Sync (' + loadedFlags.join(' / ') + ')');
+                    showToast('클라우드 동기화 완료! (' + loadedFlags.join(', ') + ')' + (failed.length ? ' · 미수신: ' + failed.join(',') : ''));
+                } else {
+                    updateLed('offline', '동기화 실패 · 데모 데이터 표시 중');
+                    showToast('시트 연결 실패 - 데모 데이터로 표시합니다. 상단 동기화 버튼으로 재시도하세요.', 'danger');
+                }
+
+                safeRenderAll();
+            }
+        }
+
+        // 🚀 시트 응답을 기다리지 않고 먼저 화면을 그린다 (멈춤 현상 원천 차단)
+        safeRenderAll();
+        setTimeout(function () { fetchGoogleSheetsData(); }, 60);
 
         function updateTargets() { 
             monthlyTarget = parseFloat(document.getElementById('inp-monthly').value)||0; 
@@ -2602,7 +2647,7 @@
                 // 🚀 [개념 정정] 품종 전환(SET-UP) 횟수 = 공정 LOSS 지표. 적을수록 좋음.
                 const hasCoilQt = mCategories.some(c => c.steel === 'COIL QT');
                 const catKeyOf = (p) => {
-                    if (hasCoilQt && p.heatTreat === '열처리재') return 'COIL QT';
+                    if (hasCoilQt && p.isCoilQt === true) return 'COIL QT';
                     const st = (p.steelType === 'STS강') ? 'STS' : '일반강';
                     const sh = ((p.shapeRaw || '원형') === '원형') ? '원형' : '원형外';
                     return `${st} ${sh}`;
@@ -2628,11 +2673,12 @@
 
                 mCategories.forEach((cat, cIdx) => {
                     totalCategoryRows++;
-                    // ✅ [FIX] COIL QT(열처리재)는 강종·형상 품종행과 상호배타 처리 → 합계 이중계상 제거
+                    // ✅ [FIX] COIL QT = 설비(PCD-0-3/PCD-5) + 실공정(T열) '코일외주' 포함 건만.
+                    //          동일 레코드가 강종·형상 행에 또 잡히지 않도록 상호배타 처리 → 전체 실적 이중계상 0
                     const filterFn = (p) => {
                         const isSts = p.steelType === 'STS강';
                         const isCircle = (p.shapeRaw || '원형') === '원형';
-                        const isQt = p.heatTreat === '열처리재';
+                        const isQt = (p.isCoilQt === true);
                         if (cat.steel === 'COIL QT') return isQt;
                         if (hasCoilQt && isQt) return false;
                         if (cat.steel === '일반강' && cat.shape === '원형') return !isSts && isCircle;
