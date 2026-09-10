@@ -171,7 +171,17 @@
             padding: 3px 5px !important;
             font-size: 11px !important;
             text-align: center;
+            white-space: nowrap;          /* ✅ 글자가 세로로 깨지는 현상 방지 */
         }
+        /* 앞쪽 요약 열은 내용이 줄바꿈 없이 한 줄로 보이도록 최소폭 확보 */
+        .cycle-table th.col-equip,  .cycle-table td.col-equip  { min-width: 104px; }
+        .cycle-table th.col-num,    .cycle-table td.col-num    { min-width: 56px; }
+        .cycle-table th.col-steel,  .cycle-table td.col-steel  { min-width: 52px; }
+        .cycle-table th.col-shape,  .cycle-table td.col-shape  { min-width: 50px; }
+        .cycle-table th.col-month,  .cycle-table td.col-month  { min-width: 62px; }
+        .cycle-table th.col-cycle,  .cycle-table td.col-cycle  { min-width: 124px; }
+        .cycle-table th.col-day,    .cycle-table td.col-day    { min-width: 26px; }
+        .equip-badge { display: inline-block; white-space: nowrap; line-height: 1.25; }
         .cell-plain-circle { background-color: #e0f2fe; color: #0369a1; font-weight: 800; }
         .cell-plain-other { background-color: #fee2e2; color: #b91c1c; font-weight: 800; border: 1px solid #fca5a5 !important; }
         .cell-sts-circle { background-color: #d1fae5; color: #047857; font-weight: 800; }
@@ -2631,33 +2641,26 @@
                 return `${y}-${m}`;
             };
 
-            const m3Str = getPrevMonthStr(3);
-            const m2Str = getPrevMonthStr(2);
             const m1Str = getPrevMonthStr(1);
-
-            const m3Code = m3Str.replace('-', '');
-            const m2Code = m2Str.replace('-', '');
             const m1Code = m1Str.replace('-', '');
             const m0Code = targetYM.replace('-', '');
 
             // 1. 헤더 생성 ([평균주기] 및 [변동성(±σ)] 분석 열 포함)
             let headerHtml = `
-                <th class="border border-slate-200 font-black">설비</th>
-                <th class="border border-slate-200 font-black">운영계획</th>
-                <th class="border border-slate-200 font-black">생산량</th>
-                <th class="border border-slate-200 font-black">진도율</th>
-                <th class="border border-slate-200 font-black">강종</th>
-                <th class="border border-slate-200 font-black">형상</th>
-                <th class="border border-slate-200 font-black text-slate-600 bg-slate-50">${m3Code}</th>
-                <th class="border border-slate-200 font-black text-slate-600 bg-slate-50">${m2Code}</th>
-                <th class="border border-slate-200 font-black text-slate-800 bg-slate-100">${m1Code}</th>
-                <th class="border border-slate-200 font-black bg-amber-100 text-amber-900">${m0Code}</th>
-                <th class="border border-slate-200 font-black bg-sky-100 text-sky-900" title="같은 품종을 다시 작업하기까지의 평균 간격(일). 길수록 몰아서 생산.">평균주기</th>
-                <th class="border border-slate-200 font-black bg-emerald-100 text-emerald-900" title="당월 이 품종이 몇 개의 연속 구간(블록)으로 생산됐는지를 설비의 '사이클 수'와 비교. 사이클마다 1블록이면 정상, 그보다 쪼개지면 불필요한 공정교체.">블록 / 사이클</th>
+                <th class="border border-slate-200 font-black col-equip">설비 / 전환관리</th>
+                <th class="border border-slate-200 font-black col-num">운영계획</th>
+                <th class="border border-slate-200 font-black col-num">생산량</th>
+                <th class="border border-slate-200 font-black col-num">진도율</th>
+                <th class="border border-slate-200 font-black col-steel">강종</th>
+                <th class="border border-slate-200 font-black col-shape">형상</th>
+                <th class="border border-slate-200 font-black text-slate-800 bg-slate-100 col-month" title="전월 실적 (TON)">전월 ${m1Code}</th>
+                <th class="border border-slate-200 font-black bg-amber-100 text-amber-900 col-month" title="조회월 실적 (TON)">당월 ${m0Code}</th>
+                <th class="border border-slate-200 font-black bg-sky-100 text-sky-900 col-num" title="같은 품종을 다시 작업하기까지의 평균 간격(일). 길수록 몰아서 생산.">평균주기</th>
+                <th class="border border-slate-200 font-black bg-emerald-100 text-emerald-900 col-cycle" title="당월 이 품종이 몇 개의 연속 구간(블록)으로 생산됐는지를 설비의 '사이클 수'와 비교. 사이클마다 1블록이면 정상, 그보다 쪼개지면 불필요한 공정교체.">블록 / 사이클</th>
             `;
 
             for (let day = 1; day <= daysInMonth; day++) {
-                headerHtml += `<th class="border border-slate-200 font-bold px-1 text-[9.5px] w-[24px] bg-slate-50">${month}/${day}</th>`;
+                headerHtml += `<th class="border border-slate-200 font-bold px-1 text-[9.5px] col-day bg-slate-50">${month}/${day}</th>`;
             }
             headerRow.innerHTML = headerHtml;
 
@@ -2727,11 +2730,8 @@
                 const mSts = mData.filter(p => p.steelType === 'STS강');
                 const mOther = mData.filter(p => (p.shapeRaw || '원형') !== '원형');
 
-                catTotals['합계'].m3 += rawSum(mData, m3Str);   catTotals['합계'].m2 += rawSum(mData, m2Str);
                 catTotals['합계'].m1 += rawSum(mData, m1Str);   catTotals['합계'].m0 += rawSum(mData, targetYM);
-                catTotals['STS'].m3 += rawSum(mSts, m3Str);     catTotals['STS'].m2 += rawSum(mSts, m2Str);
                 catTotals['STS'].m1 += rawSum(mSts, m1Str);     catTotals['STS'].m0 += rawSum(mSts, targetYM);
-                catTotals['원형外'].m3 += rawSum(mOther, m3Str); catTotals['원형外'].m2 += rawSum(mOther, m2Str);
                 catTotals['원형外'].m1 += rawSum(mOther, m1Str); catTotals['원형外'].m0 += rawSum(mOther, targetYM);
 
                 for (let day = 1; day <= daysInMonth; day++) {
@@ -2792,8 +2792,6 @@
 
                     const catData = mData.filter(filterFn);
                     
-                    const sumM3 = catData.filter(p => p.date && p.date.startsWith(m3Str)).reduce((a,c)=>a+(c.amount||0), 0) / 1000;
-                    const sumM2 = catData.filter(p => p.date && p.date.startsWith(m2Str)).reduce((a,c)=>a+(c.amount||0), 0) / 1000;
                     const sumM1 = catData.filter(p => p.date && p.date.startsWith(m1Str)).reduce((a,c)=>a+(c.amount||0), 0) / 1000;
                     const sumM0 = catData.filter(p => p.date && p.date.startsWith(targetYM)).reduce((a,c)=>a+(c.amount||0), 0) / 1000;
 
@@ -2813,11 +2811,11 @@
                         const over = catRuns - mCycles;   // 사이클 수 초과로 쪼개진 횟수
                         if (over <= 0) {
                             stableCount++;
-                            sdBadgeHtml = `<span class="px-1.5 py-0.2 rounded text-[9.5px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300" title="당월 ${mCycles}사이클 운영 기준, ${catRuns}블록은 정상 범위 (사이클마다 몰아서 생산)">${catRuns}블록 / ${mCycles}사이클 (정상)</span>`;
+                            sdBadgeHtml = `<span class="px-1.5 py-0.2 rounded text-[9.5px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300" title="당월 ${mCycles}사이클 운영 기준, ${catRuns}블록은 정상 범위 (사이클마다 몰아서 생산)">${catRuns}블록 / ${mCycles}사이클 ✔</span>`;
                         } else if (over === 1) {
-                            sdBadgeHtml = `<span class="px-1.5 py-0.2 rounded text-[9.5px] font-bold bg-amber-100 text-amber-800 border border-amber-300" title="당월 ${mCycles}사이클인데 ${catRuns}블록으로 쪼개짐 → 불필요한 공정교체 1회 유발">${catRuns}블록 (분할 +1)</span>`;
+                            sdBadgeHtml = `<span class="px-1.5 py-0.2 rounded text-[9.5px] font-bold bg-amber-100 text-amber-800 border border-amber-300" title="당월 ${mCycles}사이클인데 ${catRuns}블록으로 쪼개짐 → 불필요한 공정교체 1회 유발">${catRuns}블록 / ${mCycles}사이클 · 분할 +1</span>`;
                         } else {
-                            sdBadgeHtml = `<span class="px-1.5 py-0.2 rounded text-[9.5px] font-bold bg-red-100 text-red-800 border border-red-300" title="당월 ${mCycles}사이클인데 ${catRuns}블록으로 흩어짐 → 불필요한 공정교체 ${over}회 유발">${catRuns}블록 (분할 +${over}·LOSS)</span>`;
+                            sdBadgeHtml = `<span class="px-1.5 py-0.2 rounded text-[9.5px] font-bold bg-red-100 text-red-800 border border-red-300" title="당월 ${mCycles}사이클인데 ${catRuns}블록으로 흩어짐 → 불필요한 공정교체 ${over}회 유발">${catRuns}블록 / ${mCycles}사이클 · 분할 +${over}</span>`;
                         }
                     }
 
@@ -2828,25 +2826,23 @@
                     
                     if (cIdx === 0) {
                         const mRatio = mPlan > 0 ? Math.round((monthCurrentSum / mPlan) * 100) : 0;
-                        bodyHtml += `<td rowspan="${mCategories.length}" class="border border-slate-200 font-black text-slate-900 bg-slate-50 uppercase">
-                                        <div>${mName}</div>
-                                        <div class="mt-0.5"><span class="px-1 py-0.2 rounded text-[8.5px] font-black border ${mSwitchCls}" title="${mSwitchTitle}">전환 ${mSwitch}회${cyc.hasData ? ` <span class="opacity-70">/ 기준 ${baseAvg.toFixed(1)}</span>` : ''}</span></div>
-                                        ${cyc.hasData ? `<div class="mt-0.5 text-[8px] font-black ${overBase > 1.0 ? 'text-red-600' : overBase > 0 ? 'text-amber-700' : 'text-emerald-700'}">${overBase > 0 ? `초과 +${overBase.toFixed(1)}회 관리필요` : '기준 이내 ✔'}</div>
-                                        <div class="text-[8px] font-bold ${cyc.orderRate >= 80 ? 'text-sky-700' : 'text-slate-500'}" title="표준 CYCLE 순서(${idealSeqTxt})대로 넘어간 전환 비율">순서준수 ${cyc.orderRate}% · ${mCycles}사이클</div>` : ''}
+                        bodyHtml += `<td rowspan="${mCategories.length}" class="border border-slate-200 font-black text-slate-900 bg-slate-50 col-equip">
+                                        <div class="text-[12px] font-black tracking-tight">${mName}</div>
+                                        <div class="mt-0.5"><span class="equip-badge px-1 py-0.2 rounded text-[9px] font-black border ${mSwitchCls}" title="${mSwitchTitle}">전환 ${mSwitch}${cyc.hasData ? ` <span class="opacity-70">/ 기준 ${baseAvg.toFixed(1)}</span>` : ''}</span></div>
+                                        ${cyc.hasData ? `<div class="mt-0.5 text-[9px] font-black ${overBase > 1.0 ? 'text-red-600' : overBase > 0 ? 'text-amber-700' : 'text-emerald-700'}">${overBase > 0 ? `초과 +${overBase.toFixed(1)} 관리` : '기준 이내 ✔'}</div>
+                                        <div class="text-[9px] font-bold ${cyc.orderRate >= 80 ? 'text-sky-700' : 'text-slate-500'}" title="표준 CYCLE 순서(${idealSeqTxt})대로 넘어간 전환 비율">순서 ${cyc.orderRate}% · ${mCycles}사이클</div>` : ''}
                                      </td>
-                                     <td rowspan="${mCategories.length}" class="border border-slate-200 font-bold text-slate-700 font-mono-num">${mPlan.toLocaleString()}</td>
-                                     <td rowspan="${mCategories.length}" class="border border-slate-200 font-black text-sky-800 font-mono-num" title="설비 원본 실적 합계 (품종행 합과 일치)">${fmtT(monthCurrentSum)}</td>
-                                     <td rowspan="${mCategories.length}" class="border border-slate-200 font-extrabold text-sky-700 bg-sky-50">${mRatio}%</td>`;
+                                     <td rowspan="${mCategories.length}" class="border border-slate-200 font-bold text-slate-700 font-mono-num col-num">${mPlan.toLocaleString()}</td>
+                                     <td rowspan="${mCategories.length}" class="border border-slate-200 font-black text-sky-800 font-mono-num col-num" title="설비 원본 실적 합계 (품종행 합과 일치)">${fmtT(monthCurrentSum)}</td>
+                                     <td rowspan="${mCategories.length}" class="border border-slate-200 font-extrabold text-sky-700 bg-sky-50 col-num">${mRatio}%</td>`;
                     }
 
-                    bodyHtml += `<td class="border border-slate-200 font-bold">${cat.steel}</td>
-                                 <td class="border border-slate-200 font-bold">${cat.shape}</td>
-                                 <td class="border border-slate-200 font-mono-num text-slate-500">${sumM3 > 0 ? fmtT(sumM3) : '-'}</td>
-                                 <td class="border border-slate-200 font-mono-num text-slate-500">${sumM2 > 0 ? fmtT(sumM2) : '-'}</td>
-                                 <td class="border border-slate-200 font-mono-num font-extrabold text-slate-800 bg-slate-50">${sumM1 > 0 ? fmtT(sumM1) : '-'}</td>
-                                 <td class="border border-slate-200 font-mono-num font-black text-amber-800 bg-amber-50/50">${sumM0 > 0 ? fmtT(sumM0) : '-'}</td>
-                                 <td class="border border-slate-200 font-mono-num font-black text-sky-900 bg-sky-50/60">${intervalStats.mean > 0 ? intervalStats.mean + '일' : '-'}</td>
-                                 <td class="border border-slate-200 font-bold">${sdBadgeHtml}</td>`;
+                    bodyHtml += `<td class="border border-slate-200 font-bold col-steel">${cat.steel}</td>
+                                 <td class="border border-slate-200 font-bold col-shape">${cat.shape}</td>
+                                 <td class="border border-slate-200 font-mono-num font-extrabold text-slate-800 bg-slate-50 col-month">${sumM1 > 0 ? fmtT(sumM1) : '-'}</td>
+                                 <td class="border border-slate-200 font-mono-num font-black text-amber-800 bg-amber-50/50 col-month">${sumM0 > 0 ? fmtT(sumM0) : '-'}</td>
+                                 <td class="border border-slate-200 font-mono-num font-black text-sky-900 bg-sky-50/60 col-num">${intervalStats.mean > 0 ? intervalStats.mean + '일' : '-'}</td>
+                                 <td class="border border-slate-200 font-bold col-cycle">${sdBadgeHtml}</td>`;
 
                     // 일자별 셀 매트릭스 생성
                     for (let day = 1; day <= daysInMonth; day++) {
@@ -2854,9 +2850,9 @@
                         const dayVal = catData.filter(p => p.date === dateStr).reduce((a,c)=>a+c.amount, 0) / 1000;
 
                         if (dayVal > 0) {
-                            bodyHtml += `<td class="border border-slate-200 font-mono-num ${cat.class} shadow-xs" title="${mName} (${cat.name}) ${day}일: ${dayVal.toFixed(1)}T">${dayVal < 10 ? dayVal.toFixed(1) : Math.round(dayVal)}</td>`;
+                            bodyHtml += `<td class="border border-slate-200 font-mono-num col-day ${cat.class} shadow-xs" title="${mName} (${cat.name}) ${day}일: ${dayVal.toFixed(1)}T">${dayVal < 10 ? dayVal.toFixed(1) : Math.round(dayVal)}</td>`;
                         } else {
-                            bodyHtml += `<td class="border border-slate-100 font-mono-num text-slate-300">-</td>`;
+                            bodyHtml += `<td class="border border-slate-100 font-mono-num col-day text-slate-300">-</td>`;
                         }
                     }
 
@@ -2870,15 +2866,13 @@
                     <td colspan="4" class="border border-slate-300 text-slate-900">${label}</td>
                     <td class="border border-slate-300 text-slate-700">${label === '합계' ? '전체' : label}</td>
                     <td class="border border-slate-300 text-slate-700">-</td>
-                    <td class="border border-slate-300 font-mono-num">${totalsObj.m3 > 0 ? fmtT(totalsObj.m3) : '-'}</td>
-                    <td class="border border-slate-300 font-mono-num">${totalsObj.m2 > 0 ? fmtT(totalsObj.m2) : '-'}</td>
-                    <td class="border border-slate-300 font-mono-num">${totalsObj.m1 > 0 ? fmtT(totalsObj.m1) : '-'}</td>
-                    <td class="border border-slate-300 font-mono-num text-amber-900">${totalsObj.m0 > 0 ? fmtT(totalsObj.m0) : '-'}</td>
-                    <td class="border border-slate-300 font-bold text-sky-800 text-[9.5px]" colspan="2">${label === '합계' ? '전 설비 원본 기준 (중복 없음)' : (label === 'STS 합계' ? '강종 STS 만 추출' : '형상 원형外 만 추출')}</td>`;
+                    <td class="border border-slate-300 font-mono-num col-month">${totalsObj.m1 > 0 ? fmtT(totalsObj.m1) : '-'}</td>
+                    <td class="border border-slate-300 font-mono-num text-amber-900 col-month">${totalsObj.m0 > 0 ? fmtT(totalsObj.m0) : '-'}</td>
+                    <td class="border border-slate-300 font-bold text-sky-800 text-[9.5px]" colspan="2">${label === '합계' ? '전 설비 원본 기준' : (label === 'STS 합계' ? '강종 STS 추출' : '형상 원형外 추출')}</td>`;
 
                 for (let day = 1; day <= daysInMonth; day++) {
                     const val = totalsObj.days[day];
-                    rowHtml += `<td class="border border-slate-300 font-mono-num ${val > 0 ? 'text-slate-900 font-extrabold bg-slate-200/80' : 'text-slate-300'}">${val > 0 ? Math.round(val) : '-'}</td>`;
+                    rowHtml += `<td class="border border-slate-300 font-mono-num col-day ${val > 0 ? 'text-slate-900 font-extrabold bg-slate-200/80' : 'text-slate-300'}">${val > 0 ? Math.round(val) : '-'}</td>`;
                 }
 
                 rowHtml += `</tr>`;
