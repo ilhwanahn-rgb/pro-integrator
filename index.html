@@ -653,7 +653,7 @@
                         <span class="w-2 h-5 bg-sky-600 rounded"></span>
                         CDM CYCLE TIME <span class="text-sky-700 font-semibold ml-0.5 text-sm lg:text-base">분석 및 작업시점 예측</span>
                     </h1>
-                    <p class="text-slate-500 font-bold text-[9.5px] mt-0.5 ml-3">품종별 평균 작업 주기(Interval) 및 <b class="text-slate-700">품종 전환 횟수(원형↔원형外 / 일반강↔STS)</b> 기반 전환 LOSS 진단 · <span class="text-emerald-700 font-black">전환이 적을수록 우수</span></p>
+                    <p class="text-slate-500 font-bold text-[9.5px] mt-0.5 ml-3">설비별 <b class="text-slate-700">표준 CYCLE 순서</b> 준수 및 <b class="text-slate-700">26.1~8월 월평균 전환 횟수(기준선)</b> 대비 초과 관리 · <span class="text-emerald-700 font-black">기준 초과분이 곧 불필요한 공정 LOSS</span></p>
                 </div>
 
                 <div class="flex flex-wrap items-center gap-2 glass-panel p-1.5 !flex-row !h-auto border border-slate-300">
@@ -688,12 +688,12 @@
 
                 <div class="glass-panel p-3 border-l-4 border-l-emerald-600">
                     <div class="flex justify-between items-center mb-1">
-                        <span class="text-[10px] font-black text-slate-500 uppercase">전환 LOSS 안정도</span>
+                        <span class="text-[10px] font-black text-slate-500 uppercase" title="설비별 26.1~8월 월평균 전환 횟수를 기준선으로, 당월 실적이 그보다 몇 회 많은지. 0 이하면 양호.">기준 대비 초과 전환</span>
                         <i class="fa-solid fa-arrow-right-arrow-left text-emerald-600 text-xs"></i>
                     </div>
                     <div class="flex items-baseline justify-between">
                         <h4 id="cycle-kpi-stability" class="text-xl font-black text-emerald-800 font-mono-num">82.5%</h4>
-                        <span class="text-[9px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">전환 少 품종 비율</span>
+                        <span id="cycle-kpi-stability-sub" class="text-[9px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">26.1~8월 평균 기준</span>
                     </div>
                 </div>
 
@@ -2502,6 +2502,100 @@
             };
         }
 
+        // ============================================================
+        // 🚀 [NEW] 설비별 표준 CYCLE(품종 순환 순서) 정의
+        //   · 배열은 순환(↺). 시작 품종이 달라도(회전) 동일 사이클로 인정.
+        //   · 원형外 = 육각 및 이형
+        // ============================================================
+        const IDEAL_CYCLE = {
+            'PCD-0-2': ['일반강 원형', 'STS 원형'],
+            'PCD-1':   ['일반강 원형', 'STS 원형'],
+            'PCD-0-3': ['일반강 원형', 'STS 원형', 'COIL QT'],
+            'PCD-5':   ['COIL QT', 'STS 원형', 'STS 원형外', '일반강 원형外', '일반강 원형'],
+            'PCD-2-2': ['일반강 원형', 'STS 원형', 'STS 원형外', '일반강 원형外'],
+            'PCD-3':   ['일반강 원형', 'STS 원형', 'STS 원형外', '일반강 원형外'],
+            'PCD-4':   ['일반강 원형', 'STS 원형', 'STS 원형外', '일반강 원형外']
+        };
+        // 관리 기준선 산출 구간 : 26년 1월 ~ 8월 실제 CYCLE 운영 실적
+        const BASELINE_FROM = '2026-01';
+        const BASELINE_TO   = '2026-08';
+
+        function makeCatKeyFn(mName) {
+            const hasCoilQt = COIL_QT_EQUIPS.includes(mName);
+            return function (p) {
+                if (hasCoilQt && p.isCoilQt === true) return 'COIL QT';
+                const st = (p.steelType === 'STS강') ? 'STS' : '일반강';
+                const sh = ((p.shapeRaw || '원형') === '원형') ? '원형' : '원형外';
+                return st + ' ' + sh;
+            };
+        }
+
+        // 한 달치 CYCLE 운영 분석 : 블록(연속 생산구간) → 전환 횟수 · 사이클 수 · 표준순서 준수율
+        function analyzeCycleMonth(records, ym, mName) {
+            const catKeyOf = makeCatKeyFn(mName);
+            const order = IDEAL_CYCLE[mName] || ['일반강 원형', 'STS 원형', 'STS 원형外', '일반강 원형外'];
+            const L = order.length;
+            const pos = (k) => order.indexOf(k);
+
+            const byDate = {};
+            records.forEach(p => {
+                if (p.date && p.date.startsWith(ym)) (byDate[p.date] = byDate[p.date] || []).push(p);
+            });
+            const dates = Object.keys(byDate).sort();
+
+            const blocks = [];
+            dates.forEach(d => {
+                const keys = [...new Set(byDate[d].map(catKeyOf))];
+                const prev = blocks.length ? blocks[blocks.length - 1] : null;
+                if (keys.length > 1 && prev !== null) {
+                    // 같은 날 여러 품종이면 표준 CYCLE 순서에 가장 가깝게 배열 (일중 순서는 알 수 없으므로 유리하게 가정)
+                    const pi = pos(prev);
+                    const dist = (k) => {
+                        const i = pos(k);
+                        if (i === -1 || pi === -1) return 99;
+                        const dd = (i - pi + L) % L;
+                        return dd === 0 ? L : dd;
+                    };
+                    keys.sort((a, b) => dist(a) - dist(b));
+                }
+                keys.forEach(k => { if (blocks.length === 0 || blocks[blocks.length - 1] !== k) blocks.push(k); });
+            });
+
+            const runCount = {};
+            blocks.forEach(k => { runCount[k] = (runCount[k] || 0) + 1; });
+            const distinct = Object.keys(runCount).length;
+            const switches = blocks.length > 0 ? blocks.length - 1 : 0;
+            const cycles = distinct > 0 ? Math.max(1, Math.round(blocks.length / distinct)) : 0;
+            const idealSwitches = distinct > 0 ? Math.max(0, cycles * distinct - 1) : 0;
+
+            // 표준 CYCLE 순서 준수율 : 다음 블록이 '표준 순환상 다음 품종'인가
+            const produced = order.filter(k => runCount[k]);
+            const extra = Object.keys(runCount).filter(k => order.indexOf(k) === -1);
+            const ring = produced.concat(extra);
+            let okCnt = 0;
+            for (let i = 1; i < blocks.length; i++) {
+                const ci = ring.indexOf(blocks[i - 1]);
+                if (ci === -1) continue;
+                if (blocks[i] === ring[(ci + 1) % ring.length]) okCnt++;
+            }
+            const orderRate = switches > 0 ? Math.round((okCnt / switches) * 100) : (blocks.length > 0 ? 100 : 0);
+
+            return { blocks, runCount, distinct, switches, cycles, idealSwitches, orderRate, ring, hasData: blocks.length > 0 };
+        }
+
+        // 26.1~8월 실적 기반 설비별 '월평균 전환 횟수' = 관리 기준선
+        function baselineSwitches(records, mName, excludeYm) {
+            const months = [...new Set(records.map(p => (p.date ? p.date.substring(0, 7) : null)).filter(Boolean))]
+                .filter(m => m >= BASELINE_FROM && m <= BASELINE_TO && m !== excludeYm).sort();
+            const vals = [];
+            months.forEach(m => {
+                const st = analyzeCycleMonth(records, m, mName);
+                if (st.hasData) vals.push(st.switches);
+            });
+            if (vals.length === 0) return { avg: null, n: 0, months: [] };
+            return { avg: vals.reduce((a, b) => a + b, 0) / vals.length, n: vals.length, months };
+        }
+
         // 🚀 [ENHANCED] CDM CYCLE TIME 분석 매트릭스 표 랜더링 로직 (평균주기 & 변동성 표준편차 열 적용)
         function renderCycleTable() {
             const tbody = document.getElementById('cycle-table-body');
@@ -2559,7 +2653,7 @@
                 <th class="border border-slate-200 font-black text-slate-800 bg-slate-100">${m1Code}</th>
                 <th class="border border-slate-200 font-black bg-amber-100 text-amber-900">${m0Code}</th>
                 <th class="border border-slate-200 font-black bg-sky-100 text-sky-900" title="같은 품종을 다시 작업하기까지의 평균 간격(일). 길수록 몰아서 생산.">평균주기</th>
-                <th class="border border-slate-200 font-black bg-emerald-100 text-emerald-900" title="당월 이 품종을 새로 걸어 올린 횟수(전환 SET-UP 횟수). 적을수록 공정 LOSS가 작아 우수.">전환횟수(LOSS)</th>
+                <th class="border border-slate-200 font-black bg-emerald-100 text-emerald-900" title="당월 이 품종이 몇 개의 연속 구간(블록)으로 생산됐는지를 설비의 '사이클 수'와 비교. 사이클마다 1블록이면 정상, 그보다 쪼개지면 불필요한 공정교체.">블록 / 사이클</th>
             `;
 
             for (let day = 1; day <= daysInMonth; day++) {
@@ -2605,8 +2699,11 @@
             let stableCount = 0;
             let totalCategoryRows = 0;
             let totalCategoryRowsWithRun = 0;   // 당월 실적이 있는 품종 행 수 (전환 안정도 분모)
-            let totalSwitches = 0;          // 전체 설비 품종 전환 횟수 합
-            let worstSwitchMachine = { name: '-', cnt: -1 };
+            let totalSwitches = 0;          // 당월 실제 전환 횟수 합
+            let totalBaseSwitches = 0;      // 26.1~8월 기준선 합
+            let totalOverSwitches = 0;      // 기준 초과(관리 필요) 합
+            let orderRateSum = 0, orderRateCnt = 0;
+            let worstSwitchMachine = { name: '-', cnt: 0, base: 0, over: -999, orderRate: 0 };
 
             // ✅ [FIX] 합계/STS/원형外 는 "품종행 누적"이 아니라 원본 데이터에서 직접 집계 → 중복·누락 원천 차단
             const catTotals = {
@@ -2644,32 +2741,37 @@
                     catTotals['원형外'].days[day] += mOther.filter(p => p.date === dStr).reduce((a,c)=>a+(c.amount||0), 0) / 1000;
                 }
 
-                // 🚀 [개념 정정] 품종 전환(SET-UP) 횟수 = 공정 LOSS 지표. 적을수록 좋음.
+                // 🚀 [개념 정정 v2] 설비별 표준 CYCLE 대비 + 26.1~8월 월평균(기준선) 대비 전환 관리
                 const hasCoilQt = mCategories.some(c => c.steel === 'COIL QT');
-                const catKeyOf = (p) => {
-                    if (hasCoilQt && p.isCoilQt === true) return 'COIL QT';
-                    const st = (p.steelType === 'STS강') ? 'STS' : '일반강';
-                    const sh = ((p.shapeRaw || '원형') === '원형') ? '원형' : '원형外';
-                    return `${st} ${sh}`;
-                };
-                const daySeq = [];
-                for (let day = 1; day <= daysInMonth; day++) {
-                    const dStr = `${targetYM}-${String(day).padStart(2, '0')}`;
-                    const keys = [...new Set(mData.filter(p => p.date === dStr).map(catKeyOf))];
-                    keys.forEach(k => daySeq.push(k));
-                }
-                let mSwitch = 0;
-                const runCount = {};
-                daySeq.forEach((k, i) => {
-                    if (i > 0 && daySeq[i] !== daySeq[i-1]) mSwitch++;
-                    if (i === 0 || daySeq[i] !== daySeq[i-1]) runCount[k] = (runCount[k] || 0) + 1;
-                });
-                totalSwitches += mSwitch;
-                if (mSwitch > worstSwitchMachine.cnt) worstSwitchMachine = { name: mName, cnt: mSwitch };
+                const cyc = analyzeCycleMonth(mData, targetYM, mName);
+                const runCount = cyc.runCount;
+                const mSwitch = cyc.switches;
+                const distinctCats = cyc.distinct;
+                const mCycles = cyc.cycles;
 
-                let mSwitchCls = 'bg-emerald-100 text-emerald-800 border-emerald-300';
-                if (mSwitch >= 10) mSwitchCls = 'bg-red-100 text-red-800 border-red-300';
-                else if (mSwitch >= 5) mSwitchCls = 'bg-amber-100 text-amber-800 border-amber-300';
+                const base = baselineSwitches(mData, mName, targetYM);
+                const baseAvg = (base.avg !== null) ? base.avg : cyc.idealSwitches;   // 기준 실적 없으면 표준 CYCLE 이론값
+                const baseLabel = (base.avg !== null) ? `26.1~8월 월평균 ${baseAvg.toFixed(1)}회 (${base.n}개월)` : `표준 CYCLE 이론 ${baseAvg}회`;
+                const overBase = cyc.hasData ? (mSwitch - baseAvg) : 0;
+
+                totalSwitches += mSwitch;
+                totalBaseSwitches += (cyc.hasData ? baseAvg : 0);
+                if (cyc.hasData && overBase > 0) totalOverSwitches += overBase;
+                if (cyc.hasData && overBase > worstSwitchMachine.over) {
+                    worstSwitchMachine = { name: mName, cnt: mSwitch, base: baseAvg, over: overBase, orderRate: cyc.orderRate };
+                }
+                if (cyc.hasData) { orderRateSum += cyc.orderRate; orderRateCnt++; }
+
+                let mSwitchCls = 'bg-slate-100 text-slate-500 border-slate-200';
+                if (cyc.hasData) {
+                    if (overBase > 1.0) mSwitchCls = 'bg-red-100 text-red-800 border-red-300';
+                    else if (overBase > 0) mSwitchCls = 'bg-amber-100 text-amber-800 border-amber-300';
+                    else mSwitchCls = 'bg-emerald-100 text-emerald-800 border-emerald-300';
+                }
+                const idealSeqTxt = (IDEAL_CYCLE[mName] || []).join(' → ') + ' ↺';
+                const mSwitchTitle = !cyc.hasData
+                    ? '당월 실적 없음'
+                    : `표준 CYCLE: ${idealSeqTxt}\n당월 ${mCycles}사이클 · 품종 ${distinctCats}종 · 전환 ${mSwitch}회\n관리 기준선: ${baseLabel}\n${overBase > 0 ? '기준 초과 ' + overBase.toFixed(1) + '회 → 관리 필요' : '기준 이내 (양호)'}`;
 
                 mCategories.forEach((cat, cIdx) => {
                     totalCategoryRows++;
@@ -2702,20 +2804,22 @@
                         allMeanCount++;
                     }
 
-                    // 🚀 [개념 정정] 전환 횟수(당월 SET-UP 횟수) 기준 등급 판단 — 적을수록 우수(전환 LOSS 최소)
+                    // 🚀 [개념 정정 v3] 블록 수를 '당월 사이클 수' 기준으로 판정.
+                    //    한 사이클에 한 품종은 1블록이 정상. 사이클 수를 넘겨 쪼개졌으면 그만큼 불필요한 공정교체.
                     const catRuns = runCount[cat.name === 'COIL QT' ? 'COIL QT' : `${cat.steel} ${cat.shape}`] || 0;
                     let sdBadgeHtml = `<span class="text-slate-400 text-[10px]">-</span>`;
                     if (catRuns > 0) {
-                        if (catRuns <= 2) {
+                        totalCategoryRowsWithRun++;
+                        const over = catRuns - mCycles;   // 사이클 수 초과로 쪼개진 횟수
+                        if (over <= 0) {
                             stableCount++;
-                            sdBadgeHtml = `<span class="px-1.5 py-0.2 rounded text-[9.5px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300" title="당월 ${catRuns}회만 걸어 몰아서 생산 → 전환 LOSS 최소">${catRuns}회 (연속생산·우수)</span>`;
-                        } else if (catRuns <= 4) {
-                            sdBadgeHtml = `<span class="px-1.5 py-0.2 rounded text-[9.5px] font-bold bg-amber-100 text-amber-800 border border-amber-300" title="당월 ${catRuns}회 전환 → 전환 LOSS 보통">${catRuns}회 (보통)</span>`;
+                            sdBadgeHtml = `<span class="px-1.5 py-0.2 rounded text-[9.5px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300" title="당월 ${mCycles}사이클 운영 기준, ${catRuns}블록은 정상 범위 (사이클마다 몰아서 생산)">${catRuns}블록 / ${mCycles}사이클 (정상)</span>`;
+                        } else if (over === 1) {
+                            sdBadgeHtml = `<span class="px-1.5 py-0.2 rounded text-[9.5px] font-bold bg-amber-100 text-amber-800 border border-amber-300" title="당월 ${mCycles}사이클인데 ${catRuns}블록으로 쪼개짐 → 불필요한 공정교체 1회 유발">${catRuns}블록 (분할 +1)</span>`;
                         } else {
-                            sdBadgeHtml = `<span class="px-1.5 py-0.2 rounded text-[9.5px] font-bold bg-red-100 text-red-800 border border-red-300" title="당월 ${catRuns}회 전환 → 원형↔원형外 / 일반강↔STS 교체마다 공정 LOSS 발생">${catRuns}회 (잦은전환·LOSS)</span>`;
+                            sdBadgeHtml = `<span class="px-1.5 py-0.2 rounded text-[9.5px] font-bold bg-red-100 text-red-800 border border-red-300" title="당월 ${mCycles}사이클인데 ${catRuns}블록으로 흩어짐 → 불필요한 공정교체 ${over}회 유발">${catRuns}블록 (분할 +${over}·LOSS)</span>`;
                         }
                     }
-                    if (catRuns > 0) totalCategoryRowsWithRun++;
 
                     // 검증용: 화면에 표시된 품종 행들의 당월 합 (원본 총계와 대사)
                     displayedSum.m0 += catData.filter(p => p.date && p.date.startsWith(targetYM)).reduce((a,c)=>a+(c.amount||0), 0) / 1000;
@@ -2726,7 +2830,9 @@
                         const mRatio = mPlan > 0 ? Math.round((monthCurrentSum / mPlan) * 100) : 0;
                         bodyHtml += `<td rowspan="${mCategories.length}" class="border border-slate-200 font-black text-slate-900 bg-slate-50 uppercase">
                                         <div>${mName}</div>
-                                        <div class="mt-0.5"><span class="px-1 py-0.2 rounded text-[8.5px] font-black border ${mSwitchCls}" title="당월 이 설비의 품종 전환(SET-UP) 총 횟수 — 적을수록 스케줄 생산성 우수">전환 ${mSwitch}회</span></div>
+                                        <div class="mt-0.5"><span class="px-1 py-0.2 rounded text-[8.5px] font-black border ${mSwitchCls}" title="${mSwitchTitle}">전환 ${mSwitch}회${cyc.hasData ? ` <span class="opacity-70">/ 기준 ${baseAvg.toFixed(1)}</span>` : ''}</span></div>
+                                        ${cyc.hasData ? `<div class="mt-0.5 text-[8px] font-black ${overBase > 1.0 ? 'text-red-600' : overBase > 0 ? 'text-amber-700' : 'text-emerald-700'}">${overBase > 0 ? `초과 +${overBase.toFixed(1)}회 관리필요` : '기준 이내 ✔'}</div>
+                                        <div class="text-[8px] font-bold ${cyc.orderRate >= 80 ? 'text-sky-700' : 'text-slate-500'}" title="표준 CYCLE 순서(${idealSeqTxt})대로 넘어간 전환 비율">순서준수 ${cyc.orderRate}% · ${mCycles}사이클</div>` : ''}
                                      </td>
                                      <td rowspan="${mCategories.length}" class="border border-slate-200 font-bold text-slate-700 font-mono-num">${mPlan.toLocaleString()}</td>
                                      <td rowspan="${mCategories.length}" class="border border-slate-200 font-black text-sky-800 font-mono-num" title="설비 원본 실적 합계 (품종행 합과 일치)">${fmtT(monthCurrentSum)}</td>
@@ -2809,17 +2915,27 @@
             const kpiMeanEl = document.getElementById('cycle-kpi-mean');
             const kpiStabEl = document.getElementById('cycle-kpi-stability');
             if (kpiMeanEl) kpiMeanEl.innerText = `${avgIntervalAll}일`;
-            if (kpiStabEl) kpiStabEl.innerText = `${stabilityRatio}%`;
+            if (kpiStabEl) {
+                kpiStabEl.innerText = `${totalOverSwitches > 0 ? '+' : ''}${totalOverSwitches.toFixed(1)}회`;
+                kpiStabEl.className = `text-xl font-black font-mono-num ${totalOverSwitches > 0 ? 'text-red-700' : 'text-emerald-800'}`;
+            }
+            const kpiStabSub = document.getElementById('cycle-kpi-stability-sub');
+            if (kpiStabSub) {
+                kpiStabSub.innerText = totalOverSwitches > 0 ? '관리 필요' : '기준 이내 ✔';
+                kpiStabSub.className = `text-[9px] font-bold px-1.5 py-0.5 rounded border ${totalOverSwitches > 0 ? 'text-red-700 bg-red-50 border-red-200' : 'text-emerald-700 bg-emerald-50 border-emerald-200'}`;
+            }
 
             // AI 진단 브리핑
             const aiGuideEl = document.getElementById('cycle-ai-prediction');
             if (aiGuideEl) {
                 const overallRatio = Math.round((grandMonthTotal / grandPlanTotal) * 100);
-                const lossHours = ((totalSwitches * CHANGEOVER_LOSS_MIN) / 60).toFixed(1);
-                aiGuideEl.innerHTML = `선택하신 <b>[${targetYM}]</b> CDM 전 설비 <b>품종 전환 횟수는 총 ${totalSwitches}회</b>이며, 전환이 적은(2회 이하) 품종 비율은 <b>${stabilityRatio}%</b>, 평균 작업 주기는 <b>약 ${avgIntervalAll}일</b>입니다.<br>
-                ⚠️ <b>전환 LOSS 개념:</b> 원형↔원형外, 일반강↔STS 로 바뀔 때마다 다이스·세팅 교체 공정 LOSS가 발생합니다. 따라서 <b class="text-emerald-700">전환이 적고 한 품종을 몰아서 연속 생산할수록 스케줄 생산성이 좋은 것</b>이며, 잦은 전환은 개선 대상입니다.<br>
-                💡 <b>진단:</b> 전환이 가장 잦은 설비는 <code>${worstSwitchMachine.name}</code> (<b>${worstSwitchMachine.cnt > 0 ? worstSwitchMachine.cnt : 0}회</b>)로, 전환 1회당 ${CHANGEOVER_LOSS_MIN}분 기준 당월 누적 전환 LOSS는 <b>약 ${lossHours}시간</b>으로 추정됩니다. 동일 품종을 인접 일자로 묶어 배치하면 LOSS를 직접 줄일 수 있습니다. 진도율 기준 월 계획 대비 달성률은 <b>${overallRatio}%</b> 입니다.`;
-            }
+                const wasteHours = ((totalOverSwitches * CHANGEOVER_LOSS_MIN) / 60).toFixed(1);
+                const avgOrderRate = orderRateCnt > 0 ? Math.round(orderRateSum / orderRateCnt) : 0;
+                const cycleRef = MACHINE_ORDER.map(m => `<code>${m}</code> ${(IDEAL_CYCLE[m] || []).join('→')}↺`).join(' &nbsp;·&nbsp; ');
+                aiGuideEl.innerHTML = `선택하신 <b>[${targetYM}]</b> CDM 전 설비 <b>실제 공정교체 ${totalSwitches}회</b> / <b>관리 기준선(26.1~8월 월평균) ${totalBaseSwitches.toFixed(1)}회</b> → <b class="${totalOverSwitches > 0 ? 'text-red-600' : 'text-emerald-700'}">기준 초과 ${totalOverSwitches.toFixed(1)}회</b>. 표준 CYCLE 순서 준수율 <b>${avgOrderRate}%</b>, 사이클 내 분할 없이 생산한 품종 비율 <b>${stabilityRatio}%</b>, 평균 작업 주기 <b>약 ${avgIntervalAll}일</b>.<br>
+                📋 <b>설비별 표준 CYCLE(순환):</b> <span class="text-[10px]">${cycleRef}</span><br>
+                ⚠️ <b>판정 기준:</b> 한 달에 사이클을 2~3회 도는 것은 정상입니다. 문제는 <b class="text-red-600">사이클 순서를 벗어나 같은 품종이 여러 번 쪼개지는 것</b>이며, 이때만 불필요한 공정교체(원형↔원형外 / 일반강↔STS)가 늘어납니다. 따라서 절대 횟수가 아니라 <b>설비별 26.1~8월 월평균 대비 초과분</b>을 관리 대상으로 봅니다.<br>
+                💡 <b>진단:</b> 기준 초과가 가장 큰 설비는 <code>${worstSwitchMachine.name}</code> (실적 <b>${worstSwitchMachine.cnt}회</b> / 기준 <b>${(worstSwitchMachine.base || 0).toFixed(1)}회</b> → 초과 <b>${worstSwitchMachine.over > 0 ? '+' + worstSwitchMachine.over.toFixed(1) : '0'}회</b>, 순서준수 ${worstSwitchMachine.orderRate}%)입니다. 전환 1회당 ${CHANGEOVER_LOSS_MIN}분 기준, 초과분만 해소해도 당월 <b>약 ${wasteHours}시간</b>을 회수할 수 있습니다. 진도율 기준 월 계획 대비 달성률은 <b>${overallRatio}%</b> 입니다.`;            }
         }
     </script>
 </body>
