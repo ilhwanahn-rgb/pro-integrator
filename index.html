@@ -1730,7 +1730,7 @@
                 
                 let rawSteel = String(getVal(row, ['강종', '재질', '강종구분', 'STEEL', 'MATERIAL', '품명', '강종명']) || '').trim().toUpperCase();
                 let steelType = "탄소강";
-                if (rawSteel.includes("STS") || rawSteel.includes("스텐") || rawSteel.includes("304") || rawSteel.includes("316") || rawSteel.includes("STAINLESS")) steelType = "STS강";
+                if (rawSteel.includes("STS") || rawSteel.includes("430") || rawSteel.includes("304") || rawSteel.includes("316") || rawSteel.includes("SUS")) steelType = "STS강";
                 else if (rawSteel.includes("합금") || rawSteel.includes("SCM") || rawSteel.includes("SNCM") || rawSteel.includes("ALLOY")) steelType = "합금강";
                 else if (rawSteel.includes("쾌삭") || rawSteel.includes("SUM") || rawSteel.includes("FREE")) steelType = "쾌삭강";
                 else steelType = "탄소강";
