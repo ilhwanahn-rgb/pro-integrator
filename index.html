@@ -1730,7 +1730,7 @@
                 
                 let rawSteel = String(getVal(row, ['강종', '재질', '강종구분', 'STEEL', 'MATERIAL', '품명', '강종명']) || '').trim().toUpperCase();
                 let steelType = "탄소강";
-                if (rawSteel.includes("STS") || rawSteel.includes("SUS430") || rawSteel.includes("CSS303FS") || rawSteel.includes("CSS430F") || rawSteel.includes("PSS430F") || rawSteel.includes("SUS310") || rawSteel.includes("SUS316TI") || rawSteel.includes("304") || rawSteel.includes("316/316L") || rawSteel.includes("CSS303FS") || rawSteel.includes("SUS303F") || rawSteel.includes("SUS410") || rawSteel.includes("SUS420F") || rawSteel.includes("SUS303")) steelType = "STS강";
+                if (rawSteel.includes("STS") || rawSteel.includes("SUS430") || rawSteel.includes("416") || rawSteel.includes("PSS430FH") || rawSteel.includes("CSS303FS") || rawSteel.includes("CSS430F") || rawSteel.includes("PSS430F") || rawSteel.includes("SUS310") || rawSteel.includes("SUS316TI") || rawSteel.includes("304") || rawSteel.includes("316/316L") || rawSteel.includes("CSS303FS") || rawSteel.includes("SUS303F") || rawSteel.includes("SUS410") || rawSteel.includes("SUS420F") || rawSteel.includes("SUS303")) steelType = "STS강";
                 else if (rawSteel.includes("합금") || rawSteel.includes("SCM") || rawSteel.includes("SNCM")|| rawSteel.includes("SCR") || rawSteel.includes("SNM") || rawSteel.includes("ALLOY")) steelType = "합금강";
                 else if (rawSteel.includes("쾌삭") || rawSteel.includes("SUM") || rawSteel.includes("FREE")) steelType = "쾌삭강";
                 else steelType = "탄소강";
