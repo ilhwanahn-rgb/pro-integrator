@@ -202,7 +202,8 @@
                 <div class="nav-icon active" onclick="switchTab('main')" id="nav-main" title="메인 대시보드"><i class="fa-solid fa-chart-line"></i></div>
                 <div class="nav-icon" onclick="switchTab('analytics')" id="nav-analytics" title="CD 생산성 분석"><i class="fa-solid fa-chart-pie"></i></div>
                 <div class="nav-icon" onclick="switchTab('cycle')" id="nav-cycle" title="CDM CYCLE TIME 분석"><i class="fa-solid fa-arrows-spin"></i></div>
-                
+                <div class="nav-icon" onclick="switchTab('insp')" id="nav-insp" title="다기능 부적합 현황 (PND-3 · PND-4)"><i class="fa-solid fa-microscope"></i></div>
+
                 <div class="w-6 h-[1px] bg-slate-600 my-1"></div>
                 <div class="nav-icon hover:text-sky-400" onclick="toggleEditMode()" id="nav-edit-mode" title="대시보드 배치/크기 자유 편집"><i class="fa-solid fa-up-down-left-right"></i></div>
                 <div class="nav-icon hover:text-emerald-400" onclick="openWidgetManager()" title="위젯 추가/숨김 관리"><i class="fa-solid fa-cubes"></i></div>
@@ -755,6 +756,182 @@
                 </div>
             </div>
         </main>
+
+        <!-- TAB 4: 다기능 부적합 현황 (PND-3 · PND-4 다기능 검사실적 기반) -->
+        <main class="flex-1 p-2.5 lg:p-4 overflow-y-auto h-screen relative z-10 tab-content" id="tab-insp">
+            <header class="flex flex-col xl:flex-row justify-between items-start xl:items-end gap-2 mb-2.5">
+                <div>
+                    <h1 class="text-lg lg:text-xl font-black tracking-tight text-slate-900 uppercase flex items-center gap-2">
+                        <span class="w-2 h-5 bg-violet-600 rounded"></span>
+                        다기능 부적합 현황 <span class="text-violet-700 font-semibold ml-0.5 text-sm lg:text-base">PND-3 · PND-4 검사실적 기반</span>
+                    </h1>
+                    <p class="text-slate-500 font-bold text-[9.5px] mt-0.5 ml-3">부적합률 = <b class="text-slate-700">부적합중량 ÷ 검사중량</b> (중량 기준) · 아이템 · 강종 · 제강사 · PCD 호기별 경향성 자동 진단</p>
+                </div>
+
+                <div class="flex flex-wrap items-center gap-2 glass-panel p-1.5 !flex-row !h-auto border border-slate-300">
+                    <span id="insp-source-badge" class="text-[9px] font-black px-1.5 py-0.5 rounded border bg-amber-50 text-amber-700 border-amber-300">데모 데이터</span>
+
+                    <div class="flex items-center gap-1 px-1.5 border-l border-slate-300">
+                        <i class="fa-solid fa-calendar-check text-violet-600 text-[11px]"></i>
+                        <select id="insp-period-select" class="bg-slate-100 border border-slate-300 text-[11px] font-bold text-slate-800 py-0.5 px-1.5 rounded-md outline-none cursor-pointer" onchange="onInspPeriodChange()">
+                            <option value="LATEST">기간 로딩 중...</option>
+                        </select>
+                    </div>
+
+                    <div class="flex bg-slate-100 p-0.5 rounded-md border border-slate-300" title="TOP3 · 경향성 · 파레토 · 교차분석에 적용 (상단 KPI는 항상 PND-3/PND-4/합계 모두 표시)">
+                        <button id="btn-insp-ALL" onclick="setInspEquip('ALL')" class="px-2 py-0.5 text-[10.5px] font-bold rounded bg-white text-violet-700 border border-slate-300 transition-all">전체 합계</button>
+                        <button id="btn-insp-PND-3" onclick="setInspEquip('PND-3')" class="px-2 py-0.5 text-[10.5px] font-bold rounded text-slate-500 transition-all">PND-3</button>
+                        <button id="btn-insp-PND-4" onclick="setInspEquip('PND-4')" class="px-2 py-0.5 text-[10.5px] font-bold rounded text-slate-500 transition-all">PND-4</button>
+                    </div>
+
+                    <div class="flex items-center gap-1 px-1.5 border-l border-slate-300" title="검사량이 이 값 미만인 아이템/구분은 순위·판정에서 제외 (소량 LOT 1건으로 불량률이 튀는 왜곡 방지)">
+                        <span class="text-[9px] font-black text-slate-500">최소 검사량</span>
+                        <input type="number" id="insp-min-ton" class="target-input text-violet-700" value="5" step="1" min="0" onchange="renderInsp()">
+                        <span class="text-[8.5px] font-bold text-slate-500">TON</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- 데모 데이터 안내 배너 -->
+            <div id="insp-demo-banner" class="hidden mb-2.5 px-3 py-2 rounded-lg border border-amber-300 bg-amber-50 flex flex-wrap items-center justify-between gap-2">
+                <p id="insp-demo-msg" class="text-[10.5px] font-bold text-amber-900 leading-relaxed">
+                    <i class="fa-solid fa-circle-info text-amber-600 mr-1"></i>
+                    현재 <b>데모 데이터</b>로 표시 중입니다.
+                </p>
+                <button onclick="openModal()" class="px-2.5 py-1 text-[10.5px] font-black rounded-md text-white bg-amber-600 hover:bg-amber-700 shadow-sm flex items-center gap-1 shrink-0"><i class="fa-solid fa-sliders"></i> 연동 설정 열기</button>
+            </div>
+
+            <!-- ① KPI : PND-3 / PND-4 / 합계 / 주요 부적합 유형 -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-2 mb-2.5">
+                <div class="glass-panel p-3 border-l-4" style="border-left-color:#1f77b4" id="insp-kpi-PND-3"></div>
+                <div class="glass-panel p-3 border-l-4" style="border-left-color:#ff7f0e" id="insp-kpi-PND-4"></div>
+                <div class="glass-panel p-3 border-l-4" style="border-left-color:#1f2d3d" id="insp-kpi-TOTAL"></div>
+                <div class="glass-panel p-3 border-l-4 border-l-rose-500" id="insp-kpi-type"></div>
+            </div>
+
+            <!-- ② 불량률 TOP3 아이템 + 월별 추이 -->
+            <div class="grid grid-cols-1 xl:grid-cols-12 gap-2.5 mb-2.5">
+                <div class="glass-panel p-3 xl:col-span-5">
+                    <div class="flex justify-between items-center mb-1.5 border-b border-slate-200 pb-1">
+                        <h3 class="text-xs font-black text-slate-900 flex items-center gap-1.5">
+                            <i class="fa-solid fa-ranking-star text-red-600 text-xs"></i> 부적합률 TOP3 아이템
+                        </h3>
+                        <span id="insp-top3-badge" class="text-[8.5px] font-extrabold text-red-700 bg-red-50 px-1.5 py-0.5 rounded border border-red-200">-</span>
+                    </div>
+                    <div id="insp-top3" class="space-y-1.5"></div>
+                    <p class="text-[8.5px] font-bold text-slate-400 mt-1.5"><i class="fa-solid fa-hand-pointer mr-0.5"></i> 카드를 클릭하면 해당 아이템의 부적합 LOT 이력을 볼 수 있습니다.</p>
+                </div>
+
+                <div class="glass-panel p-3 xl:col-span-7">
+                    <div class="flex justify-between items-center mb-1 border-b border-slate-200 pb-1">
+                        <h3 class="text-xs font-black text-slate-900 flex items-center gap-1.5">
+                            <i class="fa-solid fa-chart-line text-violet-600 text-xs"></i> 월별 부적합률 추이 (PND-3 · PND-4 · 합계)
+                        </h3>
+                        <span class="text-[8.5px] font-extrabold text-slate-500">선: 부적합률(%) · 막대: 검사량(TON)</span>
+                    </div>
+                    <div class="h-[235px] w-full relative"><canvas id="inspTrendChart"></canvas></div>
+                </div>
+            </div>
+
+            <!-- ③ 경향성 분석 (아이템 · 강종 · 제강사 · PCD 호기) + 자동 진단 -->
+            <div class="grid grid-cols-1 xl:grid-cols-12 gap-2.5 mb-2.5">
+                <div class="glass-panel p-3 xl:col-span-7">
+                    <div class="flex flex-wrap justify-between items-center gap-1.5 mb-1 border-b border-slate-200 pb-1">
+                        <h3 class="text-xs font-black text-slate-900 flex items-center gap-1.5">
+                            <i class="fa-solid fa-magnifying-glass-chart text-violet-600 text-xs"></i> 경향성 분석 · <span id="insp-dim-title">아이템별</span> 부적합률
+                        </h3>
+                        <div class="flex bg-slate-100 p-0.5 rounded-md border border-slate-300" id="insp-dim-tabs">
+                            <button id="btn-dim-item" onclick="setInspDim('item')" class="px-2 py-0.5 text-[10px] font-bold rounded transition-all">아이템</button>
+                            <button id="btn-dim-steel" onclick="setInspDim('steel')" class="px-2 py-0.5 text-[10px] font-bold rounded transition-all">강종</button>
+                            <button id="btn-dim-maker" onclick="setInspDim('maker')" class="px-2 py-0.5 text-[10px] font-bold rounded transition-all">제강사</button>
+                            <button id="btn-dim-pcd" onclick="setInspDim('pcd')" class="px-2 py-0.5 text-[10px] font-bold rounded transition-all">PCD 호기</button>
+                        </div>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-2 text-[8.5px] font-bold text-slate-500 mb-1">
+                        <span><span class="inline-block w-2.5 h-2.5 rounded-sm align-middle mr-0.5" style="background:#d62728"></span>집중관리</span>
+                        <span><span class="inline-block w-2.5 h-2.5 rounded-sm align-middle mr-0.5" style="background:#f59e0b"></span>주의</span>
+                        <span><span class="inline-block w-2.5 h-2.5 rounded-sm align-middle mr-0.5" style="background:#1f77b4"></span>양호</span>
+                        <span><span class="inline-block w-4 border-t-2 border-dashed border-slate-700 align-middle mr-0.5"></span>전체 평균</span>
+                    </div>
+                    <div class="h-[260px] w-full relative"><canvas id="inspDimChart"></canvas></div>
+                </div>
+
+                <div class="glass-panel p-3 xl:col-span-5 bg-gradient-to-br from-violet-50/70 via-white to-white border-l-4 border-l-violet-600">
+                    <div class="flex items-center justify-between mb-1.5 border-b border-slate-200 pb-1">
+                        <h3 class="text-xs font-black text-slate-900 flex items-center gap-1.5">
+                            <i class="fa-solid fa-wand-magic-sparkles text-amber-500 text-xs"></i> 경향성 자동 진단
+                        </h3>
+                        <span id="insp-diag-scope" class="text-[8.5px] font-extrabold text-violet-700 bg-violet-50 px-1.5 py-0.5 rounded border border-violet-200">-</span>
+                    </div>
+                    <ul id="insp-insights" class="space-y-1.5 text-[10.5px] font-bold text-slate-700 leading-relaxed"></ul>
+                    <p class="text-[8.5px] font-bold text-slate-400 mt-2 leading-relaxed border-t border-slate-100 pt-1.5">
+                        판정 기준 · <b class="text-red-600">집중관리</b>: 평균 대비 1.5배 이상 + (통계 유의 또는 최근 개월 60% 이상 평균 초과) ·
+                        <b class="text-amber-600">주의</b>: 평균 대비 1.2배 이상 · 통계 유의: LOT 기준 비율검정 p&lt;0.05
+                    </p>
+                </div>
+            </div>
+
+            <!-- ④ 구분별 상세 레지스트리 -->
+            <div class="glass-panel overflow-hidden mb-2.5">
+                <div class="p-2.5 border-b border-slate-200 bg-slate-50 flex flex-wrap justify-between items-center gap-1">
+                    <h3 class="text-xs font-black text-slate-900 flex items-center gap-1.5"><i class="fa-solid fa-table-list text-violet-700 text-xs"></i> <span id="insp-table-title">아이템별</span> 부적합 상세 레지스트리</h3>
+                    <div class="flex items-center gap-1.5">
+                        <span id="insp-sum-check" class="text-[9px] font-black px-1.5 py-0.5 rounded border bg-slate-100 text-slate-500 border-slate-200">집계 검증 대기</span>
+                        <span class="text-[8.5px] font-bold text-slate-500">행 클릭 시 LOT 이력</span>
+                    </div>
+                </div>
+                <div class="overflow-x-auto p-1.5 max-h-[380px] overflow-y-auto">
+                    <table class="w-full text-xs">
+                        <thead>
+                            <tr class="bg-slate-100/80">
+                                <th class="py-1 px-2 text-center text-[10px]">#</th>
+                                <th id="insp-th-dim" class="py-1 px-2 text-left text-[10px]">아이템</th>
+                                <th class="py-1 px-2 text-right text-[10px]">검사량(T)</th>
+                                <th class="py-1 px-2 text-right text-[10px] text-red-600">부적합(T)</th>
+                                <th class="py-1 px-2 text-right text-[10px] text-red-700">부적합률</th>
+                                <th class="py-1 px-2 text-right text-[10px]" style="color:#1f77b4">PND-3</th>
+                                <th class="py-1 px-2 text-right text-[10px]" style="color:#c2410c">PND-4</th>
+                                <th class="py-1 px-2 text-right text-[10px]" title="전체 평균 부적합률 대비 배수">평균 대비</th>
+                                <th class="py-1 px-2 text-center text-[10px]" title="추세 기간 중 전체 평균을 초과한 개월 수 / 실적이 있는 개월 수">지속성</th>
+                                <th class="py-1 px-2 text-center text-[10px]" title="월별 부적합률 선형 기울기 (%p/월)">추세</th>
+                                <th class="py-1 px-2 text-center text-[10px]" title="해당 구분 vs 나머지, LOT 기준 두 비율 검정">통계</th>
+                                <th class="py-1 px-2 text-left text-[10px]">주요 부적합</th>
+                                <th class="py-1 px-2 text-center text-[10px]">판정</th>
+                            </tr>
+                        </thead>
+                        <tbody id="insp-dim-body"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ⑤ 부적합 유형 파레토 + 교차 분석 -->
+            <div class="grid grid-cols-1 xl:grid-cols-12 gap-2.5 mb-6">
+                <div class="glass-panel p-3 xl:col-span-5">
+                    <div class="flex justify-between items-center mb-1 border-b border-slate-200 pb-1">
+                        <h3 class="text-xs font-black text-slate-900 flex items-center gap-1.5">
+                            <i class="fa-solid fa-chart-column text-rose-600 text-xs"></i> 부적합 유형 파레토
+                        </h3>
+                        <span class="text-[8.5px] font-extrabold text-slate-500">막대: 부적합중량(T) · 선: 누적%</span>
+                    </div>
+                    <div class="h-[250px] w-full relative"><canvas id="inspParetoChart"></canvas></div>
+                </div>
+
+                <div class="glass-panel p-3 xl:col-span-7">
+                    <div class="flex flex-wrap justify-between items-center gap-1.5 mb-1 border-b border-slate-200 pb-1">
+                        <h3 class="text-xs font-black text-slate-900 flex items-center gap-1.5">
+                            <i class="fa-solid fa-table-cells text-violet-600 text-xs"></i> 교차 분석 히트맵 (부적합률 %)
+                        </h3>
+                        <div class="flex items-center gap-1 text-[10px] font-bold text-slate-600">
+                            <select id="insp-cross-row" class="bg-slate-100 border border-slate-300 text-[10.5px] font-bold text-slate-800 py-0.5 px-1 rounded-md outline-none cursor-pointer" onchange="renderInsp()"></select>
+                            <span>×</span>
+                            <select id="insp-cross-col" class="bg-slate-100 border border-slate-300 text-[10.5px] font-bold text-slate-800 py-0.5 px-1 rounded-md outline-none cursor-pointer" onchange="renderInsp()"></select>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto no-scrollbar" id="insp-cross-wrap"></div>
+                    <p class="text-[8.5px] font-bold text-slate-400 mt-1">색이 진할수록 전체 평균 대비 부적합률이 높음 · 빈칸(·)은 검사량 부족 · 두 요인이 겹칠 때만 높아지는 조합을 찾는 용도</p>
+                </div>
+            </div>
+        </main>
     </div>
 
     <!-- PRO-Bot 챗봇 창 -->
@@ -887,6 +1064,53 @@
         </div>
     </div>
 
+    <!-- 🚀 [NEW] 다기능 부적합 상세 LOT 이력 모달 -->
+    <div id="insp-detail-modal" class="modal-bg" onclick="if(event.target===this) closeInspDetail()">
+        <div class="glass-panel w-full max-w-4xl overflow-hidden border border-slate-300 !justify-start">
+            <div class="p-4 border-b border-slate-200 flex justify-between items-center bg-violet-800 text-white">
+                <div class="flex items-center gap-2.5 min-w-0">
+                    <div class="bg-white/20 p-2 rounded-md text-white"><i class="fa-solid fa-microscope text-lg"></i></div>
+                    <div class="min-w-0">
+                        <h3 class="text-sm font-black text-white truncate" id="insp-modal-title">부적합 LOT 이력</h3>
+                        <p class="text-[9.5px] text-violet-100 font-bold" id="insp-modal-sub">Multi-function Inspection NG Log</p>
+                    </div>
+                </div>
+                <i class="fa-solid fa-xmark text-lg text-white cursor-pointer hover:text-violet-200" onclick="closeInspDetail()"></i>
+            </div>
+            <div class="p-4 space-y-3">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-center" id="insp-modal-kpis"></div>
+                <div>
+                    <h4 class="text-xs font-black text-slate-800 mb-1 flex items-center gap-1.5"><i class="fa-solid fa-list-ol text-rose-600"></i> 부적합 유형 구성</h4>
+                    <div id="insp-modal-types" class="flex flex-wrap gap-1.5"></div>
+                </div>
+                <div>
+                    <h4 class="text-xs font-black text-slate-800 mb-1 flex items-center gap-1.5"><i class="fa-solid fa-list-check text-violet-600"></i> 부적합 발생 LOT (최근순)</h4>
+                    <div class="max-h-[280px] overflow-y-auto border border-slate-200 rounded-lg p-1 bg-slate-50">
+                        <table class="w-full text-xs">
+                            <thead>
+                                <tr>
+                                    <th class="py-1 px-2 text-left text-[10px]">검사일</th>
+                                    <th class="py-1 px-2 text-center text-[10px]">다기능</th>
+                                    <th class="py-1 px-2 text-center text-[10px]">PCD</th>
+                                    <th class="py-1 px-2 text-left text-[10px]">아이템</th>
+                                    <th class="py-1 px-2 text-left text-[10px]">강종</th>
+                                    <th class="py-1 px-2 text-left text-[10px]">제강사</th>
+                                    <th class="py-1 px-2 text-right text-[10px]">검사(kg)</th>
+                                    <th class="py-1 px-2 text-right text-[10px] text-red-600">부적합(kg)</th>
+                                    <th class="py-1 px-2 text-left text-[10px]">부적합명</th>
+                                </tr>
+                            </thead>
+                            <tbody id="insp-modal-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="p-3 bg-slate-50 border-t border-slate-200 flex justify-end">
+                <button onclick="closeInspDetail()" class="px-4 py-1.5 rounded-md text-xs font-bold bg-slate-800 text-white hover:bg-slate-900">닫기</button>
+            </div>
+        </div>
+    </div>
+
     <!-- 위젯 관리자 모달 -->
     <div id="widget-manager-modal" class="modal-bg">
         <div class="glass-panel w-full max-w-lg overflow-hidden border border-slate-300 !justify-start">
@@ -929,6 +1153,14 @@
                     <label class="block text-[10px] font-extrabold text-slate-500 uppercase tracking-widest mb-1">03. CD 포장실적 CSV URL (Pack Sheet)</label>
                     <input type="text" id="modal-url-pack" class="gs-input" placeholder="https://docs.google.com/.../pub?output=csv">
                 </div>
+                <div class="pt-2 border-t border-dashed border-slate-300">
+                    <label class="block text-[10px] font-extrabold text-violet-700 uppercase tracking-widest mb-1"><i class="fa-solid fa-microscope mr-1"></i>04. 다기능 검사실적 CSV URL (PND-3 · PND-4)</label>
+                    <input type="text" id="modal-url-insp" class="gs-input" placeholder="https://docs.google.com/.../pub?gid=...&single=true&output=csv">
+                    <p class="text-[9.5px] font-bold text-slate-500 mt-1 leading-relaxed">
+                        필수: <b>일자 · 다기능 호기(PND-3/4) · 중량 · 자주검사(정상/부적합)</b> / 분석용: <b>품목명 · 강종 · 제강사(메이커) · PCD 호기 · 부적합명</b><br>
+                        헤더 이름이 조금 달라도 자동 인식합니다 (PND·PCD 컬럼은 값으로도 찾음). 부적합중량 컬럼이 있으면 그 값을, 없으면 자주검사 '부적합' LOT의 중량 전체를 부적합량으로 집계합니다.
+                    </p>
+                </div>
             </div>
             <div class="p-4 bg-slate-50 border-t border-slate-200 flex justify-end gap-2">
                 <button onclick="closeModal()" class="px-4 py-2 rounded-md text-xs font-bold text-slate-500 hover:bg-slate-200">취소</button>
@@ -944,6 +1176,8 @@
         let SHARED_PROD_URL = localStorage.getItem('GS_PROD_URL') || "https://docs.google.com/spreadsheets/d/e/2PACX-1vQTdp-wPWsANap0UF_ZvT8HzCbnaqxyiL86rxNfZEqA6ir9m5AczfkDYh2LLBVrYuGSxGiS62i51wRh/pub?gid=1999060895&single=true&output=csv";
         let SHARED_DOWN_URL = localStorage.getItem('GS_DOWN_URL') || "https://docs.google.com/spreadsheets/d/e/2PACX-1vQTdp-wPWsANap0UF_ZvT8HzCbnaqxyiL86rxNfZEqA6ir9m5AczfkDYh2LLBVrYuGSxGiS62i51wRh/pub?gid=1618063531&single=true&output=csv";
         let SHARED_PACK_URL = localStorage.getItem('GS_PACK_URL') || "https://docs.google.com/spreadsheets/d/e/2PACX-1vQTdp-wPWsANap0UF_ZvT8HzCbnaqxyiL86rxNfZEqA6ir9m5AczfkDYh2LLBVrYuGSxGiS62i51wRh/pub?gid=433609624&single=true&output=csv";
+        // ✅ [NEW] 다기능 검사실적 (PND-3 / PND-4) — 구글 시트 '다기능 검사실적' 탭의 CSV 게시 URL (설정 모달 04번)
+        let SHARED_INSP_URL = localStorage.getItem('GS_INSP_URL') || "https://docs.google.com/spreadsheets/d/e/2PACX-1vQTdp-wPWsANap0UF_ZvT8HzCbnaqxyiL86rxNfZEqA6ir9m5AczfkDYh2LLBVrYuGSxGiS62i51wRh/pub?gid=2067876329&single=true&output=csv";
 
         const MACHINE_ORDER = ['PCD-0-2', 'PCD-0-3', 'PCD-1', 'PCD-5', 'PCD-2-2', 'PCD-3', 'PCD-4'];
         const CHANGEOVER_LOSS_MIN = 30; // 품종 전환(다이스·세팅 교체) 1회당 표준 공정 LOSS 추정치(분)
@@ -1301,6 +1535,7 @@
             if (chartShapeInstance) chartShapeInstance.resize();
             if (chartHeatInstance) chartHeatInstance.resize();
             if (analyticsChartInstance) analyticsChartInstance.resize();
+            if (typeof inspCharts === 'object' && inspCharts) Object.values(inspCharts).forEach(c => { try { c && c.resize(); } catch (e) {} });
         }
 
         function updateTime() {
@@ -1332,7 +1567,7 @@
         }
 
         function switchTab(tabId) {
-            ['main', 'analytics', 'cycle'].forEach(id => {
+            ['main', 'analytics', 'cycle', 'insp'].forEach(id => {
                 const tabEl = document.getElementById(`tab-${id}`);
                 const navEl = document.getElementById(`nav-${id}`);
                 if (tabEl) tabEl.classList.remove('active');
@@ -1344,6 +1579,7 @@
 
             if (tabId === 'analytics') updateAnalytics();
             else if (tabId === 'cycle') renderCycleTable();
+            else if (tabId === 'insp') renderInsp();
             else setTimeout(resizeAllCharts, 100);
         }
 
@@ -1646,6 +1882,7 @@
             document.getElementById('modal-url-prod').value = SHARED_PROD_URL;
             document.getElementById('modal-url-down').value = SHARED_DOWN_URL;
             document.getElementById('modal-url-pack').value = SHARED_PACK_URL;
+            document.getElementById('modal-url-insp').value = SHARED_INSP_URL;
             document.getElementById('sync-modal').style.display = 'flex';
         }
 
@@ -1657,10 +1894,12 @@
             SHARED_PROD_URL = document.getElementById('modal-url-prod').value.trim();
             SHARED_DOWN_URL = document.getElementById('modal-url-down').value.trim();
             SHARED_PACK_URL = document.getElementById('modal-url-pack').value.trim();
+            SHARED_INSP_URL = document.getElementById('modal-url-insp').value.trim();
 
             localStorage.setItem('GS_PROD_URL', SHARED_PROD_URL);
             localStorage.setItem('GS_DOWN_URL', SHARED_DOWN_URL);
             localStorage.setItem('GS_PACK_URL', SHARED_PACK_URL);
+            localStorage.setItem('GS_INSP_URL', SHARED_INSP_URL);
 
             closeModal();
             fetchGoogleSheetsData();
@@ -1793,6 +2032,10 @@
                 const cTab = document.getElementById('tab-cycle');
                 if (cTab && cTab.classList.contains('active')) renderCycleTable();
             } catch (e) { console.error('renderCycleTable error', e); }
+            try {
+                const iTab = document.getElementById('tab-insp');
+                if (iTab && iTab.classList.contains('active')) renderInsp();
+            } catch (e) { console.error('renderInsp error', e); }
         }
 
         async function fetchOneSheet(url, dataType) {
@@ -1805,7 +2048,7 @@
                 const text = await res.text();
                 if (typeof Papa === 'undefined') { console.warn('PapaParse 미로딩 - CSV 파싱 생략'); return null; }
                 const aoa = Papa.parse(text, { skipEmptyLines: true }).data;
-                const parsed = extractDataFromAOA(aoa, dataType);
+                const parsed = dataType === 'INSP' ? extractInspData(aoa) : extractDataFromAOA(aoa, dataType);
                 return (parsed && parsed.length > 0) ? parsed : null;
             } catch (e) {
                 if (e && e.name === 'AbortError') console.warn(dataType + ' 시트 응답 없음 (' + (SYNC_TIMEOUT_MS / 1000) + '초 초과)');
@@ -1825,19 +2068,25 @@
             const failed = [];
 
             try {
-                const [prodRes, downRes, packRes] = await Promise.all([
+                const [prodRes, downRes, packRes, inspRes] = await Promise.all([
                     fetchOneSheet(SHARED_PROD_URL, 'PROD'),
                     fetchOneSheet(SHARED_DOWN_URL, 'DOWN'),
-                    fetchOneSheet(SHARED_PACK_URL, 'PACK')
+                    fetchOneSheet(SHARED_PACK_URL, 'PACK'),
+                    fetchOneSheet(SHARED_INSP_URL, 'INSP')
                 ]);
 
                 if (prodRes) { prodData = prodRes; loadedFlags.push('생산:' + prodRes.length); } else failed.push('생산');
                 if (downRes) { downData = downRes; loadedFlags.push('불가동:' + downRes.length); } else failed.push('불가동');
                 if (packRes) { packData = packRes; loadedFlags.push('포장:' + packRes.length); } else failed.push('포장');
+                // 다기능 검사실적: URL 미설정이면 실패로 치지 않고 데모 유지
+                if (inspRes) { inspData = inspRes; inspIsDemo = false; inspSyncState = 'ok'; loadedFlags.push('다기능:' + inspRes.length); }
+                else if (SHARED_INSP_URL && SHARED_INSP_URL.trim()) { failed.push('다기능'); inspSyncState = 'failed'; }
+                else inspSyncState = 'nourl';
             } catch (e) {
                 console.error('동기화 처리 오류', e);
             } finally {
                 isSyncing = false;
+                if (inspSyncState === 'loading') inspSyncState = (SHARED_INSP_URL && SHARED_INSP_URL.trim()) ? 'failed' : 'nourl';
 
                 if (loadedFlags.length > 0) {
                     updateLed('synced', 'Live Sync (' + loadedFlags.join(' / ') + ')');
@@ -2931,6 +3180,861 @@
                 ⚠️ <b>판정 기준:</b> 한 달에 사이클을 2~3회 도는 것은 정상입니다. 문제는 <b class="text-red-600">사이클 순서를 벗어나 같은 품종이 여러 번 쪼개지는 것</b>이며, 이때만 불필요한 공정교체(원형↔원형外 / 일반강↔STS)가 늘어납니다. 따라서 절대 횟수가 아니라 <b>설비별 26.1~8월 월평균 대비 초과분</b>을 관리 대상으로 봅니다.<br>
                 💡 <b>진단:</b> 기준 초과가 가장 큰 설비는 <code>${worstSwitchMachine.name}</code> (실적 <b>${worstSwitchMachine.cnt}회</b> / 기준 <b>${(worstSwitchMachine.base || 0).toFixed(1)}회</b> → 초과 <b>${worstSwitchMachine.over > 0 ? '+' + worstSwitchMachine.over.toFixed(1) : '0'}회</b>, 순서준수 ${worstSwitchMachine.orderRate}%)입니다. 전환 1회당 ${CHANGEOVER_LOSS_MIN}분 기준, 초과분만 해소해도 당월 <b>약 ${wasteHours}시간</b>을 회수할 수 있습니다. 진도율 기준 월 계획 대비 달성률은 <b>${overallRatio}%</b> 입니다.`;            }
         }
+
+
+        // =====================================================================
+        // 🚀 [NEW] 다기능 부적합 현황 (PND-3 / PND-4 다기능 검사실적 기반)
+        //  - 데이터: 구글 시트 '다기능 검사실적' 탭 (설정 모달 04번 URL)
+        //  - 부적합률 = 부적합중량 ÷ 검사중량 (중량 기준)
+        //  - 경향성: 아이템 · 강종 · 제강사 · PCD 호기별 (평균 대비 배수 / 지속성 / 추세 / LOT 비율검정)
+        //  ※ var 로 선언: 위쪽 동기화 코드가 먼저 참조해도 TDZ 오류가 나지 않도록
+        // =====================================================================
+        var inspData = null;
+        var inspIsDemo = true;
+        var inspCharts = {};
+        var inspPeriod = 'LATEST';
+        var inspEquip = 'ALL';
+        var inspDim = 'item';
+        var inspLastCtx = null;
+        var inspSyncState = 'loading';   // loading | ok | failed | nourl
+        var INSP_EQUIPS = ['PND-3', 'PND-4'];
+        var INSP_COLORS = { 'PND-3': '#1f77b4', 'PND-4': '#ff7f0e', 'TOTAL': '#1f2d3d' };
+        var INSP_VERDICT_COLORS = { '집중관리': '#d62728', '주의': '#f59e0b', '양호': '#1f77b4', '표본부족': '#cbd5e1' };
+        var INSP_TREND_MONTHS = 12;
+        var INSP_DIMS = {
+            item:  { label: '아이템',  get: r => r.itemKey },
+            steel: { label: '강종',    get: r => r.steel },
+            maker: { label: '제강사',  get: r => r.maker },
+            pcd:   { label: 'PCD 호기', get: r => r.pcd },
+            pnd:   { label: '다기능 호기', get: r => r.pnd }
+        };
+
+        function escHtml(s) {
+            return String(s === null || s === undefined ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+        }
+
+        // 'CD * ASTM A193 B7 * ACDQT * 원형' → 'ASTM A193 B7 · ACDQT · 원형' (차트·히트맵 라벨용)
+        function inspShortName(name, max) {
+            let s = String(name || '').replace(/^CD\s*\*\s*/i, '').replace(/\s*\*\s*/g, ' · ').trim();
+            if (max && s.length > max) s = s.substring(0, max - 1) + '…';
+            return s;
+        }
+
+        function normPnd(v) {
+            const s = String(v || '').toUpperCase().replace(/\s/g, '');
+            if (!s) return '미분류';
+            let m = s.match(/PND-?0*(\d+)/); if (m) return 'PND-' + m[1];
+            m = s.match(/^0*(\d+)(호기|호)?$/); if (m) return 'PND-' + m[1];
+            if (s.includes('다기능')) { m = s.match(/(\d+)/); if (m) return 'PND-' + m[1]; }
+            return s;
+        }
+
+        function normPcd(v) {
+            let s = String(v || '').toUpperCase().replace(/\s/g, '');
+            if (!s) return '미기재';
+            s = s.replace(/호기$/, '');
+            if (/^\d/.test(s)) s = 'PCD-' + s;
+            s = s.replace(/^PCD(?=\d)/, 'PCD-');
+            return s;
+        }
+
+        function classifySteel(raw) {
+            const s = String(raw || '').toUpperCase();
+            if (/STS|SUS|PSS4|CSS3|CSS4|304|316|410|416|420|430/.test(s)) return 'STS강';
+            if (/합금|SCM|SNCM|SCR|SNM|ALLOY/.test(s)) return '합금강';
+            if (/쾌삭|SUM|FREE/.test(s)) return '쾌삭강';
+            return '탄소강';
+        }
+
+        // 헤더 이름이 조금 달라도 인식되도록 키워드 매칭 (정확일치 → 포함일치 순)
+        function extractInspData(aoa) {
+            if (!Array.isArray(aoa) || aoa.length === 0) return [];
+            const norm = h => (h === null || h === undefined) ? '' : String(h).replace(/﻿/g, '').replace(/\s/g, '').toUpperCase();
+
+            let hIdx = -1;
+            for (let i = 0; i < Math.min(20, aoa.length); i++) {
+                const row = aoa[i]; if (!row) continue;
+                const s = row.map(norm).join('|');
+                const hits = ['검사일', '일자', '날짜', 'DATE', '호기', '설비', 'PND', '중량', '작업량', '자주검사', '부적합', '불량', '강종', '품목', '품명', '메이커', '제강사'].filter(k => s.includes(k)).length;
+                if (hits >= 3) { hIdx = i; break; }
+            }
+            if (hIdx === -1) { window.INSP_PARSE_ERROR = '헤더 행(일자·설비·중량 등)을 찾지 못했습니다.'; return []; }
+            const headers = aoa[hIdx].map(norm);
+
+            const find = (keys, excludes = []) => {
+                const ok = h => h && !excludes.some(x => h.includes(x));
+                for (const k of keys) { const i = headers.findIndex(h => ok(h) && h === k); if (i !== -1) return i; }
+                for (const k of keys) { const i = headers.findIndex(h => ok(h) && h.includes(k)); if (i !== -1) return i; }
+                return -1;
+            };
+            const NG_WORDS = ['부적합', '불량', 'NG', '불합격'];
+            const C = {
+                date:   find(['검사일자', '검사일', '작업일자', '생산일자', '일자', '날짜', 'DATE']),
+                pnd:    find(['다기능호기', '다기능설비', '검사호기', '검사설비', 'PND호기', 'PND', '다기능']),
+                pcd:    find(['PCD호기', '인발호기', '인발설비', '전공정설비', '전공정', '생산호기', 'PCD']),
+                code:   find(['품목코드', 'ITEMCODE', '품번', '자재코드']),
+                item:   find(['품목명', '품명', '아이템', 'ITEM', '제품명'], ['코드', 'CODE']),
+                steel:  find(['원자재강종', '강종', '재질', 'STEEL', 'GRADE']),
+                maker:  find(['제강사', '메이커', 'MAKER', '제조사', '공급사']),
+                dia:    find(['선경', '치수', 'DIA', 'SIZE'], ['원자재']),
+                insW:   find(['검사중량', '검사량', '투입중량', '제품중량', '작업량', '생산량', '중량', '실적', 'WEIGHT'], NG_WORDS),
+                ngW:    find(['부적합중량', '불량중량', '부적합량', '불량량', 'NG중량']),
+                ngName: find(['부적합명', '불량명', '부적합유형', '불량유형', '부적합사유', '불량사유', '결함명', '부적합내용', 'DEFECT'], ['중량', '부적합량', '불량량', 'KG']),
+                lot:    find(['검사번호', 'LOT', '제조번호', '코일번호', '번들번호']),
+                // ✅ 자주검사 결과 (정상 / 부적합) — 부적합 판정의 기준 컬럼
+                result: find(['자주검사결과', '자주검사판정', '자주검사', '합격여부', '판정', '검사결과', '품질판정'])
+            };
+
+            // ✅ 값 기반 컬럼 탐지 : 헤더가 '작업설비'처럼 모호해도 값에 PND-3/4, PCD-x 가 들어있는 열을 찾아냄
+            const sample = aoa.slice(hIdx + 1, hIdx + 401).filter(r => r && r.join('').trim());
+            const colByValue = (re, exclude = []) => {
+                let best = -1, bestRatio = 0;
+                headers.forEach((h, ci) => {
+                    if (exclude.includes(ci)) return;
+                    let hit = 0, nonEmpty = 0;
+                    sample.forEach(r => { const v = r[ci] === undefined || r[ci] === null ? '' : String(r[ci]).trim(); if (!v) return; nonEmpty++; if (re.test(v.replace(/\s/g, ''))) hit++; });
+                    const ratio = nonEmpty ? hit / nonEmpty : 0;
+                    if (ratio > bestRatio) { bestRatio = ratio; best = ci; }
+                });
+                return bestRatio >= 0.3 ? best : -1;
+            };
+            const pndByVal = colByValue(/^(PND|다기능)/i);
+            if (pndByVal !== -1) C.pnd = pndByVal;
+            const pcdByVal = colByValue(/^PCD/i, [C.pnd]);
+            if (pcdByVal !== -1) C.pcd = pcdByVal;
+            else if (C.pcd === C.pnd) C.pcd = -1;
+            if (C.result === -1) C.result = colByValue(/^(정상|부적합|합격|불합격|OK|NG)$/i);
+
+            window.INSP_PARSE_ERROR = '';
+            if (C.date < 0 || C.insW < 0) {
+                window.INSP_PARSE_ERROR = `${C.date < 0 ? '일자' : ''}${C.date < 0 && C.insW < 0 ? '·' : ''}${C.insW < 0 ? '중량' : ''} 컬럼을 찾지 못했습니다.`;
+                console.warn('다기능 검사실적: ' + window.INSP_PARSE_ERROR, headers); return [];
+            }
+            window.INSP_COLUMN_MAP = Object.fromEntries(Object.entries(C).map(([k, v]) => [k, v >= 0 ? aoa[hIdx][v] : null]));
+            console.info('[다기능 검사실적] 컬럼 매핑', window.INSP_COLUMN_MAP);
+
+            const NG_RE = /부적합|불합격|불량|NG|FAIL|이상|폐기|재작업|보류/i;
+            // 자주검사 컬럼이면 '정상' 이외 값(결함명 직접 기재 포함)은 모두 부적합으로 본다
+            const resIsSelfInsp = C.result >= 0 && headers[C.result].includes('자주검사');
+            const OK_RE = /^(정상|합격|적합|양호|OK|PASS|Y)$/i;
+            const out = [];
+            for (let i = hIdx + 1; i < aoa.length; i++) {
+                const row = aoa[i]; if (!row || !row.join('').trim()) continue;
+                const g = idx => (idx >= 0 && row[idx] !== undefined && row[idx] !== null) ? String(row[idx]).trim() : '';
+                const date = normalizeDate(g(C.date));
+                if (!date || !/^\d{4}-\d{2}-\d{2}$/.test(date)) continue;
+                const insW = safeNum(g(C.insW));
+                if (insW <= 0) continue;
+
+                // 부적합 판정: ① 자주검사 결과가 부적합 → NG LOT ② 부적합중량 컬럼이 있으면 그 값, 없으면 LOT 중량 전체
+                const res = g(C.result).replace(/\s/g, '');
+                const resNg = !!res && !OK_RE.test(res) && (NG_RE.test(res) || resIsSelfInsp);
+                let ngW = C.ngW >= 0 ? safeNum(g(C.ngW)) : 0;
+                if (resNg && ngW <= 0) ngW = insW;
+                ngW = Math.min(Math.max(ngW, 0), insW);
+
+                let ngFull = g(C.ngName).replace(/^부적합\s*\[\d+\]\s*-\s*/, '').trim();
+                // 부적합명 컬럼이 없고 자주검사 칸에 결함명이 직접 적힌 경우(예: '직진도 불량') 그 값을 사용
+                if (!ngFull && ngW > 0 && res && !/^(부적합|불합격|NG|불량)$/i.test(res)) ngFull = g(C.result);
+                let ngName = ngFull.split(/[,/]/)[0].trim();
+                if (ngW > 0 && !ngName) ngName = '미기재';
+
+                const code = g(C.code), name = g(C.item);
+                const steel = (g(C.steel) || '미기재').toUpperCase();
+                out.push({
+                    date, ym: date.substring(0, 7),
+                    pnd: normPnd(g(C.pnd)), pcd: normPcd(g(C.pcd)),
+                    itemKey: code || name || '미기재', itemName: name || code || '미기재',
+                    steel, steelClass: classifySteel(steel),
+                    maker: g(C.maker) || '미기재',
+                    dia: g(C.dia), lot: g(C.lot),
+                    insW, ngW, ngName: ngW > 0 ? ngName : '', ngFull: ngW > 0 ? (ngFull || ngName) : ''
+                });
+            }
+            return out;
+        }
+
+        // ---------- 데모 데이터 (시트 미연동 시 화면 구성 확인용 · 가상 값) ----------
+        function buildInspDemoData() {
+            let seed = 20260930;
+            const rnd = () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+            const pick = (arr, wKey = 'w') => { const tot = arr.reduce((a, c) => a + (c[wKey] || 1), 0); let x = rnd() * tot; for (const it of arr) { x -= (it[wKey] || 1); if (x <= 0) return it; } return arr[arr.length - 1]; };
+            const ITEMS = [
+                { code: 'DEMO-01', name: 'SCM435 Φ14.2 볼트용', steel: 'SCM435', w: 14, f: 1.0 },
+                { code: 'DEMO-02', name: 'S45C Φ22.0 샤프트용', steel: 'S45C', w: 12, f: 0.8 },
+                { code: 'DEMO-03', name: 'SUM24L Φ9.5 쾌삭', steel: 'SUM24L', w: 9, f: 1.2 },
+                { code: 'DEMO-04', name: 'SUS304 Φ12.0 정밀', steel: 'SUS304', w: 6, f: 1.9 },
+                { code: 'DEMO-05', name: 'SCM440 Φ28.0 QT', steel: 'SCM440', w: 8, f: 1.1 },
+                { code: 'DEMO-06', name: '10B21 Φ11.3 냉간압조', steel: '10B21', w: 10, f: 0.7 },
+                { code: 'DEMO-07', name: 'S20C Φ10.0 핀용', steel: 'S20C', w: 9, f: 0.9 },
+                { code: 'DEMO-08', name: 'SUS430FR Φ8.0 자성', steel: 'SUS430FR', w: 4, f: 2.4 },
+                { code: 'DEMO-09', name: 'SCR420 Φ18.0 기어용', steel: 'SCR420', w: 7, f: 1.0 },
+                { code: 'DEMO-10', name: 'SAE1045 Φ25.4 로드', steel: 'SAE1045', w: 6, f: 0.8 }
+            ];
+            const MAKERS = [{ n: '제강사 A', w: 38, f: 0.85 }, { n: '제강사 B', w: 27, f: 1.0 }, { n: '제강사 C', w: 20, f: 1.9 }, { n: '제강사 D', w: 15, f: 1.05 }];
+            const PCDS = [{ n: 'PCD-0-2', w: 10, f: 1.0 }, { n: 'PCD-0-3', w: 9, f: 0.9 }, { n: 'PCD-1', w: 14, f: 0.95 }, { n: 'PCD-2-2', w: 13, f: 1.0 }, { n: 'PCD-3', w: 15, f: 1.8 }, { n: 'PCD-4', w: 22, f: 0.9 }, { n: 'PCD-5', w: 12, f: 1.0 }];
+            const SURF = [{ n: 'ECT 불량', w: 45 }, { n: 'SCAB', w: 15 }, { n: 'PIT', w: 10 }, { n: '찍힘, 긁힘', w: 8 }];
+            const PROC = [{ n: '직진도 불량', w: 40 }, { n: 'DIES MARK', w: 20 }, { n: '선경 OVER', w: 12 }, { n: '선경 미달', w: 10 }, { n: '초,종물 단척봉', w: 8 }];
+            const out = [];
+            const months = ['2026-01', '2026-02', '2026-03', '2026-04', '2026-05', '2026-06', '2026-07', '2026-08', '2026-09'];
+            months.forEach((ym, mi) => {
+                INSP_EQUIPS.forEach(pnd => {
+                    const n = 70 + Math.floor(rnd() * 20);
+                    for (let k = 0; k < n; k++) {
+                        const it = pick(ITEMS), mk = pick(MAKERS), pc = pick(PCDS);
+                        const day = 1 + Math.floor(rnd() * 28);
+                        const insW = Math.round(2000 + rnd() * 6000);
+                        const makerTrend = mk.n === '제강사 C' ? (1 + mi * 0.07) : 1;   // 데모: C 소재는 월이 갈수록 악화
+                        const surfP = 0.045 * it.f * mk.f * makerTrend;
+                        const procP = 0.035 * (pnd === 'PND-4' ? 1.35 : 1.0) * pc.f * (it.steel.startsWith('SUS') ? 1.4 : 1.0);
+                        let ngW = 0, ngName = '';
+                        const r = rnd();
+                        if (r < surfP) { ngName = pick(SURF).n; ngW = Math.round(insW * (0.08 + rnd() * 0.35)); }
+                        else if (r < surfP + procP) { ngName = pick(PROC).n; ngW = Math.round(insW * (0.05 + rnd() * 0.3)); }
+                        const date = `${ym}-${String(day).padStart(2, '0')}`;
+                        out.push({
+                            date, ym, pnd, pcd: pc.n, itemKey: it.code, itemName: it.name, steel: it.steel, steelClass: classifySteel(it.steel),
+                            maker: mk.n, dia: '', lot: `DEMO${ym.replace('-', '')}${pnd.slice(-1)}${String(k + 1).padStart(3, '0')}`,
+                            insW, ngW, ngName, ngFull: ngName
+                        });
+                    }
+                });
+            });
+            return out;
+        }
+
+        // ---------- 공통 집계 유틸 ----------
+        function inspAgg(list) {
+            let ins = 0, ng = 0, lots = 0, ngLots = 0;
+            for (const r of list) { ins += r.insW; ng += r.ngW; lots++; if (r.ngW > 0) ngLots++; }
+            return { ins, ng, lots, ngLots, rate: ins > 0 ? ng / ins * 100 : 0 };
+        }
+        function inspGroup(list, fn) {
+            const m = new Map();
+            for (const r of list) { const k = fn(r); if (!m.has(k)) m.set(k, []); m.get(k).push(r); }
+            return m;
+        }
+        function normCdf(z) {
+            const t = 1 / (1 + 0.2316419 * Math.abs(z));
+            const d = 0.3989423 * Math.exp(-z * z / 2);
+            const p = d * t * (0.3193815 + t * (-0.3565638 + t * (1.781478 + t * (-1.821256 + t * 1.330274))));
+            return z >= 0 ? 1 - p : p;
+        }
+        // 두 비율 검정 (LOT 기준: 부적합 발생 LOT 비율) — 해당 구분 vs 나머지
+        function twoPropTest(x1, n1, x2, n2) {
+            if (n1 < 5 || n2 < 5) return null;
+            const p = (x1 + x2) / (n1 + n2);
+            if (p <= 0 || p >= 1) return null;
+            const z = (x1 / n1 - x2 / n2) / Math.sqrt(p * (1 - p) * (1 / n1 + 1 / n2));
+            return { z, p: 2 * (1 - normCdf(Math.abs(z))) };
+        }
+        function linSlope(ys) {
+            const n = ys.length; if (n < 3) return null;
+            const mx = (n - 1) / 2, my = ys.reduce((a, c) => a + c, 0) / n;
+            let num = 0, den = 0;
+            ys.forEach((y, i) => { num += (i - mx) * (y - my); den += (i - mx) * (i - mx); });
+            return den > 0 ? num / den : null;
+        }
+        function ymShift(ym, delta) {
+            const [y, m] = ym.split('-').map(Number);
+            const d = new Date(y, m - 1 + delta, 1);
+            return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+        }
+        function inspFmtT(v) { return (v / 1000).toLocaleString('ko-KR', { minimumFractionDigits: 1, maximumFractionDigits: 1 }); }
+        function inspFmtR(v) { return (v || 0).toFixed(2) + '%'; }
+
+        // ---------- 기간 선택 ----------
+        function getInspPeriodCtx(all) {
+            const months = [...new Set(all.map(r => r.ym))].sort();
+            const years = [...new Set(months.map(m => m.substring(0, 4)))].sort().reverse();
+            const latest = months[months.length - 1] || '';
+            const sel = document.getElementById('insp-period-select');
+            let val = inspPeriod;
+            const validVals = ['ALL', ...years.map(y => 'Y:' + y), ...months.map(m => 'M:' + m)];
+            if (!validVals.includes(val)) val = latest ? 'M:' + latest : 'ALL';
+            inspPeriod = val;
+            if (sel) {
+                sel.innerHTML = [...months].reverse().map(m => `<option value="M:${m}">${m}월 분석</option>`).join('')
+                    + years.map(y => `<option value="Y:${y}">${y}년 누계</option>`).join('')
+                    + `<option value="ALL">전체 기간 누계</option>`;
+                sel.value = val;
+            }
+            let label, inPeriod, endYm, prevIn = null, prevLabel = '';
+            if (val.startsWith('M:')) {
+                const ym = val.slice(2); label = `${ym}월`; endYm = ym;
+                inPeriod = r => r.ym === ym;
+                const pym = ymShift(ym, -1);
+                if (months.includes(pym)) { prevIn = r => r.ym === pym; prevLabel = '전월'; }
+            } else if (val.startsWith('Y:')) {
+                const y = val.slice(2); label = `${y}년 누계`;
+                const ms = months.filter(m => m.startsWith(y)); endYm = ms[ms.length - 1] || latest;
+                inPeriod = r => r.ym.startsWith(y);
+                const py = String(Number(y) - 1);
+                if (years.includes(py)) { prevIn = r => r.ym.startsWith(py); prevLabel = '전년'; }
+            } else {
+                label = '전체 기간'; endYm = latest; inPeriod = () => true;
+            }
+            const windowMonths = months.filter(m => m <= endYm && m > ymShift(endYm, -INSP_TREND_MONTHS));
+            return { label, inPeriod, prevIn, prevLabel, endYm, windowMonths, months };
+        }
+
+        function onInspPeriodChange() {
+            inspPeriod = document.getElementById('insp-period-select').value;
+            renderInsp();
+        }
+        function setInspEquip(eq) {
+            inspEquip = eq;
+            ['ALL', 'PND-3', 'PND-4'].forEach(k => {
+                const b = document.getElementById('btn-insp-' + k);
+                if (b) b.className = `px-2 py-0.5 text-[10.5px] font-bold rounded transition-all ${k === eq ? 'bg-white text-violet-700 border border-slate-300 shadow-xs' : 'text-slate-500'}`;
+            });
+            renderInsp();
+        }
+        function setInspDim(d) { inspDim = d; renderInsp(); }
+
+        // ---------- 구분별(아이템/강종/제강사/PCD) 경향성 통계 ----------
+        function inspDimStats(F, dimKey, windowRecs, windowMonths, minKg) {
+            const fn = INSP_DIMS[dimKey].get;
+            const overall = inspAgg(F);
+            const monthOverall = {};
+            inspGroup(windowRecs, r => r.ym).forEach((list, ym) => { monthOverall[ym] = inspAgg(list); });
+            const winByCat = inspGroup(windowRecs, fn);
+            const rows = [];
+            inspGroup(F, fn).forEach((list, key) => {
+                const a = inspAgg(list);
+                const byPnd = {};
+                INSP_EQUIPS.forEach(p => { byPnd[p] = inspAgg(list.filter(r => r.pnd === p)); });
+                const types = {};
+                list.forEach(r => { if (r.ngW > 0) types[r.ngName] = (types[r.ngName] || 0) + r.ngW; });
+                const topType = Object.entries(types).sort((x, y) => y[1] - x[1])[0] || null;
+                const test = twoPropTest(a.ngLots, a.lots, overall.ngLots - a.ngLots, overall.lots - a.lots);
+
+                // 지속성 · 추세 (추세 기간 = 선택기간 말월 기준 최근 12개월)
+                const wl = winByCat.get(key) || [];
+                const byM = {}; inspGroup(wl, r => r.ym).forEach((l, ym) => { byM[ym] = inspAgg(l); });
+                let mCnt = 0, mOver = 0; const series = [];
+                windowMonths.forEach(ym => {
+                    const c = byM[ym]; if (!c || c.ins <= 0) return;
+                    mCnt++; series.push(c.rate);
+                    if (monthOverall[ym] && c.rate > monthOverall[ym].rate) mOver++;
+                });
+                const slope = linSlope(series);
+                const lift = overall.rate > 0 ? a.rate / overall.rate : 0;
+                const sig = !!(test && test.p < 0.05 && test.z > 0);
+                const persist = mCnt > 0 ? mOver / mCnt : 0;
+                let verdict = '양호';
+                if (a.ins < minKg) verdict = '표본부족';
+                else if (lift >= 1.5 && (sig || (mCnt >= 3 && persist >= 0.6))) verdict = '집중관리';
+                else if (lift >= 1.2) verdict = '주의';
+                const sample = list[0];
+                rows.push({
+                    key, name: dimKey === 'item' ? sample.itemName : key,
+                    steel: sample.steel, list, ...a, byPnd, topType, typeShare: topType && a.ng > 0 ? topType[1] / a.ng * 100 : 0,
+                    test, sig, lift, mCnt, mOver, persist, slope, verdict
+                });
+            });
+            rows.sort((x, y) => (y.ins >= minKg) - (x.ins >= minKg) || y.rate - x.rate);
+            return { rows, overall };
+        }
+
+        // ---------- 메인 렌더 ----------
+        function renderInsp() {
+            if (!Array.isArray(inspData) || inspData.length === 0) { inspData = buildInspDemoData(); inspIsDemo = true; }
+            const all = inspData;
+            const ctx = getInspPeriodCtx(all);
+            const minTonEl = document.getElementById('insp-min-ton');
+            const minKg = Math.max(0, parseFloat(minTonEl ? minTonEl.value : 5) || 0) * 1000;
+
+            // 데이터 출처 배지 / 데모 배너
+            const srcBadge = document.getElementById('insp-source-badge');
+            if (srcBadge) {
+                srcBadge.innerText = inspIsDemo ? '데모 데이터 (시트 미연동)' : `시트 연동 · ${all.length.toLocaleString()}건`;
+                srcBadge.className = `text-[9px] font-black px-1.5 py-0.5 rounded border ${inspIsDemo ? 'bg-amber-50 text-amber-700 border-amber-300' : 'bg-emerald-50 text-emerald-700 border-emerald-300'}`;
+                const MAP_LBL = { date: '일자', pnd: '다기능 호기', pcd: 'PCD 호기', code: '품목코드', item: '품목명', steel: '강종', maker: '제강사', insW: '중량', ngW: '부적합중량', ngName: '부적합명', result: '자주검사(판정)' };
+                const cm = window.INSP_COLUMN_MAP;
+                srcBadge.title = (!inspIsDemo && cm) ? '인식된 컬럼 (대시보드 항목 ← 시트 헤더)\n' + Object.entries(MAP_LBL).map(([k, l]) => `${l} ← ${cm[k] || '(없음)'}`).join('\n') : '';
+                srcBadge.style.cursor = (!inspIsDemo && cm) ? 'help' : '';
+            }
+            const banner = document.getElementById('insp-demo-banner');
+            if (banner) banner.classList.toggle('hidden', !inspIsDemo);
+            const msg = document.getElementById('insp-demo-msg');
+            if (msg && inspIsDemo) {
+                const why = {
+                    loading: '구글 시트 <b>다기능 검사실적</b> 탭을 불러오는 중입니다. 잠시 후 실제 데이터로 바뀝니다.',
+                    nourl: '04번 다기능 검사실적 URL이 비어 있습니다. 설정에서 CSV 게시 URL을 입력하세요.',
+                    failed: window.INSP_PARSE_ERROR
+                        ? `시트는 받았지만 <b>${window.INSP_PARSE_ERROR}</b> 헤더 이름을 확인해 주세요.`
+                        : '다기능 검사실적 시트 연결에 실패했습니다 (게시 여부·URL 확인 후 좌측 ⟳ 동기화).'
+                }[inspSyncState] || '';
+                msg.innerHTML = `<i class="fa-solid fa-circle-info text-amber-600 mr-1"></i> 현재 <b>데모 데이터</b>(제강사 A~D·예시 아이템 등 가상 값, 실제 실적 아님)로 화면 구성만 표시 중입니다. ${why}`;
+            }
+
+            const P = all.filter(ctx.inPeriod);                              // 기간 전체 (PND 구분 무관)
+            const eqFilter = r => inspEquip === 'ALL' || r.pnd === inspEquip;
+            const F = P.filter(eqFilter);                                    // 기간 + 설비 필터
+            const windowRecs = all.filter(r => ctx.windowMonths.includes(r.ym) && eqFilter(r));
+            const scopeTxt = `${ctx.label} · ${inspEquip === 'ALL' ? 'PND-3+4 합계' : inspEquip}`;
+            const scopeEl = document.getElementById('insp-diag-scope'); if (scopeEl) scopeEl.innerText = scopeTxt;
+
+            renderInspKpis(P, all, ctx);
+            const dimStats = {};
+            ['item', 'steel', 'maker', 'pcd'].forEach(d => { dimStats[d] = inspDimStats(F, d, windowRecs, ctx.windowMonths, minKg); });
+            inspLastCtx = { F, dimStats, ctx, minKg };
+
+            renderInspTop3(dimStats.item, minKg, scopeTxt);
+            renderInspTrend(all, ctx);
+            renderInspDim(dimStats[inspDim], minKg);
+            renderInspInsights(F, dimStats, minKg, P);
+            renderInspPareto(F);
+            renderInspCross(F, minKg);
+        }
+
+        function renderInspKpis(P, all, ctx) {
+            const prevP = ctx.prevIn ? all.filter(ctx.prevIn) : null;
+            const defs = [
+                { id: 'PND-3', title: 'PND-3', filt: r => r.pnd === 'PND-3', color: INSP_COLORS['PND-3'], icon: 'fa-3' },
+                { id: 'PND-4', title: 'PND-4', filt: r => r.pnd === 'PND-4', color: INSP_COLORS['PND-4'], icon: 'fa-4' },
+                { id: 'TOTAL', title: '다기능 합계', filt: () => true, color: INSP_COLORS.TOTAL, icon: 'fa-sigma' }
+            ];
+            const sums = {};
+            defs.forEach(d => {
+                const a = inspAgg(P.filter(d.filt)); sums[d.id] = a;
+                const pa = prevP ? inspAgg(prevP.filter(d.filt)) : null;
+                let delta = '';
+                if (pa && pa.ins > 0) {
+                    const dp = a.rate - pa.rate;
+                    const cls = dp > 0.005 ? 'bg-red-50 text-red-700 border-red-200' : dp < -0.005 ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-slate-50 text-slate-600 border-slate-200';
+                    delta = `<span class="text-[8.5px] font-extrabold px-1.5 py-0.5 rounded border ${cls}" title="${ctx.prevLabel} ${inspFmtR(pa.rate)}">${ctx.prevLabel} ${dp > 0 ? '▲' : dp < 0 ? '▼' : ''}${Math.abs(dp).toFixed(2)}%p</span>`;
+                }
+                const el = document.getElementById('insp-kpi-' + d.id);
+                if (!el) return;
+                el.innerHTML = `
+                    <div class="flex justify-between items-center mb-0.5">
+                        <span class="text-[10px] font-black uppercase flex items-center gap-1" style="color:${d.color}"><i class="fa-solid fa-microscope text-[10px]"></i> ${d.title} ${d.id === 'TOTAL' ? '' : '부적합'}</span>
+                        ${delta}
+                    </div>
+                    <div class="flex items-baseline gap-1 mt-0.5">
+                        <h4 class="text-xl lg:text-2xl font-black font-mono-num ${a.rate > 0 ? 'text-slate-900' : 'text-slate-400'}">${a.ins > 0 ? a.rate.toFixed(2) : '-'}</h4>
+                        <span class="text-[10px] font-bold text-slate-500">% 부적합률</span>
+                    </div>
+                    <div class="grid grid-cols-3 gap-1 mt-1.5 pt-1.5 border-t border-slate-100 text-center">
+                        <div><p class="text-[8.5px] font-bold text-slate-400">검사량</p><p class="text-[11px] font-black font-mono-num text-slate-800">${inspFmtT(a.ins)}<span class="text-[8px] text-slate-400 ml-0.5">T</span></p></div>
+                        <div><p class="text-[8.5px] font-bold text-slate-400">부적합</p><p class="text-[11px] font-black font-mono-num text-red-600">${inspFmtT(a.ng)}<span class="text-[8px] text-slate-400 ml-0.5">T</span></p></div>
+                        <div><p class="text-[8.5px] font-bold text-slate-400">NG LOT</p><p class="text-[11px] font-black font-mono-num text-slate-800">${a.ngLots}<span class="text-[8px] text-slate-400">/${a.lots}</span></p></div>
+                    </div>`;
+            });
+
+            // 집계 검증 : PND-3 + PND-4 (+기타) = 합계
+            const others = inspAgg(P.filter(r => !INSP_EQUIPS.includes(r.pnd)));
+            const chkEl = document.getElementById('insp-sum-check');
+            if (chkEl) {
+                const gap = Math.round(sums['PND-3'].ins + sums['PND-4'].ins + others.ins - sums.TOTAL.ins);
+                const gapNg = Math.round(sums['PND-3'].ng + sums['PND-4'].ng + others.ng - sums.TOTAL.ng);
+                const ok = gap === 0 && gapNg === 0;
+                chkEl.className = `text-[9px] font-black px-1.5 py-0.5 rounded border ${ok ? 'bg-emerald-50 text-emerald-700 border-emerald-300' : 'bg-red-50 text-red-700 border-red-300'}`;
+                chkEl.innerText = ok ? `집계 검증 OK · PND-3+PND-4${others.lots ? '+기타' : ''} = 합계 ${inspFmtT(sums.TOTAL.ins)}T` : `집계 차이 ${gap}kg / 부적합 ${gapNg}kg`;
+                chkEl.title = others.lots ? `다기능 호기가 PND-3/4가 아닌(미분류) ${others.lots}건 ${inspFmtT(others.ins)}T 가 합계에만 포함되어 있습니다.` : '호기별 합과 합계가 일치합니다.';
+            }
+
+            // 주요 부적합 유형 카드 (기간 · 설비필터 적용)
+            const F = P.filter(r => inspEquip === 'ALL' || r.pnd === inspEquip);
+            const tot = inspAgg(F);
+            const types = {};
+            F.forEach(r => { if (r.ngW > 0) types[r.ngName] = (types[r.ngName] || 0) + r.ngW; });
+            const top = Object.entries(types).sort((a, b) => b[1] - a[1]).slice(0, 3);
+            const tEl = document.getElementById('insp-kpi-type');
+            if (tEl) {
+                tEl.innerHTML = `
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="text-[10px] font-black text-rose-700 uppercase flex items-center gap-1"><i class="fa-solid fa-bug text-[10px]"></i> 주요 부적합 유형</span>
+                        <span class="text-[8.5px] font-extrabold text-slate-500">${inspEquip === 'ALL' ? '합계' : inspEquip}</span>
+                    </div>
+                    ${top.length === 0 ? '<p class="text-[10px] font-bold text-slate-400 py-3 text-center">부적합 없음</p>' : top.map((t, i) => {
+                        const pct = tot.ng > 0 ? t[1] / tot.ng * 100 : 0;
+                        return `<div class="mb-1">
+                            <div class="flex justify-between text-[10px] font-extrabold"><span class="text-slate-800 truncate">${i + 1}. ${escHtml(t[0])}</span><span class="font-mono-num text-rose-700">${pct.toFixed(0)}%</span></div>
+                            <div class="h-1.5 bg-slate-100 rounded-full overflow-hidden"><div class="h-full rounded-full ${i === 0 ? 'bg-rose-500' : i === 1 ? 'bg-rose-300' : 'bg-rose-200'}" style="width:${pct.toFixed(1)}%"></div></div>
+                        </div>`;
+                    }).join('')}`;
+            }
+        }
+
+        function renderInspTop3(stat, minKg, scopeTxt) {
+            const el = document.getElementById('insp-top3');
+            const badge = document.getElementById('insp-top3-badge');
+            if (badge) badge.innerText = `${scopeTxt} · 검사량 ${minKg / 1000}T 이상`;
+            if (!el) return;
+            const cands = stat.rows.filter(r => r.ins >= minKg && r.ng > 0).sort((a, b) => b.rate - a.rate).slice(0, 3);
+            if (cands.length === 0) { el.innerHTML = '<div class="text-center text-slate-400 text-[10.5px] font-bold py-8">조건에 맞는 부적합 아이템이 없습니다.</div>'; return; }
+            const medal = ['bg-red-600 text-white', 'bg-orange-500 text-white', 'bg-amber-400 text-amber-950'];
+            el.innerHTML = cands.map((r, i) => {
+                const makers = {}; r.list.forEach(x => { makers[x.maker] = (makers[x.maker] || 0) + x.ngW; });
+                const topMaker = Object.entries(makers).sort((a, b) => b[1] - a[1])[0];
+                const pcds = {}; r.list.forEach(x => { pcds[x.pcd] = (pcds[x.pcd] || 0) + x.ngW; });
+                const topPcd = Object.entries(pcds).sort((a, b) => b[1] - a[1])[0];
+                const p3 = r.byPnd['PND-3'], p4 = r.byPnd['PND-4'];
+                return `<div class="top3-row-clickable rounded-lg border border-slate-200 bg-white p-2 flex gap-2 items-stretch" onclick="openInspDetail('item', ${JSON.stringify(r.key).replace(/"/g, '&quot;')})" title="클릭 시 LOT 이력">
+                    <div class="w-7 shrink-0 rounded-md ${medal[i]} flex items-center justify-center text-sm font-black">${i + 1}</div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex justify-between items-start gap-2">
+                            <div class="min-w-0">
+                                <p class="text-[11.5px] font-black text-slate-900 truncate" title="${escHtml(r.name)}">${escHtml(inspShortName(r.name))}</p>
+                                <p class="text-[9px] font-bold text-slate-500 truncate">
+                                    <span class="px-1 rounded bg-slate-100 border border-slate-200">${escHtml(r.steel)}</span>
+                                    ${r.key !== r.name ? `<span class="ml-0.5">${escHtml(r.key)}</span>` : ''}
+                                    · 주요 ${escHtml(r.topType ? r.topType[0] : '-')} ${r.typeShare.toFixed(0)}%
+                                </p>
+                            </div>
+                            <div class="text-right shrink-0">
+                                <p class="text-lg font-black font-mono-num text-red-600 leading-none">${r.rate.toFixed(2)}<span class="text-[9px] ml-0.5">%</span></p>
+                                <p class="text-[8.5px] font-extrabold text-slate-500 mt-0.5">평균 대비 <b class="${r.lift >= 1.5 ? 'text-red-600' : 'text-amber-600'}">${r.lift.toFixed(1)}배</b></p>
+                            </div>
+                        </div>
+                        <div class="flex flex-wrap gap-x-2 gap-y-0.5 mt-1 text-[9px] font-bold text-slate-600">
+                            <span>부적합 <b class="font-mono-num text-slate-800">${inspFmtT(r.ng)}T</b> / 검사 <b class="font-mono-num text-slate-800">${inspFmtT(r.ins)}T</b></span>
+                            <span style="color:${INSP_COLORS['PND-3']}">PND-3 <b class="font-mono-num">${p3.ins > 0 ? p3.rate.toFixed(2) + '%' : '-'}</b></span>
+                            <span style="color:#c2410c">PND-4 <b class="font-mono-num">${p4.ins > 0 ? p4.rate.toFixed(2) + '%' : '-'}</b></span>
+                            ${topMaker ? `<span>제강사 <b>${escHtml(topMaker[0])}</b></span>` : ''}
+                            ${topPcd ? `<span>PCD <b>${escHtml(topPcd[0])}</b></span>` : ''}
+                        </div>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        function renderInspTrend(all, ctx) {
+            const canvas = document.getElementById('inspTrendChart');
+            if (!canvas || !window.Chart) return;
+            if (inspCharts.trend) inspCharts.trend.destroy();
+            const labels = ctx.windowMonths;
+            const byM = inspGroup(all.filter(r => labels.includes(r.ym)), r => r.ym);
+            const series = key => labels.map(ym => {
+                const l = (byM.get(ym) || []).filter(r => key === 'TOTAL' || r.pnd === key);
+                const a = inspAgg(l); return a.ins > 0 ? +a.rate.toFixed(3) : null;
+            });
+            const insS = key => labels.map(ym => +(inspAgg((byM.get(ym) || []).filter(r => r.pnd === key)).ins / 1000).toFixed(1));
+            inspCharts.trend = new Chart(canvas.getContext('2d'), {
+                data: {
+                    labels: labels.map(m => m.substring(2).replace('-', '.')),
+                    datasets: [
+                        { type: 'line', label: 'PND-3 부적합률', data: series('PND-3'), borderColor: INSP_COLORS['PND-3'], backgroundColor: INSP_COLORS['PND-3'], borderWidth: 2.5, pointRadius: 3.5, tension: 0.25, yAxisID: 'y', spanGaps: true, order: 1 },
+                        { type: 'line', label: 'PND-4 부적합률', data: series('PND-4'), borderColor: INSP_COLORS['PND-4'], backgroundColor: INSP_COLORS['PND-4'], borderWidth: 2.5, pointRadius: 3.5, tension: 0.25, yAxisID: 'y', spanGaps: true, order: 1 },
+                        { type: 'line', label: '합계 부적합률', data: series('TOTAL'), borderColor: INSP_COLORS.TOTAL, backgroundColor: INSP_COLORS.TOTAL, borderWidth: 2, borderDash: [5, 4], pointRadius: 2.5, tension: 0.25, yAxisID: 'y', spanGaps: true, order: 0 },
+                        { type: 'bar', label: 'PND-3 검사량', data: insS('PND-3'), backgroundColor: 'rgba(31,119,180,0.18)', borderColor: 'rgba(31,119,180,0.35)', borderWidth: 1, yAxisID: 'y1', stack: 'ins', order: 3 },
+                        { type: 'bar', label: 'PND-4 검사량', data: insS('PND-4'), backgroundColor: 'rgba(255,127,14,0.18)', borderColor: 'rgba(255,127,14,0.35)', borderWidth: 1, yAxisID: 'y1', stack: 'ins', order: 3 }
+                    ]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false },
+                    scales: {
+                        x: { stacked: true, grid: { display: false }, ticks: { font: { size: 10, weight: 'bold' } } },
+                        y: { position: 'left', beginAtZero: true, title: { display: true, text: '부적합률 (%)', font: { size: 9, weight: 'bold' } }, ticks: { font: { size: 9 }, callback: v => v + '%' }, grid: { color: 'rgba(0,0,0,0.06)' } },
+                        y1: { position: 'right', stacked: true, beginAtZero: true, title: { display: true, text: '검사량 (TON)', font: { size: 9, weight: 'bold' } }, ticks: { font: { size: 9 } }, grid: { drawOnChartArea: false } }
+                    },
+                    plugins: {
+                        legend: { position: 'top', labels: { font: { size: 9.5, weight: 'bold' }, boxWidth: 10, boxHeight: 10, padding: 8, usePointStyle: true } },
+                        tooltip: { callbacks: { label: c => c.dataset.yAxisID === 'y' ? ` ${c.dataset.label}: ${c.raw === null ? '-' : c.raw.toFixed(2) + '%'}` : ` ${c.dataset.label}: ${c.raw} TON` } }
+                    }
+                }
+            });
+        }
+
+        // 평균선(점선) 그리기 플러그인
+        var inspAvgLinePlugin = {
+            id: 'inspAvgLine',
+            afterDatasetsDraw(chart, args, opts) {
+                if (opts === undefined || opts.value === undefined || opts.value === null) return;
+                const xs = chart.scales.x; const { top, bottom } = chart.chartArea;
+                const x = xs.getPixelForValue(opts.value);
+                const c = chart.ctx; c.save();
+                c.strokeStyle = '#1f2d3d'; c.setLineDash([5, 4]); c.lineWidth = 1.5;
+                c.beginPath(); c.moveTo(x, top); c.lineTo(x, bottom); c.stroke();
+                c.setLineDash([]); c.fillStyle = '#1f2d3d'; c.font = 'bold 9.5px Inter, sans-serif'; c.textAlign = 'left';
+                c.textBaseline = 'bottom'; c.fillText(`평균 ${opts.value.toFixed(2)}%`, Math.min(x + 4, chart.chartArea.right - 62), top - 2);
+                c.restore();
+            }
+        };
+
+        function renderInspDim(stat, minKg) {
+            const dim = INSP_DIMS[inspDim];
+            ['item', 'steel', 'maker', 'pcd'].forEach(d => {
+                const b = document.getElementById('btn-dim-' + d);
+                if (b) b.className = `px-2 py-0.5 text-[10px] font-bold rounded transition-all ${d === inspDim ? 'bg-white text-violet-700 border border-slate-300 shadow-xs' : 'text-slate-500'}`;
+            });
+            const t1 = document.getElementById('insp-dim-title'); if (t1) t1.innerText = dim.label + '별';
+            const t2 = document.getElementById('insp-table-title'); if (t2) t2.innerText = dim.label + '별';
+            const th = document.getElementById('insp-th-dim'); if (th) th.innerText = dim.label;
+
+            // 차트: 검사량 기준 충족 구분만, 부적합률 내림차순 상위 12
+            const canvas = document.getElementById('inspDimChart');
+            if (canvas && window.Chart) {
+                if (inspCharts.dim) inspCharts.dim.destroy();
+                const rows = stat.rows.filter(r => r.ins >= minKg).slice(0, 12);
+                const short = s => inspShortName(s, 20);
+                inspCharts.dim = new Chart(canvas.getContext('2d'), {
+                    type: 'bar',
+                    data: {
+                        labels: rows.map(r => short(r.name)),
+                        datasets: [{
+                            label: '부적합률', data: rows.map(r => +r.rate.toFixed(3)),
+                            backgroundColor: rows.map(r => INSP_VERDICT_COLORS[r.verdict]), borderRadius: 3, maxBarThickness: 18
+                        }]
+                    },
+                    options: {
+                        indexAxis: 'y', responsive: true, maintainAspectRatio: false, layout: { padding: { top: 14 } },
+                        onClick: (e, els) => { if (els && els.length) openInspDetail(inspDim, rows[els[0].index].key); },
+                        scales: {
+                            x: { beginAtZero: true, ticks: { font: { size: 9 }, callback: v => v + '%' }, grid: { color: 'rgba(0,0,0,0.06)' } },
+                            y: { ticks: { font: { size: 10, weight: 'bold' } }, grid: { display: false } }
+                        },
+                        plugins: {
+                            legend: { display: false },
+                            inspAvgLine: { value: stat.overall.rate },
+                            tooltip: { callbacks: {
+                                title: items => rows[items[0].dataIndex].name,
+                                label: c => { const r = rows[c.dataIndex]; return [` 부적합률 ${r.rate.toFixed(2)}% (평균 대비 ${r.lift.toFixed(2)}배)`, ` 부적합 ${inspFmtT(r.ng)}T / 검사 ${inspFmtT(r.ins)}T`, ` 판정: ${r.verdict}`]; }
+                            } }
+                        }
+                    },
+                    plugins: [inspAvgLinePlugin]
+                });
+            }
+
+            // 상세 레지스트리 표
+            const body = document.getElementById('insp-dim-body');
+            if (!body) return;
+            const vBadge = {
+                '집중관리': 'bg-red-600 text-white border-red-700',
+                '주의': 'bg-amber-100 text-amber-800 border-amber-300',
+                '양호': 'bg-sky-50 text-sky-700 border-sky-200',
+                '표본부족': 'bg-slate-100 text-slate-400 border-slate-200'
+            };
+            let rank = 0;
+            body.innerHTML = stat.rows.map(r => {
+                const ok = r.ins >= minKg; if (ok) rank++;
+                const p3 = r.byPnd['PND-3'], p4 = r.byPnd['PND-4'];
+                const trend = r.slope === null ? '<span class="text-slate-300">-</span>'
+                    : r.slope > 0.15 ? `<span class="text-red-600" title="${r.slope.toFixed(2)}%p/월">↗ 악화</span>`
+                    : r.slope < -0.15 ? `<span class="text-emerald-600" title="${r.slope.toFixed(2)}%p/월">↘ 개선</span>`
+                    : `<span class="text-slate-500" title="${r.slope.toFixed(2)}%p/월">→ 보합</span>`;
+                const stat2 = !r.test ? '<span class="text-slate-300">-</span>'
+                    : r.sig ? `<span class="px-1 rounded bg-red-50 text-red-700 border border-red-200" title="p=${r.test.p.toFixed(3)}">유의</span>`
+                    : `<span class="text-slate-400" title="p=${r.test.p.toFixed(3)}">-</span>`;
+                return `<tr class="cursor-pointer ${ok ? '' : 'opacity-50'}" onclick="openInspDetail('${inspDim}', ${JSON.stringify(r.key).replace(/"/g, '&quot;')})">
+                    <td class="text-center font-mono-num py-1 px-2 text-[10.5px]">${ok ? rank : '-'}</td>
+                    <td class="py-1 px-2 text-[10.5px] max-w-[220px] truncate" title="${escHtml(r.name)}">${escHtml(r.name)}${inspDim === 'item' ? ` <span class="text-[9px] text-slate-400">${escHtml(r.steel)}</span>` : ''}</td>
+                    <td class="text-right font-mono-num py-1 px-2 text-[10.5px]">${inspFmtT(r.ins)}</td>
+                    <td class="text-right font-mono-num py-1 px-2 text-[10.5px] text-red-600">${inspFmtT(r.ng)}</td>
+                    <td class="text-right font-mono-num py-1 px-2 text-[11px] font-black ${r.lift >= 1.5 && ok ? 'text-red-700' : 'text-slate-900'}">${inspFmtR(r.rate)}</td>
+                    <td class="text-right font-mono-num py-1 px-2 text-[10.5px]" style="color:${INSP_COLORS['PND-3']}">${p3.ins > 0 ? inspFmtR(p3.rate) : '-'}</td>
+                    <td class="text-right font-mono-num py-1 px-2 text-[10.5px]" style="color:#c2410c">${p4.ins > 0 ? inspFmtR(p4.rate) : '-'}</td>
+                    <td class="text-right font-mono-num py-1 px-2 text-[10.5px] ${r.lift >= 1.5 ? 'text-red-600' : r.lift >= 1.2 ? 'text-amber-600' : 'text-slate-600'}">${r.lift.toFixed(2)}x</td>
+                    <td class="text-center font-mono-num py-1 px-2 text-[10.5px]">${r.mCnt > 0 ? `${r.mOver}/${r.mCnt}` : '-'}</td>
+                    <td class="text-center py-1 px-2 text-[10px] font-black whitespace-nowrap">${trend}</td>
+                    <td class="text-center py-1 px-2 text-[9.5px] font-black">${stat2}</td>
+                    <td class="py-1 px-2 text-[10px] whitespace-nowrap">${r.topType ? `${escHtml(r.topType[0])} <span class="text-slate-400">${r.typeShare.toFixed(0)}%</span>` : '-'}</td>
+                    <td class="text-center py-1 px-2"><span class="px-1.5 py-0.5 rounded border text-[9.5px] font-black whitespace-nowrap ${vBadge[r.verdict]}">${r.verdict}</span></td>
+                </tr>`;
+            }).join('') || '<tr><td colspan="13" class="text-center text-slate-400 py-6">데이터 없음</td></tr>';
+        }
+
+        // 부적합 유형이 특정 구분에 몰려 있는지 (유형 중량 점유율 ÷ 검사량 점유율)
+        function inspTypeConcentration(F, typeName, dimKey, minKg) {
+            const fn = INSP_DIMS[dimKey].get;
+            const tot = inspAgg(F);
+            const typeTot = F.reduce((a, r) => a + (r.ngName === typeName ? r.ngW : 0), 0);
+            if (typeTot <= 0 || tot.ins <= 0) return null;
+            let best = null;
+            inspGroup(F, fn).forEach((l, key) => {
+                const ins = l.reduce((a, r) => a + r.insW, 0);
+                if (ins < minKg) return;
+                const tw = l.reduce((a, r) => a + (r.ngName === typeName ? r.ngW : 0), 0);
+                const shNg = tw / typeTot, shIns = ins / tot.ins;
+                const conc = shIns > 0 ? shNg / shIns : 0;
+                if (!best || conc > best.conc) best = { key, name: dimKey === 'item' ? l[0].itemName : key, shNg, shIns, conc };
+            });
+            return best && best.conc >= 1.5 && best.shNg >= 0.25 ? best : null;
+        }
+
+        function renderInspInsights(F, dimStats, minKg, P) {
+            const ul = document.getElementById('insp-insights');
+            if (!ul) return;
+            const li = (icon, color, html) => `<li class="flex gap-1.5"><i class="fa-solid ${icon} ${color} mt-[3px] text-[10px] w-3 shrink-0 text-center"></i><span>${html}</span></li>`;
+            const out = [];
+            const tot = inspAgg(F);
+            if (tot.ins <= 0) { ul.innerHTML = li('fa-circle-info', 'text-slate-400', '선택한 기간에 검사 실적이 없습니다.'); return; }
+
+            // ① PND-3 vs PND-4
+            const a3 = inspAgg(P.filter(r => r.pnd === 'PND-3')), a4 = inspAgg(P.filter(r => r.pnd === 'PND-4'));
+            if (a3.ins > 0 && a4.ins > 0) {
+                const t = twoPropTest(a4.ngLots, a4.lots, a3.ngLots, a3.lots);
+                const hi = a4.rate >= a3.rate ? 'PND-4' : 'PND-3', lo = hi === 'PND-4' ? 'PND-3' : 'PND-4';
+                const ah = hi === 'PND-4' ? a4 : a3, al = hi === 'PND-4' ? a3 : a4;
+                const sigTxt = t ? (t.p < 0.05 ? `<b class="text-red-600">통계적으로 유의</b> (p=${t.p.toFixed(3)}) → 설비 조건(ECT 감도·교정롤 세팅) 점검 권장` : `차이는 통계적으로 유의하지 않음 (p=${t.p.toFixed(2)})`) : '';
+                out.push(li('fa-code-compare', 'text-violet-600', `<b>호기 비교:</b> <b style="color:${INSP_COLORS[hi] === INSP_COLORS['PND-4'] ? '#c2410c' : INSP_COLORS[hi]}">${hi} ${inspFmtR(ah.rate)}</b> vs ${lo} ${inspFmtR(al.rate)} (${(ah.rate - al.rate) >= 0 ? '+' : ''}${(ah.rate - al.rate).toFixed(2)}%p). ${sigTxt}`));
+            }
+
+            // ② 차원별 최상위 경향
+            const DIM_ORDER = [['maker', '소재(제강사) 요인 점검 권장'], ['steel', '강종별 작업조건 점검 권장'], ['pcd', '인발 설비(PCD) 요인 점검 권장'], ['item', '']];
+            DIM_ORDER.forEach(([d, hint]) => {
+                const s = dimStats[d]; const label = INSP_DIMS[d].label;
+                const flagged = s.rows.filter(r => r.verdict === '집중관리' || r.verdict === '주의').sort((a, b) => (b.verdict === '집중관리') - (a.verdict === '집중관리') || b.lift - a.lift);
+                if (flagged.length === 0) {
+                    out.push(li('fa-circle-check', 'text-emerald-600', `<b>${label}별:</b> 뚜렷한 경향 없음 (검사량 ${minKg / 1000}T 이상 모든 ${label}이 평균 대비 1.2배 미만)`));
+                    return;
+                }
+                const r = flagged[0];
+                const isHot = r.verdict === '집중관리';
+                const trendTxt = r.slope === null ? '' : r.slope > 0.15 ? ', <b class="text-red-600">악화 추세</b>' : r.slope < -0.15 ? ', 개선 추세' : ', 보합';
+                const more = flagged.length > 1 ? ` <span class="text-slate-500">외 ${flagged.slice(1, 3).map(x => escHtml(inspShortName(x.name, 14))).join(', ')}</span>` : '';
+                out.push(li(isHot ? 'fa-triangle-exclamation' : 'fa-circle-exclamation', isHot ? 'text-red-600' : 'text-amber-500',
+                    `<b>${label}별:</b> <b class="${isHot ? 'text-red-700' : 'text-amber-700'}">${escHtml(inspShortName(r.name, 30))}</b> ${inspFmtR(r.rate)} — 평균 ${inspFmtR(s.overall.rate)}의 <b>${r.lift.toFixed(1)}배</b>` +
+                    `${r.mCnt >= 2 ? `, 최근 ${r.mCnt}개월 중 ${r.mOver}개월 평균 초과` : ''}${trendTxt}${r.sig ? ', 통계 유의' : ''}` +
+                    `${r.topType ? ` · 주요 ${escHtml(r.topType[0])}` : ''}${isHot && hint ? ` → <span class="text-slate-600">${hint}</span>` : ''}${more}`));
+            });
+
+            // ③ 주요 부적합 유형의 집중도 (유형 ↔ 원인 요인 연결)
+            const types = {}; F.forEach(r => { if (r.ngW > 0) types[r.ngName] = (types[r.ngName] || 0) + r.ngW; });
+            Object.entries(types).sort((a, b) => b[1] - a[1]).slice(0, 2).forEach(([tn, tw]) => {
+                let best = null, bestDim = '';
+                ['maker', 'pcd', 'steel'].forEach(d => { const c = inspTypeConcentration(F, tn, d, minKg); if (c && (!best || c.conc > best.conc)) { best = c; bestDim = d; } });
+                if (best) out.push(li('fa-bullseye', 'text-rose-600', `<b>${escHtml(tn)}</b>(부적합의 ${(tw / tot.ng * 100).toFixed(0)}%) 중 <b>${(best.shNg * 100).toFixed(0)}%</b>가 ${INSP_DIMS[bestDim].label} <b>${escHtml(inspShortName(best.name, 30))}</b>에서 발생 (검사량 비중은 ${(best.shIns * 100).toFixed(0)}%) → 유형과 요인이 연결된 경향`));
+            });
+
+            // ④ 교차 조합 최고치 (제강사 × 강종)
+            let bestCell = null;
+            inspGroup(F, r => r.maker + '\u0001' + r.steel).forEach((l, k) => {
+                const a = inspAgg(l); if (a.ins < minKg || a.ng <= 0) return;
+                if (!bestCell || a.rate > bestCell.rate) bestCell = { k, ...a };
+            });
+            if (bestCell && tot.rate > 0 && bestCell.rate / tot.rate >= 1.5) {
+                const [mk, st] = bestCell.k.split('\u0001');
+                out.push(li('fa-table-cells', 'text-violet-600', `<b>교차 조합:</b> 제강사 <b>${escHtml(mk)}</b> × 강종 <b>${escHtml(st)}</b> ${inspFmtR(bestCell.rate)} (평균의 ${(bestCell.rate / tot.rate).toFixed(1)}배, 검사 ${inspFmtT(bestCell.ins)}T) — 조합 단위 점검 대상`));
+            }
+
+            if (inspIsDemo) out.push(li('fa-flask', 'text-amber-500', '<span class="text-amber-700">위 진단은 데모 데이터 기준 예시입니다. 시트 연동 후 실제 결과로 바뀝니다.</span>'));
+            ul.innerHTML = out.join('');
+        }
+
+        function renderInspPareto(F) {
+            const canvas = document.getElementById('inspParetoChart');
+            if (!canvas || !window.Chart) return;
+            if (inspCharts.pareto) inspCharts.pareto.destroy();
+            const types = {}; let totNg = 0;
+            F.forEach(r => { if (r.ngW > 0) { types[r.ngName] = (types[r.ngName] || 0) + r.ngW; totNg += r.ngW; } });
+            let arr = Object.entries(types).sort((a, b) => b[1] - a[1]);
+            if (arr.length > 8) { const rest = arr.slice(7).reduce((a, c) => a + c[1], 0); arr = [...arr.slice(0, 7), ['기타', rest]]; }
+            let cum = 0;
+            const cumArr = arr.map(t => { cum += t[1]; return totNg > 0 ? +(cum / totNg * 100).toFixed(1) : 0; });
+            inspCharts.pareto = new Chart(canvas.getContext('2d'), {
+                data: {
+                    labels: arr.map(t => t[0]),
+                    datasets: [
+                        { type: 'line', label: '누적 %', data: cumArr, borderColor: '#1f2d3d', backgroundColor: '#1f2d3d', borderWidth: 2, pointRadius: 3, yAxisID: 'y1', order: 0 },
+                        { type: 'bar', label: '부적합중량 (TON)', data: arr.map(t => +(t[1] / 1000).toFixed(2)), backgroundColor: arr.map((t, i) => i === 0 ? '#e11d48' : i < 3 ? '#fb7185' : '#fecdd3'), borderRadius: 3, yAxisID: 'y', order: 1 }
+                    ]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    scales: {
+                        x: { grid: { display: false }, ticks: { font: { size: 9, weight: 'bold' }, maxRotation: 40, minRotation: 0 } },
+                        y: { beginAtZero: true, ticks: { font: { size: 9 } }, title: { display: true, text: 'TON', font: { size: 9, weight: 'bold' } }, grid: { color: 'rgba(0,0,0,0.06)' } },
+                        y1: { position: 'right', min: 0, max: 100, ticks: { font: { size: 9 }, callback: v => v + '%' }, grid: { drawOnChartArea: false } }
+                    },
+                    plugins: {
+                        legend: { position: 'top', labels: { font: { size: 9.5, weight: 'bold' }, boxWidth: 12 } },
+                        tooltip: { callbacks: { label: c => c.dataset.yAxisID === 'y1' ? ` 누적 ${c.raw}%` : ` ${c.raw} TON (${totNg > 0 ? (c.raw * 1000 / totNg * 100).toFixed(1) : 0}%)` } }
+                    }
+                }
+            });
+        }
+
+        function renderInspCross(F, minKg) {
+            const rowSel = document.getElementById('insp-cross-row'), colSel = document.getElementById('insp-cross-col');
+            const opts = ['maker', 'steel', 'pcd', 'item', 'pnd'];
+            [[rowSel, 'maker'], [colSel, 'steel']].forEach(([sel, def]) => {
+                if (!sel) return;
+                const cur = sel.value || def;
+                sel.innerHTML = opts.map(o => `<option value="${o}">${INSP_DIMS[o].label}</option>`).join('');
+                sel.value = cur;
+            });
+            const wrap = document.getElementById('insp-cross-wrap');
+            if (!wrap || !rowSel || !colSel) return;
+            let rd = rowSel.value, cd = colSel.value;
+            if (rd === cd) { cd = rd === 'steel' ? 'maker' : 'steel'; colSel.value = cd; }
+            const rf = INSP_DIMS[rd].get, cf = INSP_DIMS[cd].get;
+            const tot = inspAgg(F);
+            const topKeys = fn => [...inspGroup(F, fn).entries()].map(([k, l]) => ({ k, ins: l.reduce((a, r) => a + r.insW, 0), name: (fn === INSP_DIMS.item.get) ? l[0].itemName : k })).sort((a, b) => b.ins - a.ins).slice(0, 8);
+            const rows = topKeys(rf), cols = topKeys(cf);
+            const cellMap = new Map();
+            F.forEach(r => { const k = rf(r) + '\u0001' + cf(r); if (!cellMap.has(k)) cellMap.set(k, []); cellMap.get(k).push(r); });
+            const cellMin = Math.max(1000, minKg / 2);
+            const short = s => inspShortName(s, 13);
+            const color = lift => {
+                if (lift >= 2) return 'background:#b91c1c;color:#fff';
+                if (lift >= 1.5) return 'background:#ef4444;color:#fff';
+                if (lift >= 1.2) return 'background:#fdba74;color:#7c2d12';
+                if (lift >= 0.8) return 'background:#fef3c7;color:#78350f';
+                return 'background:#dcfce7;color:#14532d';
+            };
+            let html = `<table class="w-full border-collapse" style="border-spacing:2px;border-collapse:separate"><thead><tr><th class="!bg-white text-[9.5px] !py-1 !px-1.5 text-slate-500">${INSP_DIMS[rd].label} \\ ${INSP_DIMS[cd].label}</th>`;
+            html += cols.map(c => `<th class="text-center text-[9.5px] !py-1 !px-1 whitespace-nowrap" title="${escHtml(c.name)}">${escHtml(short(c.name))}</th>`).join('') + `<th class="text-center text-[9.5px] !py-1 !px-1">계</th></tr></thead><tbody>`;
+            rows.forEach(r => {
+                const rowAgg = inspAgg(F.filter(x => rf(x) === r.k));
+                html += `<tr><td class="text-[10px] !py-1 !px-1.5 whitespace-nowrap font-black" title="${escHtml(r.name)}">${escHtml(short(r.name))}</td>`;
+                cols.forEach(c => {
+                    const l = cellMap.get(r.k + '\u0001' + c.k) || [];
+                    const a = inspAgg(l);
+                    if (a.ins < cellMin) { html += `<td class="text-center text-slate-300 !py-1 !px-1 text-[10px]" title="검사량 ${inspFmtT(a.ins)}T (부족)">·</td>`; return; }
+                    const lift = tot.rate > 0 ? a.rate / tot.rate : 0;
+                    html += `<td class="text-center font-mono-num !py-1 !px-1 text-[10px] font-black" style="${color(lift)}" title="${escHtml(r.name)} × ${escHtml(c.name)}\n부적합률 ${inspFmtR(a.rate)} (평균의 ${lift.toFixed(2)}배)\n부적합 ${inspFmtT(a.ng)}T / 검사 ${inspFmtT(a.ins)}T">${a.rate.toFixed(1)}</td>`;
+                });
+                const rl = tot.rate > 0 ? rowAgg.rate / tot.rate : 0;
+                html += `<td class="text-center font-mono-num !py-1 !px-1 text-[10px] font-black border-l-2 border-slate-300" style="${color(rl)}">${rowAgg.rate.toFixed(1)}</td></tr>`;
+            });
+            html += `<tr><td class="text-[10px] !py-1 !px-1.5 font-black">계</td>` + cols.map(c => {
+                const a = inspAgg(F.filter(x => cf(x) === c.k)); const lift = tot.rate > 0 ? a.rate / tot.rate : 0;
+                return `<td class="text-center font-mono-num !py-1 !px-1 text-[10px] font-black border-t-2 border-slate-300" style="${color(lift)}">${a.rate.toFixed(1)}</td>`;
+            }).join('') + `<td class="text-center font-mono-num !py-1 !px-1 text-[10px] font-black bg-slate-800 !text-white">${tot.rate.toFixed(1)}</td></tr>`;
+            html += '</tbody></table>';
+            wrap.innerHTML = rows.length && cols.length ? html : '<div class="text-center text-slate-400 text-[10.5px] font-bold py-8">데이터 없음</div>';
+        }
+
+        // ---------- LOT 이력 모달 ----------
+        function openInspDetail(dimKey, key) {
+            if (!inspLastCtx) return;
+            const fn = INSP_DIMS[dimKey].get;
+            const list = inspLastCtx.F.filter(r => fn(r) === key);
+            if (list.length === 0) return;
+            const a = inspAgg(list);
+            const name = dimKey === 'item' ? list[0].itemName : key;
+            document.getElementById('insp-modal-title').innerText = `[${INSP_DIMS[dimKey].label}] ${name}`;
+            document.getElementById('insp-modal-sub').innerText = `${inspLastCtx.ctx.label} · ${inspEquip === 'ALL' ? 'PND-3+4' : inspEquip} · 전체 평균 ${inspFmtR(inspAgg(inspLastCtx.F).rate)}`;
+            const box = (lbl, val, cls) => `<div class="${cls} p-2 rounded-lg border"><span class="text-[9px] font-bold block mb-0.5 opacity-80">${lbl}</span><h4 class="text-sm font-black font-mono-num">${val}</h4></div>`;
+            document.getElementById('insp-modal-kpis').innerHTML =
+                box('검사량', inspFmtT(a.ins) + ' T', 'bg-slate-50 border-slate-200 text-slate-800') +
+                box('부적합량', inspFmtT(a.ng) + ' T', 'bg-red-50 border-red-200 text-red-800') +
+                box('부적합률', inspFmtR(a.rate), 'bg-amber-50 border-amber-200 text-amber-900') +
+                box('NG LOT / 전체', `${a.ngLots} / ${a.lots}`, 'bg-violet-50 border-violet-200 text-violet-900');
+            const types = {}; list.forEach(r => { if (r.ngW > 0) types[r.ngName] = (types[r.ngName] || 0) + r.ngW; });
+            document.getElementById('insp-modal-types').innerHTML = Object.entries(types).sort((x, y) => y[1] - x[1]).slice(0, 6)
+                .map(([t, w]) => `<span class="px-2 py-0.5 rounded-md bg-rose-50 border border-rose-200 text-[10px] font-black text-rose-800">${escHtml(t)} <span class="font-mono-num">${inspFmtT(w)}T · ${(w / a.ng * 100).toFixed(0)}%</span></span>`).join('') || '<span class="text-[10px] text-slate-400 font-bold">부적합 없음</span>';
+            const ngList = list.filter(r => r.ngW > 0).sort((x, y) => y.date.localeCompare(x.date)).slice(0, 300);
+            document.getElementById('insp-modal-body').innerHTML = ngList.map(r => `<tr>
+                <td class="py-1 px-2 text-[10px] font-mono-num">${r.date}</td>
+                <td class="py-1 px-2 text-center text-[10px] font-black" style="color:${r.pnd === 'PND-4' ? '#c2410c' : INSP_COLORS['PND-3']}">${escHtml(r.pnd)}</td>
+                <td class="py-1 px-2 text-center text-[10px]">${escHtml(r.pcd)}</td>
+                <td class="py-1 px-2 text-[10px] max-w-[160px] truncate" title="${escHtml(r.itemName)}">${escHtml(r.itemName)}</td>
+                <td class="py-1 px-2 text-[10px]">${escHtml(r.steel)}</td>
+                <td class="py-1 px-2 text-[10px]">${escHtml(r.maker)}</td>
+                <td class="py-1 px-2 text-right text-[10px] font-mono-num">${r.insW.toLocaleString()}</td>
+                <td class="py-1 px-2 text-right text-[10px] font-mono-num text-red-600">${r.ngW.toLocaleString()}</td>
+                <td class="py-1 px-2 text-[10px]">${escHtml(r.ngFull)}</td>
+            </tr>`).join('') || '<tr><td colspan="9" class="text-center text-slate-400 py-4 text-[10px]">부적합 LOT 없음</td></tr>';
+            document.getElementById('insp-detail-modal').style.display = 'flex';
+        }
+        function closeInspDetail() { document.getElementById('insp-detail-modal').style.display = 'none'; }
+
     </script>
 </body>
 </html>
