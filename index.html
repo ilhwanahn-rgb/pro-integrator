@@ -16,27 +16,79 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gridstack@9.2.2/dist/gridstack.min.css"/>
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- IBM Carbon 테마: Tailwind 색상·서체·모서리를 Carbon 토큰으로 재매핑 -->
+    <script>tailwind.config = {"theme": {"extend": {"colors": {"slate": {"50": "#F4F4F4", "100": "#E8E8E8", "200": "#E0E0E0", "300": "#C6C6C6", "400": "#A8A8A8", "500": "#6F6F6F", "600": "#525252", "700": "#393939", "800": "#262626", "900": "#161616", "950": "#161616"}, "gray": {"50": "#F4F4F4", "100": "#E8E8E8", "200": "#E0E0E0", "300": "#C6C6C6", "400": "#A8A8A8", "500": "#6F6F6F", "600": "#525252", "700": "#393939", "800": "#262626", "900": "#161616", "950": "#161616"}, "zinc": {"50": "#F4F4F4", "100": "#E8E8E8", "200": "#E0E0E0", "300": "#C6C6C6", "400": "#A8A8A8", "500": "#6F6F6F", "600": "#525252", "700": "#393939", "800": "#262626", "900": "#161616", "950": "#161616"}, "neutral": {"50": "#F4F4F4", "100": "#E8E8E8", "200": "#E0E0E0", "300": "#C6C6C6", "400": "#A8A8A8", "500": "#6F6F6F", "600": "#525252", "700": "#393939", "800": "#262626", "900": "#161616", "950": "#161616"}, "stone": {"50": "#F4F4F4", "100": "#E8E8E8", "200": "#E0E0E0", "300": "#C6C6C6", "400": "#A8A8A8", "500": "#6F6F6F", "600": "#525252", "700": "#393939", "800": "#262626", "900": "#161616", "950": "#161616"}, "sky": {"50": "#EDF5FF", "100": "#EDF5FF", "200": "#D0E2FF", "300": "#A6C8FF", "400": "#78A9FF", "500": "#4589FF", "600": "#0F62FE", "700": "#0043CE", "800": "#002D9C", "900": "#001D6C", "950": "#001141"}, "blue": {"50": "#EDF5FF", "100": "#EDF5FF", "200": "#D0E2FF", "300": "#A6C8FF", "400": "#78A9FF", "500": "#4589FF", "600": "#0F62FE", "700": "#0043CE", "800": "#002D9C", "900": "#001D6C", "950": "#001141"}, "indigo": {"50": "#EDF5FF", "100": "#EDF5FF", "200": "#D0E2FF", "300": "#A6C8FF", "400": "#78A9FF", "500": "#4589FF", "600": "#0F62FE", "700": "#0043CE", "800": "#002D9C", "900": "#001D6C", "950": "#001141"}, "red": {"50": "#FFF1F1", "100": "#FFF1F1", "200": "#FFD7D9", "300": "#FFB3B8", "400": "#FF8389", "500": "#FA4D56", "600": "#DA1E28", "700": "#A2191F", "800": "#750E13", "900": "#520408", "950": "#2D0709"}, "rose": {"50": "#FFF1F1", "100": "#FFF1F1", "200": "#FFD7D9", "300": "#FFB3B8", "400": "#FF8389", "500": "#FA4D56", "600": "#DA1E28", "700": "#A2191F", "800": "#750E13", "900": "#520408", "950": "#2D0709"}, "emerald": {"50": "#DEFBE6", "100": "#DEFBE6", "200": "#A7F0BA", "300": "#6FDC8C", "400": "#42BE65", "500": "#24A148", "600": "#198038", "700": "#0E6027", "800": "#044317", "900": "#022D0D", "950": "#071908"}, "green": {"50": "#DEFBE6", "100": "#DEFBE6", "200": "#A7F0BA", "300": "#6FDC8C", "400": "#42BE65", "500": "#24A148", "600": "#198038", "700": "#0E6027", "800": "#044317", "900": "#022D0D", "950": "#071908"}, "lime": {"50": "#DEFBE6", "100": "#DEFBE6", "200": "#A7F0BA", "300": "#6FDC8C", "400": "#42BE65", "500": "#24A148", "600": "#198038", "700": "#0E6027", "800": "#044317", "900": "#022D0D", "950": "#071908"}, "teal": {"50": "#D9FBFB", "100": "#D9FBFB", "200": "#9EF0F0", "300": "#3DDBD9", "400": "#08BDBA", "500": "#009D9A", "600": "#007D79", "700": "#005D5D", "800": "#004144", "900": "#022B30", "950": "#081A1C"}, "cyan": {"50": "#E5F6FF", "100": "#E5F6FF", "200": "#BAE6FF", "300": "#82CFFF", "400": "#33B1FF", "500": "#1192E8", "600": "#0072C3", "700": "#00539A", "800": "#003A6D", "900": "#012749", "950": "#061727"}, "violet": {"50": "#F6F2FF", "100": "#F6F2FF", "200": "#E8DAFF", "300": "#D4BBFF", "400": "#BE95FF", "500": "#A56EFF", "600": "#8A3FFC", "700": "#6929C4", "800": "#491D8B", "900": "#31135E", "950": "#1C0F30"}, "purple": {"50": "#F6F2FF", "100": "#F6F2FF", "200": "#E8DAFF", "300": "#D4BBFF", "400": "#BE95FF", "500": "#A56EFF", "600": "#8A3FFC", "700": "#6929C4", "800": "#491D8B", "900": "#31135E", "950": "#1C0F30"}, "fuchsia": {"50": "#FFF0F7", "100": "#FFF0F7", "200": "#FFD6E8", "300": "#FFAFD2", "400": "#FF7EB6", "500": "#EE5396", "600": "#D02670", "700": "#9F1853", "800": "#740937", "900": "#510224", "950": "#2A0A18"}, "pink": {"50": "#FFF0F7", "100": "#FFF0F7", "200": "#FFD6E8", "300": "#FFAFD2", "400": "#FF7EB6", "500": "#EE5396", "600": "#D02670", "700": "#9F1853", "800": "#740937", "900": "#510224", "950": "#2A0A18"}, "orange": {"50": "#FFF2E8", "100": "#FFF2E8", "200": "#FFD9BE", "300": "#FFB784", "400": "#FF832B", "500": "#EB6200", "600": "#BA4E00", "700": "#8A3800", "800": "#5E2900", "900": "#3E1A00", "950": "#231000"}, "amber": {"50": "#FCF4D6", "100": "#FCF4D6", "200": "#FDDC69", "300": "#F1C21B", "400": "#F1C21B", "500": "#D2A106", "600": "#8E6A00", "700": "#684E00", "800": "#483700", "900": "#302400", "950": "#1C1500"}, "yellow": {"50": "#FCF4D6", "100": "#FCF4D6", "200": "#FDDC69", "300": "#F1C21B", "400": "#F1C21B", "500": "#D2A106", "600": "#8E6A00", "700": "#684E00", "800": "#483700", "900": "#302400", "950": "#1C1500"}}, "fontFamily": {"sans": ["'IBM Plex Sans KR'", "'IBM Plex Sans'", "'Malgun Gothic'", "sans-serif"], "mono": ["'IBM Plex Mono'", "Menlo", "monospace"]}, "fontWeight": {"medium": "400", "semibold": "600", "bold": "600", "extrabold": "600", "black": "600"}, "letterSpacing": {"wide": "0.16px", "wider": "0.32px", "widest": "0.32px"}, "borderRadius": {"none": "0", "xs": "0", "sm": "0", "DEFAULT": "0", "md": "0", "lg": "0", "xl": "0", "2xl": "0", "3xl": "0", "full": "9999px"}, "boxShadow": {"xs": "none", "sm": "none", "DEFAULT": "none", "md": "none", "lg": "0 2px 6px rgba(0,0,0,0.3)", "xl": "0 2px 6px rgba(0,0,0,0.3)", "2xl": "0 2px 6px rgba(0,0,0,0.3)"}}}};</script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- IBM Carbon 테마: Chart.js 기본값과 시리즈 색상 재매핑 -->
+    <script>
+    (function () {
+        if (!window.Chart) return;
+        var MAP = {
+            '#1f77b4':'#6929C4', '#ff7f0e':'#1192E8', '#17becf':'#005D5D', '#d62728':'#DA1E28',
+            '#9467bd':'#A56EFF', '#2ca02c':'#198038', '#e377c2':'#EE5396', '#7f7f7f':'#8D8D8D',
+            '#1f2d3d':'#161616', '#c2410c':'#8A3800', '#ef4444':'#FA4D56', '#e11d48':'#DA1E28',
+            '#fb7185':'#FF8389', '#fecdd3':'#FFD7D9', '#f59e0b':'#B28600', '#fdba74':'#FFB784',
+            '#10b981':'#24A148', '#dcfce7':'#DEFBE6', '#fef3c7':'#FCF4D6', '#cbd5e1':'#C6C6C6',
+            '#4b5563':'#525252', '#b91c1c':'#A2191F', '#7c2d12':'#5E2900', '#78350f':'#684E00',
+            '#14532d':'#044317'
+        };
+        var RGB = { '31,119,180':'105,41,196', '255,127,14':'17,146,232', '214,39,40':'218,30,40' };
+        function recolor(v) {
+            if (Array.isArray(v)) return v.map(recolor);
+            if (typeof v !== 'string') return v;
+            var k = v.trim().toLowerCase();
+            if (MAP[k]) return MAP[k];
+            return v.replace(/(rgba?\()\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/i, function (m, pre, r, g, b) {
+                var key = r + ',' + g + ',' + b;
+                return RGB[key] ? pre + RGB[key] : m;
+            });
+        }
+        var PROPS = ['backgroundColor','borderColor','pointBackgroundColor','pointBorderColor','hoverBackgroundColor','hoverBorderColor'];
+        Chart.register({
+            id: 'carbonTheme',
+            beforeUpdate: function (chart) {
+                (chart.config.data.datasets || []).forEach(function (ds) {
+                    PROPS.forEach(function (p) { if (ds[p] !== undefined && typeof ds[p] !== 'function') ds[p] = recolor(ds[p]); });
+                    if ((ds.type || chart.config.type) === 'bar') ds.borderRadius = 0;
+                });
+            }
+        });
+        Chart.defaults.font.family = "'IBM Plex Sans KR', 'IBM Plex Sans', 'Malgun Gothic', sans-serif";
+        Chart.defaults.font.weight = 400;
+        Chart.defaults.color = '#525252';
+        Chart.defaults.borderColor = '#E0E0E0';
+        Chart.defaults.plugins.legend.labels.boxWidth = 12;
+        Chart.defaults.plugins.legend.labels.boxHeight = 12;
+        Chart.defaults.plugins.tooltip.backgroundColor = '#393939';
+        Chart.defaults.plugins.tooltip.titleColor = '#F4F4F4';
+        Chart.defaults.plugins.tooltip.bodyColor = '#F4F4F4';
+        Chart.defaults.plugins.tooltip.cornerRadius = 2;
+        Chart.defaults.plugins.tooltip.padding = 8;
+        Chart.defaults.elements.line.borderWidth = 2;
+        Chart.defaults.elements.point.radius = 3;
+    })();
+    </script>
     <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/gridstack@9.2.2/dist/gridstack-all.js"></script>
 
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans+KR:wght@300;400;600&display=swap');
         
         :root {
-            --tableau-navy: #1f2d3d;
-            --tableau-slate-bg: #f3f4f8;
-            --tableau-card-bg: #ffffff;
-            --tableau-border: #d1d5db;
-            --tableau-blue: #1f77b4;
-            --tableau-orange: #ff7f0e;
-            --tableau-teal: #17becf;
-            --tableau-red: #d62728;
-            --tableau-green: #2ca02c;
-            --tableau-purple: #9467bd;
-            --tableau-text-dark: #111827;
-            --tableau-text-muted: #6b7280;
+            /* IBM Carbon (Gray 10 테마) 토큰 — 기존 변수명은 스크립트 호환을 위해 유지 */
+            --tableau-navy: #161616;
+            --tableau-slate-bg: #F4F4F4;
+            --tableau-card-bg: #FFFFFF;
+            --tableau-border: #E0E0E0;
+            --tableau-blue: #0F62FE;
+            --tableau-orange: #1192E8;
+            --tableau-teal: #005D5D;
+            --tableau-red: #DA1E28;
+            --tableau-green: #198038;
+            --tableau-purple: #6929C4;
+            --tableau-text-dark: #161616;
+            --tableau-text-muted: #525252;
         }
 
         body { 
@@ -187,6 +239,95 @@
         .cell-sts-circle { background-color: #d1fae5; color: #047857; font-weight: 800; }
         .cell-sts-other { background-color: #fef3c7; color: #b45309; font-weight: 800; border: 1px solid #fcd34d !important; }
         .cell-coil-qt { background-color: #f3e8ff; color: #6b21a8; font-weight: 800; }
+
+        /* =========================================================
+           IBM Carbon 테마 오버라이드 (기존 스타일 뒤에 위치해 우선 적용)
+           ========================================================= */
+        body {
+            font-family: 'IBM Plex Sans KR', 'IBM Plex Sans', 'Malgun Gothic', sans-serif;
+            background-color: #F4F4F4;
+            background-image: none;
+            color: #161616;
+            -webkit-font-smoothing: antialiased;
+        }
+        .font-mono-num { font-family: 'IBM Plex Mono', Menlo, monospace; font-weight: 400 !important; }
+        .uppercase { text-transform: none !important; }
+
+        /* 포커스: Carbon focus ring */
+        :focus-visible { outline: 2px solid #0F62FE !important; outline-offset: -2px; }
+
+        /* 타일 */
+        .glass-panel {
+            background: #FFFFFF;
+            border: 1px solid #E0E0E0;
+            border-radius: 0;
+            box-shadow: none;
+            transition: border-color 110ms cubic-bezier(0.2, 0, 0.38, 0.9);
+        }
+        .glass-panel:hover { border-color: #C6C6C6; box-shadow: none; }
+        .glass-panel[class*="bg-gradient"] { background-image: none !important; background-color: #FFFFFF !important; }
+        .grid-stack-item-content { border-radius: 0; }
+        .edit-mode-active .grid-stack-item-content { outline: 2px dashed #0F62FE; }
+        .widget-drag-handle { background: #E0E0E0; border-bottom: 1px solid #C6C6C6; color: #161616; font-weight: 600; font-size: 12px; }
+
+        /* 사이드 내비게이션 (Carbon UI Shell) */
+        aside { background: #161616 !important; border-right: 1px solid #393939 !important; box-shadow: none !important; }
+        aside > div:first-child { background: #0F62FE !important; background-image: none !important; border-radius: 0 !important; box-shadow: none !important; }
+        aside .w-6.h-\[1px\] { background: #393939 !important; }
+        .nav-icon { border-radius: 0; color: #C6C6C6; position: relative; transition: background-color 110ms; }
+        .nav-icon:hover { background: #333333; color: #F4F4F4; }
+        .nav-icon.active { background: #393939; color: #FFFFFF; box-shadow: inset 3px 0 0 #0F62FE; }
+        aside i { filter: none !important; }
+        .animate-bounce { animation: none !important; }
+
+        /* 데이터 테이블 */
+        table { border-collapse: collapse; border-spacing: 0; }
+        th { background: #E0E0E0; color: #161616; font-weight: 600; text-transform: none; font-size: 12px; letter-spacing: 0.16px; border-bottom: 0; }
+        td { background: #FFFFFF; border-top: 0; border-bottom: 1px solid #E0E0E0; font-weight: 400; color: #161616; }
+        td:first-child { border-left: 0; border-radius: 0; }
+        td:last-child { border-right: 0; border-radius: 0; }
+        tr:hover td { background: #E8E8E8; color: #161616; }
+
+        /* 입력 필드 (Carbon text input / select) */
+        .target-input, .gs-input, header select {
+            background: #F4F4F4 !important; border: 0 !important; border-bottom: 1px solid #8D8D8D !important;
+            border-radius: 0 !important; box-shadow: none !important; color: #161616;
+        }
+        .target-input { font-family: 'IBM Plex Mono', monospace; font-weight: 400; }
+        .target-input:focus, .gs-input:focus, header select:focus { outline: 2px solid #0F62FE !important; outline-offset: -2px; background: #F4F4F4 !important; }
+
+        /* 콘텐츠 스위처형 버튼 */
+        .weather-btn { border-radius: 0; background: #FFFFFF; color: #525252; border: 1px solid #8D8D8D; font-weight: 400; font-size: 11px; }
+        .weather-btn.active { background: #161616; color: #FFFFFF; border-color: #161616; box-shadow: none; }
+
+        /* 알림·챗봇·모달 */
+        .toast { border-radius: 0; box-shadow: 0 2px 6px rgba(0,0,0,0.3); border: 0; font-weight: 400; }
+        .chat-bot-window { border-radius: 0; box-shadow: 0 2px 6px rgba(0,0,0,0.3); border: 1px solid #E0E0E0; }
+        .chat-header { background: #161616; }
+        .chat-body { background: #F4F4F4; }
+        .chat-input-area { border-top: 1px solid #E0E0E0; }
+        .msg-bot { background: #FFFFFF; color: #161616; border: 1px solid #E0E0E0; border-radius: 0; font-weight: 400; }
+        .msg-user { background: #0F62FE; border-radius: 0; font-weight: 400; }
+        .modal-bg { background: rgba(22, 22, 22, 0.5); backdrop-filter: none; }
+
+        .top3-row-clickable:hover { background-color: #FFF1F1 !important; transform: none; }
+
+        /* 기존 Tableau 색상 고정 클래스 → Carbon 데이터 시각화 팔레트 */
+        .bg-\[\#1f77b4\] { background-color: #6929C4 !important; }
+        .border-\[\#ff7f0e\] { border-color: #1192E8 !important; }
+        .bg-\[\#17becf\] { background-color: #005D5D !important; }
+        .bg-\[\#d62728\] { background-color: #DA1E28 !important; }
+
+        /* CYCLE TIME 셀 색상 → Carbon 태그 색상 */
+        .cell-plain-circle { background-color: #EDF5FF; color: #0043CE; font-weight: 600; }
+        .cell-plain-other  { background-color: #FFF1F1; color: #A2191F; font-weight: 600; border: 1px solid #FFB3B8 !important; }
+        .cell-sts-circle   { background-color: #DEFBE6; color: #0E6027; font-weight: 600; }
+        .cell-sts-other    { background-color: #FCF4D6; color: #684E00; font-weight: 600; border: 1px solid #F1C21B !important; }
+        .cell-coil-qt      { background-color: #F6F2FF; color: #6929C4; font-weight: 600; }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+        }
     </style>
 </head>
 <body id="app-body" class="split-mode-auto">
@@ -808,8 +949,8 @@
 
             <!-- ① KPI : PND-3 / PND-4 / 합계 / 주요 부적합 유형 -->
             <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-2 mb-2.5">
-                <div class="glass-panel p-3 border-l-4" style="border-left-color:#1f77b4" id="insp-kpi-PND-3"></div>
-                <div class="glass-panel p-3 border-l-4" style="border-left-color:#ff7f0e" id="insp-kpi-PND-4"></div>
+                <div class="glass-panel p-3 border-l-4" style="border-left-color:#6929C4" id="insp-kpi-PND-3"></div>
+                <div class="glass-panel p-3 border-l-4" style="border-left-color:#1192E8" id="insp-kpi-PND-4"></div>
                 <div class="glass-panel p-3 border-l-4" style="border-left-color:#1f2d3d" id="insp-kpi-TOTAL"></div>
                 <div class="glass-panel p-3 border-l-4 border-l-rose-500" id="insp-kpi-type"></div>
             </div>
