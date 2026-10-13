@@ -348,6 +348,7 @@
                 <div class="w-6 h-[1px] bg-slate-600 my-1"></div>
                 <div class="nav-icon hover:text-sky-400" onclick="toggleEditMode()" id="nav-edit-mode" title="대시보드 배치/크기 자유 편집"><i class="fa-solid fa-up-down-left-right"></i></div>
                 <div class="nav-icon hover:text-emerald-400" onclick="openWidgetManager()" title="위젯 추가/숨김 관리"><i class="fa-solid fa-cubes"></i></div>
+                <div class="nav-icon" onclick="resetLayout()" title="기본 배치로 초기화"><i class="fa-solid fa-rotate-left"></i></div>
                 <div class="w-6 h-[1px] bg-slate-600 my-1"></div>
                 <div class="nav-icon hover:text-emerald-400" onclick="fetchGoogleSheetsData()" title="데이터 강제 동기화"><i class="fa-solid fa-arrows-rotate"></i></div>
                 <div class="nav-icon hover:text-amber-400" onclick="openModal()" title="구글 시트 연동 설정"><i class="fa-solid fa-sliders"></i></div>
@@ -359,89 +360,53 @@
         </aside>
 
         <!-- TAB 1: 메인 대시보드 -->
-        <main class="flex-1 p-3 lg:p-5 overflow-y-auto h-screen relative z-10 tab-content active" id="tab-main">
-            <!-- Tableau Header Toolbar -->
-            <header class="flex flex-col xl:flex-row justify-between items-start xl:items-end gap-3 mb-3">
-                <div>
-                    <h1 class="text-xl lg:text-2xl font-black tracking-tight text-slate-900 uppercase flex items-center gap-2.5">
-                        <span class="w-2.5 h-6 bg-sky-600 rounded"></span>
-                        포항공장 봉강생산팀 <span class="text-sky-700 font-semibold ml-0.5 text-base lg:text-lg">생산실적 및 불가동 현황</span>
+        <main class="flex-1 p-3 lg:p-4 overflow-y-auto h-screen relative z-10 tab-content active" id="tab-main">
+            <!-- 상단 헤더: 한 줄로 압축 (레이아웃 편집·위젯 관리·초기화는 왼쪽 사이드바 아이콘으로 이동) -->
+            <header class="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 mb-2">
+                <div class="flex items-baseline gap-x-3 gap-y-0.5 flex-wrap min-w-0">
+                    <h1 class="text-lg lg:text-xl font-semibold text-slate-900 whitespace-nowrap">
+                        포항공장 봉강생산팀 <span class="text-slate-600 font-normal text-sm lg:text-base ml-1">생산실적 및 불가동 현황</span>
                     </h1>
-                    <p class="text-slate-500 font-bold text-[10px] uppercase tracking-wider mt-0.5 ml-4 flex items-center gap-2">
-                        <span id="status-led" class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                        <span id="status-text">Live Sync Active</span>
+                    <p class="text-slate-500 text-[10px] flex items-center gap-1.5 min-w-0">
+                        <span id="status-led" class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0"></span>
+                        <span id="status-text" class="truncate max-w-[420px]">Live Sync Active</span>
                     </p>
                 </div>
 
-                <div class="flex flex-wrap items-center gap-2 glass-panel p-2 !flex-row !h-auto border border-slate-300">
-                    <button id="btn-toggle-edit" onclick="toggleEditMode()" class="px-2.5 py-1 text-xs font-black rounded-md text-white bg-sky-700 hover:bg-sky-800 shadow transition-all flex items-center gap-1.5">
-                        <i class="fa-solid fa-up-down-left-right"></i> <span id="txt-edit-mode">레이아웃 자유 편집</span>
-                    </button>
-                    <button onclick="openWidgetManager()" class="px-2 py-1 text-xs font-bold rounded-md text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-300 transition-all flex items-center gap-1">
-                        <i class="fa-solid fa-cubes text-sky-600"></i> 위젯 관리자
-                    </button>
-                    <button onclick="resetLayout()" class="px-2 py-1 text-xs font-bold rounded-md text-slate-600 hover:text-red-600 bg-slate-100 border border-slate-300 transition-all" title="기본 배치로 초기화">
-                        <i class="fa-solid fa-rotate-left"></i>
-                    </button>
-
-                    <div class="w-[1px] h-5 bg-slate-300 my-auto mx-1"></div>
-
-                    <div class="flex bg-slate-100 p-0.5 rounded-md border border-slate-300" id="screen-mode-container">
-                        <button id="btn-mode-1920" onclick="setScreenMode('1920')" class="px-2 py-0.5 text-[10px] font-extrabold rounded text-sky-800 bg-white shadow-xs border border-slate-300 transition-all flex items-center gap-1">
-                            <i class="fa-solid fa-desktop"></i> 1920 Full
-                        </button>
-                        <button id="btn-mode-960" onclick="setScreenMode('960')" class="px-2 py-0.5 text-[10px] font-extrabold rounded text-slate-500 transition-all flex items-center gap-1">
-                            <i class="fa-solid fa-columns"></i> 960 Split
-                        </button>
-                    </div>
-
-                    <div class="flex gap-2.5 border-r border-slate-300 pr-2.5 pl-1">
-                        <div class="flex flex-col">
-                            <span class="text-[8.5px] font-extrabold text-slate-500 uppercase tracking-widest">CDM운영계획</span>
-                            <div class="flex items-center gap-1">
-                                <input type="number" id="inp-monthly" class="target-input text-sky-700" value="3330" onchange="updateTargets()">
-                                <span class="text-[8.5px] font-bold text-slate-500">TON</span>
-                            </div>
-                        </div>
-                        <div class="flex flex-col">
-                            <span class="text-[8.5px] font-extrabold text-slate-500 uppercase tracking-widest">포장운영계획</span>
-                            <div class="flex items-center gap-1">
-                                <input type="number" id="inp-pack-monthly" class="target-input text-teal-700" value="3700" onchange="updateTargets()">
-                                <span class="text-[8.5px] font-bold text-slate-500">TON</span>
-                            </div>
-                        </div>
-                        <div class="flex flex-col">
-                            <span class="text-[8.5px] font-extrabold text-slate-500 uppercase tracking-widest">일 생산량</span>
-                            <div class="flex items-center gap-1">
-                                <input type="number" id="inp-daily" class="target-input text-amber-600" value="129" onchange="updateTargets()">
-                                <span class="text-[8.5px] font-bold text-slate-500">TON</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="flex items-center gap-1.5 px-1">
-                        <i class="fa-solid fa-calendar-days text-sky-700 text-xs"></i>
-                        <select id="month-select" class="bg-slate-100 border border-slate-300 text-[11px] font-bold text-slate-800 py-0.5 px-2 rounded-md outline-none cursor-pointer" onchange="onMonthChange()">
+                <div class="flex flex-wrap items-center gap-x-3 gap-y-1.5">
+                    <div class="flex items-center gap-1.5">
+                        <i class="fa-solid fa-calendar-days text-slate-600 text-xs"></i>
+                        <select id="month-select" class="bg-slate-100 text-[11px] text-slate-800 h-7 px-2 outline-none cursor-pointer" onchange="onMonthChange()">
                             <option value="LATEST">월 선택 로딩 중...</option>
                         </select>
-                        <select id="date-select" class="bg-slate-100 border border-slate-300 text-[11px] font-bold text-slate-800 py-0.5 px-2 rounded-md outline-none cursor-pointer" onchange="onDateChange()">
+                        <select id="date-select" class="bg-slate-100 text-[11px] text-slate-800 h-7 px-2 outline-none cursor-pointer" onchange="onDateChange()">
                             <option value="ALL">당월 누계 분석</option>
                         </select>
-
-                        <!-- 주간 / 일간 집계 버튼 -->
                         <div class="flex bg-slate-100 p-0.5 rounded-md border border-slate-300" id="view-mode-container">
                             <button id="btn-daily" onclick="setViewMode('DAILY')" class="px-2 py-0.5 text-[10px] font-bold rounded text-sky-800 bg-white border border-slate-300 transition-all">일간</button>
                             <button id="btn-weekly" onclick="setViewMode('WEEKLY')" class="px-2 py-0.5 text-[10px] font-bold rounded text-slate-500 transition-all">주간 (7일단위)</button>
                         </div>
-                    </div>
-
-                    <div class="flex items-center gap-1 px-1 border-l border-slate-300 pl-2">
-                        <i class="fa-solid fa-clock text-amber-600 text-xs"></i>
                         <div class="flex bg-slate-100 p-0.5 rounded-md border border-slate-300">
                             <button id="btn-shift-all" onclick="setShiftMode('ALL')" class="px-1.5 py-0.5 text-[10px] font-bold rounded text-sky-800 bg-white border border-slate-300 transition-all">전체</button>
                             <button id="btn-shift-day" onclick="setShiftMode('1근')" class="px-1.5 py-0.5 text-[10px] font-bold rounded text-slate-500 transition-all">1근</button>
                             <button id="btn-shift-night" onclick="setShiftMode('2근')" class="px-1.5 py-0.5 text-[10px] font-bold rounded text-slate-500 transition-all">2근</button>
                         </div>
+                    </div>
+
+                    <div class="flex items-center gap-2.5 border-l border-slate-300 pl-3 text-[10px] text-slate-600">
+                        <label class="flex items-center gap-1">CDM 계획 <input type="number" id="inp-monthly" class="target-input h-7" value="3330" onchange="updateTargets()"></label>
+                        <label class="flex items-center gap-1">포장 계획 <input type="number" id="inp-pack-monthly" class="target-input h-7" value="3700" onchange="updateTargets()"></label>
+                        <label class="flex items-center gap-1">일 생산 <input type="number" id="inp-daily" class="target-input h-7" value="129" onchange="updateTargets()"></label>
+                        <span>TON</span>
+                    </div>
+
+                    <div class="flex bg-slate-100 p-0.5 rounded-md border border-slate-300" id="screen-mode-container">
+                        <button id="btn-mode-1920" onclick="setScreenMode('1920')" class="px-2 py-0.5 text-[10px] font-extrabold rounded text-sky-800 bg-white shadow-xs border border-slate-300 transition-all flex items-center gap-1">
+                            <i class="fa-solid fa-desktop"></i> 1920
+                        </button>
+                        <button id="btn-mode-960" onclick="setScreenMode('960')" class="px-2 py-0.5 text-[10px] font-extrabold rounded text-slate-500 transition-all flex items-center gap-1">
+                            <i class="fa-solid fa-columns"></i> 960
+                        </button>
                     </div>
                 </div>
             </header>
@@ -545,25 +510,24 @@
                 <!-- Widget 5: 월별 불가동 잔디밭 차트 -->
                 <div class="grid-stack-item" gs-id="widget-oee" gs-x="9" gs-y="0" gs-w="3" gs-h="2">
                     <div class="grid-stack-item-content">
-                        <div class="glass-panel p-2.5 flex flex-col justify-between h-full bg-white">
+                        <div class="glass-panel px-2.5 py-2 flex flex-col gap-1 h-full bg-white">
                             <div class="widget-drag-handle">
                                 <span><i class="fa-solid fa-grip-dots-vertical mr-1"></i> 월별 불가동 히트맵</span>
                                 <i class="fa-solid fa-xmark cursor-pointer hover:text-red-500" onclick="removeWidget('widget-oee')"></i>
                             </div>
                             <div>
-                                <div class="flex justify-between items-center mb-0.5">
+                                <div class="flex justify-between items-center">
                                     <span class="text-[9.5px] font-black text-slate-900 uppercase flex items-center gap-1">
                                         <i class="fa-solid fa-table-cells text-red-600"></i> 월별 불가동 히트맵
                                     </span>
                                     <span id="max-down-month-badge" class="text-[8px] font-black px-1.5 py-0.5 rounded bg-red-100 text-red-700 border border-red-200">최대: -</span>
                                 </div>
-                                <p class="text-[8.5px] font-bold text-slate-400"><span id="heatmap-year-label">올해</span> 월별 불가동 집계 (1월~12월) · <span class="text-red-500 font-black">셀 클릭 시 TOP5 상세</span></p>
+                                <p class="text-[8.5px] text-slate-500 leading-tight"><span id="heatmap-year-label">올해</span> 월별 집계 · <span class="text-red-600">셀 클릭 시 TOP5 상세</span></p>
                             </div>
 
-                            <div id="downtime-heatmap-grid" class="grid grid-cols-6 gap-1 my-1">
-                            </div>
+                            <div id="downtime-heatmap-grid" class="grid grid-cols-6 grid-rows-2 gap-0.5 flex-1 min-h-0"></div>
 
-                            <div class="flex items-center justify-between text-[8px] text-slate-400 font-bold pt-1 border-t border-slate-100">
+                            <div class="flex items-center justify-between text-[8px] text-slate-500 leading-none pt-1 border-t border-slate-200 shrink-0">
                                 <span>Low</span>
                                 <div class="flex gap-0.5 items-center">
                                     <span class="w-2.5 h-2.5 rounded-xs bg-slate-100 border border-slate-200" title="0분"></span>
@@ -1649,22 +1613,22 @@
             let html = '';
             if (widgetId === 'widget-oee') {
                 html = `<div class="grid-stack-item-content">
-                    <div class="glass-panel p-2.5 flex flex-col justify-between h-full bg-white">
+                    <div class="glass-panel px-2.5 py-2 flex flex-col gap-1 h-full bg-white">
                         <div class="widget-drag-handle">
                             <span><i class="fa-solid fa-grip-dots-vertical mr-1"></i> 월별 불가동 히트맵</span>
                             <i class="fa-solid fa-xmark cursor-pointer hover:text-red-500" onclick="removeWidget('widget-oee')"></i>
                         </div>
                         <div>
-                            <div class="flex justify-between items-center mb-0.5">
+                            <div class="flex justify-between items-center">
                                 <span class="text-[9.5px] font-black text-slate-900 uppercase flex items-center gap-1">
                                     <i class="fa-solid fa-table-cells text-red-600"></i> 월별 불가동 히트맵
                                 </span>
                                 <span id="max-down-month-badge" class="text-[8px] font-black px-1.5 py-0.5 rounded bg-red-100 text-red-700 border border-red-200">최대: -</span>
                             </div>
-                            <p class="text-[8.5px] font-bold text-slate-400">연간 월별 불가동 집계 (1월~12월) · <span class="text-red-500 font-black">셀 클릭 시 TOP5 상세</span></p>
+                            <p class="text-[8.5px] text-slate-500 leading-tight"><span id="heatmap-year-label">올해</span> 월별 집계 · <span class="text-red-600">셀 클릭 시 TOP5 상세</span></p>
                         </div>
-                        <div id="downtime-heatmap-grid" class="grid grid-cols-6 gap-1 my-1"></div>
-                        <div class="flex items-center justify-between text-[8px] text-slate-400 font-bold pt-1 border-t border-slate-100">
+                        <div id="downtime-heatmap-grid" class="grid grid-cols-6 grid-rows-2 gap-0.5 flex-1 min-h-0"></div>
+                        <div class="flex items-center justify-between text-[8px] text-slate-500 leading-none pt-1 border-t border-slate-200 shrink-0">
                             <span>Low</span>
                             <div class="flex gap-0.5 items-center">
                                 <span class="w-2.5 h-2.5 rounded-xs bg-slate-100 border border-slate-200" title="0분"></span>
@@ -2341,13 +2305,13 @@
                     if (ratio < 0.25) bgColor = "bg-emerald-300 text-emerald-950 font-extrabold border border-emerald-400 shadow-xs";
                     else if (ratio < 0.55) bgColor = "bg-amber-300 text-amber-950 font-extrabold border border-amber-400 shadow-xs";
                     else if (ratio < 0.8) bgColor = "bg-orange-400 text-white font-black border border-orange-500 shadow-xs";
-                    else bgColor = "bg-red-600 text-white font-black border border-red-700 animate-pulse shadow-sm";
+                    else bgColor = "bg-red-600 text-white font-black border border-red-700";
                 }
 
                 html += `
-                <div class="${bgColor} rounded-md py-1 px-0.5 text-center transition-all hover:scale-110 hover:ring-2 hover:ring-slate-900/40 cursor-pointer shadow-xs" onclick="openMonthDownDetail('${monthKey}')" title="${m}월 총 불가동시간: ${val.toLocaleString()}분 (클릭 시 TOP5 상세)">
-                    <div class="text-[8.5px] font-bold leading-tight">${m}월</div>
-                    <div class="text-[10px] font-mono-num font-black leading-tight">${val > 0 ? (val >= 60 ? Math.round(val/60)+'h' : val+'m') : '-'}</div>
+                <div class="${bgColor} min-h-0 px-0.5 flex flex-col items-center justify-center text-center leading-none gap-px transition-colors hover:ring-2 hover:ring-slate-900/40 cursor-pointer overflow-hidden" onclick="openMonthDownDetail('${monthKey}')" title="${m}월 총 불가동시간: ${val.toLocaleString()}분 (클릭 시 TOP5 상세)">
+                    <div class="text-[8.5px] leading-none">${m}월</div>
+                    <div class="text-[10px] font-mono-num leading-none">${val > 0 ? (val >= 60 ? Math.round(val/60)+'h' : val+'m') : '-'}</div>
                 </div>`;
             }
 
@@ -3884,7 +3848,7 @@
                 const el = document.getElementById('insp-kpi-' + d.id);
                 if (!el) return;
                 el.innerHTML = `
-                    <div class="flex justify-between items-center mb-0.5">
+                    <div class="flex justify-between items-center">
                         <span class="text-[10px] font-black uppercase flex items-center gap-1" style="color:${d.color}"><i class="fa-solid fa-microscope text-[10px]"></i> ${d.title} ${d.id === 'TOTAL' ? '' : '부적합'}</span>
                         ${delta}
                     </div>
