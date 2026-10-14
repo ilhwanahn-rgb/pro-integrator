@@ -401,6 +401,7 @@
                         <label class="flex items-center gap-1">포장 계획 <input type="number" id="inp-pack-monthly" class="target-input h-7" value="3700" onchange="updateTargets()"></label>
                         <label class="flex items-center gap-1">일 생산 <input type="number" id="inp-daily" class="target-input h-7" value="129" onchange="updateTargets()"></label>
                         <span>TON</span>
+                        <span id="target-save-status" class="text-[9.5px] text-slate-500 whitespace-nowrap" title="목표는 월별로 이 브라우저에 저장됩니다. 값을 바꾸면 자동 저장돼요.">-</span>
                     </div>
 
                     <div class="flex bg-slate-100 p-0.5 rounded-md border border-slate-300" id="screen-mode-container">
@@ -2249,10 +2250,63 @@
         safeRenderAll();
         setTimeout(function () { fetchGoogleSheetsData(); }, 60);
 
+        // ===== 월별 목표 저장 (이 브라우저의 localStorage, 월별로 따로 보관) =====
+        const TARGET_STORE_KEY = 'DASHBOARD_MONTHLY_TARGETS_V1';
+        const DEFAULT_TARGETS = { monthly: 3330, pack: 3700, daily: 129 };
+        let targetsLoadedFor = null;
+
+        function readTargetStore() {
+            try { return JSON.parse(localStorage.getItem(TARGET_STORE_KEY) || '{}') || {}; } catch (e) { return {}; }
+        }
+        function writeTargetStore(store) {
+            try { localStorage.setItem(TARGET_STORE_KEY, JSON.stringify(store)); return true; } catch (e) { return false; }
+        }
+        function targetMonthKey() {
+            return (typeof selectedMonth === 'string' && /^\d{4}-\d{2}$/.test(selectedMonth)) ? selectedMonth : getCurrentMonthKey();
+        }
+        function setTargetStatus(text) {
+            const el = document.getElementById('target-save-status');
+            if (el) el.innerText = text;
+        }
+        // 해당 월 목표 불러오기: 저장값 → 없으면 그 이전 달 중 가장 최근 저장값 → 없으면 기본값
+        function loadTargetsForMonth(ym) {
+            const store = readTargetStore();
+            let t = store[ym], from = ym, inherited = false;
+            if (!t) {
+                const prev = Object.keys(store).filter(k => k < ym).sort().pop();
+                if (prev) { t = store[prev]; from = prev; inherited = true; }
+            }
+            t = t || DEFAULT_TARGETS;
+            monthlyTarget = Number(t.monthly) || 0;
+            packMonthlyTarget = Number(t.pack) || 0;
+            dailyTarget = Number(t.daily) || 0;
+            const set = (id, v) => { const el = document.getElementById(id); if (el) el.value = v; };
+            set('inp-monthly', monthlyTarget); set('inp-pack-monthly', packMonthlyTarget); set('inp-daily', dailyTarget);
+            const mm = parseInt(ym.substring(5, 7), 10);
+            setTargetStatus(store[ym] ? `${mm}월 목표 · 저장됨` : inherited ? `${mm}월 · ${parseInt(from.substring(5, 7), 10)}월 값 사용 중` : `${mm}월 · 기본값`);
+            targetsLoadedFor = ym;
+        }
+        function ensureTargetsForSelectedMonth() {
+            const ym = targetMonthKey();
+            if (ym !== targetsLoadedFor) loadTargetsForMonth(ym);
+        }
+
         function updateTargets() { 
             monthlyTarget = parseFloat(document.getElementById('inp-monthly').value)||0; 
             packMonthlyTarget = parseFloat(document.getElementById('inp-pack-monthly').value)||0; 
             dailyTarget = parseFloat(document.getElementById('inp-daily').value)||0; 
+            const ym = targetMonthKey();
+            const store = readTargetStore();
+            store[ym] = { monthly: monthlyTarget, pack: packMonthlyTarget, daily: dailyTarget, savedAt: new Date().toISOString() };
+            const mm = parseInt(ym.substring(5, 7), 10);
+            if (writeTargetStore(store)) {
+                targetsLoadedFor = ym;
+                setTargetStatus(`${mm}월 목표 · 저장됨`);
+                showToast(`${ym} 목표가 저장되었습니다.`);
+            } else {
+                setTargetStatus('저장 불가 (브라우저 저장소 차단)');
+                showToast('이 환경에서는 목표를 저장할 수 없습니다. 화면에만 반영됩니다.', 'danger');
+            }
             updateDashboard(); 
         }
         function onMonthChange() { selectedMonth = document.getElementById('month-select').value; selectedDate = 'ALL'; updateDashboard(); }
@@ -2372,6 +2426,8 @@
                     selectedMonth = 'ALL_PERIOD';
                 }
             }
+
+            ensureTargetsForSelectedMonth();
 
             let cProd = safeProd;
             let cDown = safeDown;
@@ -2971,12 +3027,13 @@
                 const prev = blocks.length ? blocks[blocks.length - 1] : null;
                 if (keys.length > 1 && prev !== null) {
                     // 같은 날 여러 품종이면 실적 패턴에 가장 가깝게 배열 (일중 순서는 알 수 없으므로 유리하게 가정)
+                    // 전날 하던 품종이 같은 날에도 있으면 그 품종을 먼저 이어서 한 것으로 본다 (불필요한 왕복 교체 방지)
                     const pi = pos(prev);
                     const dist = (k) => {
+                        if (k === prev) return -1;
                         const i = pos(k);
                         if (i === -1 || pi === -1) return 99;
-                        const dd = (i - pi + L) % L;
-                        return dd === 0 ? L : dd;
+                        return (i - pi + L) % L;
                     };
                     keys.sort((a, b) => dist(a) - dist(b));
                 }
@@ -3194,11 +3251,10 @@
                 const statusCls = overBase > 1.0 ? 'text-red-700' : overBase > 0 ? 'text-amber-700' : 'text-emerald-700';
                 const cycleCellHtml = !cyc.hasData
                     ? `<span class="text-slate-400 text-[10px]">당월 실적 없음</span>`
-                    : `<div class="flex flex-col items-center gap-1 leading-tight" title="${mSwitchTitle}${splitDetail ? '\n분할: ' + splitDetail : ''}\n당월 실제 흐름: ${seqTxt}">
+                    : `<div class="flex flex-col items-center gap-1 leading-tight" title="${mSwitchTitle}${splitDetail ? '\n분할: ' + splitDetail : ''}">
                             <div class="text-[11px] text-slate-700">공정교체 <span class="font-mono-num text-[16px] font-semibold ${statusCls}">${mSwitch}</span>회</div>
                             <span class="px-1.5 py-px text-[9.5px] border ${mSwitchCls}">기준 ${baseAvg.toFixed(1)}회 · ${statusTxt}</span>
                             <div class="text-[9.5px] ${splitTotal > 0 ? 'text-red-700' : 'text-slate-600'}">${mCycles}사이클 · ${splitTotal > 0 ? '분할 +' + splitTotal + '회' : '분할 없음'}</div>
-                            <div class="text-[9px] text-slate-500 break-all max-w-[150px]">${seqTxt}</div>
                        </div>`;
 
                 mCategories.forEach((cat, cIdx) => {
