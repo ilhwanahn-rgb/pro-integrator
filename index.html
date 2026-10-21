@@ -610,18 +610,18 @@
                 </div>
 
                 <!-- Widget 8: 통합 자산 제어 레지스트리 표 -->
-                <div class="grid-stack-item" gs-id="widget-registry" gs-x="0" gs-y="7" gs-w="12" gs-h="4">
+                <div class="grid-stack-item" gs-id="widget-registry" gs-x="0" gs-y="7" gs-w="7" gs-h="4">
                     <div class="grid-stack-item-content">
                         <div class="glass-panel overflow-hidden h-full">
                             <div class="widget-drag-handle">
                                 <span><i class="fa-solid fa-grip-dots-vertical mr-1"></i> 자산 제어 레지스트리</span>
                                 <i class="fa-solid fa-xmark cursor-pointer hover:text-red-500" onclick="removeWidget('widget-registry')"></i>
                             </div>
-                            <div class="p-3 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+                            <div class="px-3 py-2 border-b border-slate-200 flex items-center justify-between bg-slate-50">
                                 <h3 class="text-xs lg:text-sm font-black text-slate-900 flex items-center gap-2"><i class="fa-solid fa-microchip text-sky-700"></i> 통합 자산 제어 레지스트리</h3>
                                 <span class="text-[9px] font-extrabold text-slate-500 uppercase tracking-widest">Tableau Enterprise Asset Registry</span>
                             </div>
-                            <div class="overflow-x-auto p-2 flex-1">
+                            <div class="overflow-auto p-2 flex-1 min-h-0">
                                 <table>
                                     <thead>
                                         <tr>
@@ -636,6 +636,23 @@
                                     <tbody id="registry-body"></tbody>
                                 </table>
                             </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Widget 9: 월별 외주 임가공 진도현황 -->
+                <div class="grid-stack-item" gs-id="widget-outsource" gs-x="7" gs-y="7" gs-w="5" gs-h="4">
+                    <div class="grid-stack-item-content">
+                        <div class="glass-panel h-full overflow-hidden">
+                            <div class="widget-drag-handle">
+                                <span><i class="fa-solid fa-grip-dots-vertical mr-1"></i> 외주 임가공 진도현황</span>
+                                <i class="fa-solid fa-xmark cursor-pointer hover:text-red-500" onclick="removeWidget('widget-outsource')"></i>
+                            </div>
+                            <div class="px-3 py-2 border-b border-slate-200 flex items-center justify-between gap-2 bg-slate-50">
+                                <h3 class="text-xs lg:text-sm font-black text-slate-900 flex items-center gap-2"><i class="fa-solid fa-truck-ramp-box text-sky-700"></i> 월별 외주 임가공 진도현황</h3>
+                                <span id="outsource-period" class="text-[10px] text-slate-600 whitespace-nowrap">-</span>
+                            </div>
+                            <div id="outsource-body" class="flex-1 min-h-0 overflow-y-auto px-3 py-1.5 flex flex-col"></div>
                         </div>
                     </div>
                 </div>
@@ -1317,7 +1334,133 @@
 
         const MACHINE_ORDER = ['PCD-0-2', 'PCD-0-3', 'PCD-1', 'PCD-5', 'PCD-2-2', 'PCD-3', 'PCD-4'];
         const CHANGEOVER_LOSS_MIN = 30; // 품종 전환(다이스·세팅 교체) 1회당 표준 공정 LOSS 추정치(분)
-        const EXCLUDED_EQUIPS = ['미분류', 'PCD-W11', 'PCD-W8']; 
+        const EXCLUDED_EQUIPS = ['미분류', 'PCD-W11', 'PCD-W8'];
+
+        // ===== 외주 임가공 (CDM) 예산 설정 — 예산이 바뀌면 monthly 값만 고치면 됩니다 =====
+        //  · 남부스틸 : PCD-W11
+        //  · 삼원강재 : PCD-W8, 작업선경 18mm 이하 → 본사 / 19mm 이상 → 섬안
+        const OUTSOURCE_EQUIP_KEYS = ['PCD-W11', 'PCD-W8'];
+        const OUTSOURCE_SIZE_SPLIT_MM = 19;   // 이 값 미만 = 본사, 이상 = 섬안 (18mm 초과~19mm 미만도 본사로 봄)
+        const OUTSOURCE_VENDORS = [
+            { id: 'NAMBU',    name: '남부스틸',       sub: 'PCD-W11',            monthly: 200 },
+            { id: 'SW_SEOMAN', name: '삼원강재-섬안', sub: 'PCD-W8 · 19mm 이상', monthly: 150 },
+            { id: 'SW_HQ',    name: '삼원강재-본사', sub: 'PCD-W8 · 18mm 이하', monthly: 150 }
+        ];
+        let outsourceData = [];
+
+        function classifyOutsource(r) {
+            if (r.equipKey === 'PCD-W11') return 'NAMBU';
+            if (r.equipKey === 'PCD-W8') {
+                if (!r.wire) return 'SW_UNKNOWN';
+                return r.wire >= OUTSOURCE_SIZE_SPLIT_MM ? 'SW_SEOMAN' : 'SW_HQ';
+            }
+            return null;
+        }
+
+        function renderOutsourceProgress() {
+            const body = document.getElementById('outsource-body');
+            if (!body) return;
+            const ym = (typeof selectedMonth === 'string' && /^\d{4}-\d{2}$/.test(selectedMonth)) ? selectedMonth : getCurrentMonthKey();
+            const year = ym.substring(0, 4), mon = parseInt(ym.substring(5, 7), 10);
+            const now = new Date();
+            const isCurrent = ym === getCurrentMonthKey();
+            const daysInMonth = new Date(+year, mon, 0).getDate();
+            const pace = isCurrent ? Math.min(1, now.getDate() / daysInMonth) : 1;   // 당월 경과율
+
+            const sums = {}; const ytd = {}; let unknownMonth = 0;
+            (outsourceData || []).forEach(r => {
+                if (!r.date || !r.date.startsWith(year + '-')) return;
+                const v = classifyOutsource(r); if (!v) return;
+                const t = (r.amount || 0) / 1000;
+                const m = parseInt(r.date.substring(5, 7), 10);
+                if (m <= mon) ytd[v] = (ytd[v] || 0) + t;
+                if (r.date.startsWith(ym)) { sums[v] = (sums[v] || 0) + t; if (v === 'SW_UNKNOWN') unknownMonth += t; }
+            });
+
+            const fmt = n => n.toLocaleString(undefined, { maximumFractionDigits: 1, minimumFractionDigits: 1 });
+            const tag = (txt, kind) => {
+                const c = kind === 'red' ? 'background:#FFD7D9;color:#750E13' : kind === 'yellow' ? 'background:#FCF4D6;color:#684E00' : 'background:#DEFBE6;color:#0E6027';
+                return `<span class="text-[10px] px-2 py-px rounded-full whitespace-nowrap" style="${c}">${txt}</span>`;
+            };
+            const bar = (val, budget, marker) => {
+                const pct = budget > 0 ? val / budget * 100 : 0;
+                const fill = Math.min(100, pct);
+                const color = pct > 100 ? '#DA1E28' : '#0F62FE';
+                return `<div class="relative h-2 bg-slate-200 w-full">
+                        <div class="h-2" style="width:${fill}%;background:${color}"></div>
+                        ${marker !== null ? `<div class="absolute -top-0.5 h-3 w-px" style="left:${Math.min(100, marker * 100)}%;background:#161616" title="경과 기준선"></div>` : ''}
+                    </div>`;
+            };
+
+            const store = readTargetStore();
+            const planOf = (vid, ymKey) => {
+                const o = store[ymKey] && store[ymKey].outsource;
+                return (o && o[vid] !== undefined && o[vid] !== null && o[vid] !== '') ? Number(o[vid]) : null;
+            };
+            let html = '', totM = 0, totP = 0, totMB = 0, totY = 0, totYB = 0, overCnt = 0, warnCnt = 0;
+            const monthsLeft = 12 - mon;
+            OUTSOURCE_VENDORS.forEach(v => {
+                const a = sums[v.id] || 0, y = ytd[v.id] || 0;
+                const mB = v.monthly, yB = v.monthly * 12;
+                const planSaved = planOf(v.id, ym);
+                const plan = planSaved !== null ? planSaved : mB;      // 미입력 시 월 예산값을 계획으로 사용
+                // 선택 월까지의 운영계획 누계 (미입력 월은 예산값)
+                let planCum = 0;
+                for (let m = 1; m <= mon; m++) {
+                    const k = `${year}-${String(m).padStart(2, '0')}`;
+                    const pv = planOf(v.id, k); planCum += pv !== null ? pv : mB;
+                }
+                totM += a; totP += plan; totMB += mB; totY += y; totYB += yB;
+                const proj = pace > 0 ? a / pace : a;
+                let st;
+                if (y > yB) { st = tag(`연간 예산 초과 +${fmt(y - yB)}T`, 'red'); overCnt++; }
+                else if (a > plan) { st = tag(`계획 초과 +${fmt(a - plan)}T`, 'red'); overCnt++; }
+                else if (isCurrent && proj > plan) { st = tag(`초과 예상 (${fmt(proj)}T)`, 'yellow'); warnCnt++; }
+                else st = tag('계획 내', 'green');
+                const planOverBudget = plan > mB;
+                const remain = yB - y;
+                const perMonth = monthsLeft > 0 ? remain / monthsLeft : null;
+                html += `<div class="py-1.5 border-b border-slate-200 last:border-b-0">
+                    <div class="flex items-center justify-between gap-2">
+                        <div class="min-w-0"><span class="text-[12px] font-semibold text-slate-900">${v.name}</span> <span class="text-[10px] text-slate-500">${v.sub}</span></div>
+                        <div class="flex items-center gap-2 shrink-0">
+                            <label class="flex items-center gap-1 text-[10px] text-slate-600" title="${mon}월 운영계획 (톤). 입력 후 Enter 또는 다른 곳 클릭 시 저장. 월 예산 ${mB}T">
+                                ${mon}월 계획
+                                <input type="number" min="0" step="10" value="${plan}" class="target-input h-6 !w-[56px] text-[11px]" onchange="saveOutsourcePlan('${v.id}', this)">
+                                <span>T</span>${planSaved === null ? '<span class="text-slate-400">(예산값)</span>' : ''}
+                            </label>
+                            ${st}
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-[46px_1fr_auto] items-center gap-x-2 gap-y-1 mt-1 text-[10px]">
+                        <span class="text-slate-600">${mon}월</span>
+                        ${bar(a, plan, isCurrent ? pace : null)}
+                        <span class="font-mono-num text-slate-900 whitespace-nowrap text-right"><b class="text-[12px]">${fmt(a)}</b> / 계획 ${fmt(plan)}T · ${plan > 0 ? Math.round(a / plan * 100) : 0}%</span>
+                        <span class="text-slate-600">연 누계</span>
+                        ${bar(y, yB, Math.min(1, planCum / yB))}
+                        <span class="font-mono-num text-slate-700 whitespace-nowrap text-right">${fmt(y)} / 예산 ${yB.toLocaleString()}T${y > planCum ? ` <span style="color:#A2191F">(계획누계 +${fmt(y - planCum)})</span>` : ''}</span>
+                    </div>
+                    ${planOverBudget ? `<div class="text-[9.5px] mt-0.5" style="color:#684E00">${mon}월 운영계획 ${fmt(plan)}T가 월 예산 ${mB}T를 ${fmt(plan - mB)}T 초과합니다.</div>` : ''}
+                    ${remain < 0
+                        ? `<div class="text-[9.5px] mt-0.5" style="color:#A2191F">연간 예산 ${fmt(-remain)}T 초과 — 외주 중단 검토</div>`
+                        : (perMonth !== null && perMonth < v.monthly)
+                            ? `<div class="text-[9.5px] mt-0.5" style="color:#684E00">연간 잔여 ${fmt(remain)}T — 남은 ${monthsLeft}개월은 월 ${fmt(perMonth)}T 이하로 운영해야 연간 예산 내</div>`
+                            : `<div class="text-[9.5px] mt-0.5 text-slate-500">연간 예산 잔여 ${fmt(remain)}T</div>`}
+                </div>`;
+            });
+
+            const summary = overCnt > 0 ? tag(`초과 ${overCnt}곳`, 'red') : warnCnt > 0 ? tag(`초과 예상 ${warnCnt}곳`, 'yellow') : tag('전체 계획·예산 내', 'green');
+            html += `<div class="mt-auto pt-1.5 flex items-center justify-between gap-2 text-[10px] text-slate-700 border-t border-slate-300">
+                    <span>합계 ${mon}월 <b class="font-mono-num">${fmt(totM)}</b> / 계획 ${fmt(totP)}T (예산 ${totMB}T) · 연 누계 <b class="font-mono-num">${fmt(totY)}</b> / 예산 ${totYB.toLocaleString()}T</span>
+                    ${summary}
+                </div>`;
+            if (unknownMonth > 0) html += `<div class="text-[9.5px] mt-0.5" style="color:#684E00">PCD-W8 선경 미기재 ${fmt(unknownMonth)}T — 본사/섬안 구분 불가, 위 집계에서 제외</div>`;
+            if (!(outsourceData || []).length) html += `<div class="text-[9.5px] text-slate-500 mt-0.5">생산실적 시트에서 PCD-W11 / PCD-W8 실적을 아직 받지 못했습니다.</div>`;
+
+            body.innerHTML = html;
+            const per = document.getElementById('outsource-period');
+            if (per) per.innerHTML = `${year}년 ${mon}월${isCurrent ? ` · 경과 ${Math.round(pace * 100)}% <span class="inline-block w-px h-2.5 align-middle" style="background:#161616"></span>` : ''}`;
+        } 
         // ✅ COIL QT 판정 기준 : 작업설비가 PCD-0-3 / PCD-5 이면서 실공정(T열)에 '코일외주' 포함
         const COIL_QT_EQUIPS = ['PCD-0-3', 'PCD-5'];
         const COIL_QT_KEYWORD = '코일외주';
@@ -1331,7 +1474,8 @@
             { id: 'widget-oee', name: '월별 불가동 히트맵 (GitHub 잔디밭)', icon: 'fa-table-cells' },
             { id: 'widget-main-chart', name: '생산/포장/불가동 복합 차트 (일간/주간)', icon: 'fa-chart-line' },
             { id: 'widget-ratio-charts', name: '생산 비율 3종 분석 (강종/형상/열처리)', icon: 'fa-pie-chart' },
-            { id: 'widget-registry', name: '통합 자산 제어 레지스트리', icon: 'fa-microchip' }
+            { id: 'widget-registry', name: '통합 자산 제어 레지스트리', icon: 'fa-microchip' },
+            { id: 'widget-outsource', name: '월별 외주 임가공 진도현황', icon: 'fa-truck-ramp-box' }
         ];
 
         const DEFAULT_GRID_LAYOUT = [
@@ -1342,7 +1486,8 @@
             { id: 'widget-oee', x: 9, y: 0, w: 3, h: 2 },
             { id: 'widget-main-chart', x: 0, y: 2, w: 7, h: 5 },
             { id: 'widget-ratio-charts', x: 7, y: 2, w: 5, h: 5 },
-            { id: 'widget-registry', x: 0, y: 7, w: 12, h: 4 }
+            { id: 'widget-registry', x: 0, y: 7, w: 7, h: 4 },
+            { id: 'widget-outsource', x: 7, y: 7, w: 5, h: 4 }
         ];
 
         const CITY_WEATHER = {
@@ -1478,6 +1623,7 @@
             loadSavedLayout();
             renderWeatherDisplay();
             updateDashboard();
+            loadRemoteSettings();
         });
 
         function toggleEditMode() {
@@ -1511,7 +1657,7 @@
         function saveLayout() {
             if (!grid) return;
             const layout = grid.save();
-            localStorage.setItem('PRO_DASHBOARD_GRID_LAYOUT_V36', JSON.stringify(layout));
+            localStorage.setItem('PRO_DASHBOARD_GRID_LAYOUT_V37', JSON.stringify(layout));
         }
 
         function sanitizeLayout(layoutArray) {
@@ -1524,7 +1670,7 @@
         }
 
         function loadSavedLayout() {
-            const saved = localStorage.getItem('PRO_DASHBOARD_GRID_LAYOUT_V36');
+            const saved = localStorage.getItem('PRO_DASHBOARD_GRID_LAYOUT_V37');
             if (saved && grid) {
                 try {
                     const parsed = JSON.parse(saved);
@@ -1546,6 +1692,7 @@
         }
 
         function resetLayout() {
+            localStorage.removeItem('PRO_DASHBOARD_GRID_LAYOUT_V37');
             localStorage.removeItem('PRO_DASHBOARD_GRID_LAYOUT_V36');
             localStorage.removeItem('PRO_DASHBOARD_GRID_LAYOUT_V35');
             location.reload();
@@ -1598,7 +1745,8 @@
                 else if (widgetId.includes('oee')) { w = 3; h = 2; }
                 else if (widgetId.includes('main')) { w = 7; h = 5; }
                 else if (widgetId.includes('ratio')) { w = 5; h = 5; }
-                else if (widgetId.includes('registry')) { w = 12; h = 4; }
+                else if (widgetId.includes('registry')) { w = 7; h = 4; }
+                else if (widgetId.includes('outsource')) { w = 5; h = 4; }
 
                 const widgetTemplate = getWidgetHtmlTemplate(widgetId);
                 grid.addWidget(widgetTemplate, { w, h, id: widgetId });
@@ -1615,7 +1763,21 @@
             div.className = 'grid-stack-item';
             
             let html = '';
-            if (widgetId === 'widget-oee') {
+            if (widgetId === 'widget-outsource') {
+                html = `<div class="grid-stack-item-content">
+                        <div class="glass-panel h-full overflow-hidden">
+                            <div class="widget-drag-handle">
+                                <span><i class="fa-solid fa-grip-dots-vertical mr-1"></i> 외주 임가공 진도현황</span>
+                                <i class="fa-solid fa-xmark cursor-pointer hover:text-red-500" onclick="removeWidget('widget-outsource')"></i>
+                            </div>
+                            <div class="px-3 py-2 border-b border-slate-200 flex items-center justify-between gap-2 bg-slate-50">
+                                <h3 class="text-xs lg:text-sm font-black text-slate-900 flex items-center gap-2"><i class="fa-solid fa-truck-ramp-box text-sky-700"></i> 월별 외주 임가공 진도현황</h3>
+                                <span id="outsource-period" class="text-[10px] text-slate-600 whitespace-nowrap">-</span>
+                            </div>
+                            <div id="outsource-body" class="flex-1 min-h-0 overflow-y-auto px-3 py-1.5 flex flex-col"></div>
+                        </div>
+                    </div>`;
+            } else if (widgetId === 'widget-oee') {
                 html = `<div class="grid-stack-item-content">
                     <div class="glass-panel px-2.5 py-2 flex flex-col gap-1 h-full bg-white">
                         <div class="widget-drag-handle">
@@ -2090,6 +2252,7 @@
             };
 
             const parsed = [];
+            const outsourceRows = [];   // 외주 임가공 (PCD-W11 남부스틸 / PCD-W8 삼원강재)
             const lotIndex = [];   // ✅ 생산실적: 제조번호 → 작업설비 (집계 제외 설비 PCD-W8/W11 포함) — 다기능 PCD 호기 매칭용
             for (let i = headerIdx + 1; i < aoa.length; i++) {
                 const row = aoa[i]; if (!row || row.length === 0 || !row.join('').trim()) continue; 
@@ -2132,6 +2295,9 @@
                     const lotNoV = String(getVal(row, ['제조번호', 'LOTNO', 'LOT번호']) || '').trim();
                     const amountV = safeNum(getVal(row, ['작업량', '생산량', '중량', '실적', '수량']));
                     if (lotNoV) lotIndex.push({ lot: lotNoV, equip, date, amount: amountV });
+                    if (OUTSOURCE_EQUIP_KEYS.includes(equipKey)) {
+                        outsourceRows.push({ date, equipKey, amount: amountV, wire: safeNum(getVal(row, ['작업선경', '선경', '두께', 'WIRE'])) });
+                    }
                     if (EXCLUDED_EQUIPS.includes(equip.toUpperCase().trim())) continue;
                     parsed.push({ 
                         date, equipment: equip, team, isCircle, steelType, shapeRaw, heatTreat, realProc: rawProc, isCoilQt, shift: shiftVal, 
@@ -2146,7 +2312,7 @@
                 } else if (dataType === 'PACK') {
                     parsed.push({ date, equipment: equip, team, shift: shiftVal, amount: safeNum(getVal(row, ['포장량', '포장중량', '실적', '작업량', '수량'])) });
                 }
-            } if (dataType === 'PROD') parsed.lotIndex = lotIndex; return parsed;
+            } if (dataType === 'PROD') { parsed.lotIndex = lotIndex; parsed.outsource = outsourceRows; } return parsed;
         }
 
         // ✅ [FIX] 동기화가 "진행 중..."에서 멈추던 병목 해소
@@ -2221,7 +2387,7 @@
                     fetchOneSheet(SHARED_INSP_URL, 'INSP')
                 ]);
 
-                if (prodRes) { prodData = prodRes; loadedFlags.push('생산:' + prodRes.length); } else failed.push('생산');
+                if (prodRes) { prodData = prodRes; outsourceData = prodRes.outsource || []; loadedFlags.push('생산:' + prodRes.length); } else failed.push('생산');
                 if (downRes) { downData = downRes; loadedFlags.push('불가동:' + downRes.length); } else failed.push('불가동');
                 if (packRes) { packData = packRes; loadedFlags.push('포장:' + packRes.length); } else failed.push('포장');
                 // 다기능 검사실적: URL 미설정이면 실패로 치지 않고 데모 유지
@@ -2250,17 +2416,91 @@
         safeRenderAll();
         setTimeout(function () { fetchGoogleSheetsData(); }, 60);
 
-        // ===== 월별 목표 저장 (이 브라우저의 localStorage, 월별로 따로 보관) =====
+        // ===== 월별 설정 저장 (목표 · 외주 운영계획) =====
+        //  · SETTINGS_API_URL 이 있으면 구글 시트(Apps Script)에 저장 → 모든 PC·TV가 같은 값을 봄
+        //  · 없거나 실패하면 이 브라우저(localStorage)에만 저장
+        //  ※ 아래 주소에 Apps Script 웹앱 배포 URL을 붙여 넣으세요 (예: https://script.google.com/macros/s/XXXX/exec)
+        const SETTINGS_API_URL = 'https://script.google.com/macros/s/AKfycbweBF-2lTcgmSxhGzZn8PkA8JIcfKKHKITmXj16ydNAr9xvEBvAnpWKaRVf2uKKMxk/exec';
         const TARGET_STORE_KEY = 'DASHBOARD_MONTHLY_TARGETS_V1';
         const DEFAULT_TARGETS = { monthly: 3330, pack: 3700, daily: 129 };
         let targetsLoadedFor = null;
+        let settingsCache = null;          // { 'YYYY-MM': { monthly, pack, daily, outsource: { NAMBU, SW_SEOMAN, SW_HQ } } }
+        let settingsRemoteState = SETTINGS_API_URL ? 'loading' : 'none';   // none | loading | ok | failed
 
         function readTargetStore() {
-            try { return JSON.parse(localStorage.getItem(TARGET_STORE_KEY) || '{}') || {}; } catch (e) { return {}; }
+            if (settingsCache) return settingsCache;
+            try { settingsCache = JSON.parse(localStorage.getItem(TARGET_STORE_KEY) || '{}') || {}; } catch (e) { settingsCache = {}; }
+            return settingsCache;
         }
-        function writeTargetStore(store) {
-            try { localStorage.setItem(TARGET_STORE_KEY, JSON.stringify(store)); return true; } catch (e) { return false; }
+        function persistLocal() {
+            try { localStorage.setItem(TARGET_STORE_KEY, JSON.stringify(settingsCache || {})); return true; } catch (e) { return false; }
         }
+        function storageWhere() {
+            return settingsRemoteState === 'ok' ? '공유 시트' : '이 브라우저';
+        }
+
+        // 구글 시트에서 전체 설정 불러오기 (시작 시 1회)
+        async function loadRemoteSettings() {
+            if (!SETTINGS_API_URL) return;
+            try {
+                const res = await fetch(SETTINGS_API_URL + '?action=get&t=' + Date.now(), { cache: 'no-store' });
+                const json = await res.json();
+                if (!json || !json.ok) throw new Error(json && json.error || 'bad response');
+                const store = readTargetStore();
+                Object.entries(json.data || {}).forEach(([ym, vals]) => {
+                    store[ym] = Object.assign({}, store[ym] || {}, vals, { outsource: Object.assign({}, (store[ym] || {}).outsource || {}, vals.outsource || {}) });
+                });
+                persistLocal();
+                settingsRemoteState = 'ok';
+            } catch (e) {
+                console.error('설정 시트 불러오기 실패', e);
+                settingsRemoteState = 'failed';
+            }
+            targetsLoadedFor = null;     // 새 값으로 다시 반영
+            safeRenderAll();
+        }
+
+        // 한 달치 설정 일부를 저장 (patch 예: { monthly: 3830 } 또는 { outsource: { NAMBU: 180 } })
+        async function saveMonthSettings(ym, patch) {
+            const store = readTargetStore();
+            const cur = store[ym] || {};
+            const next = Object.assign({}, cur, patch);
+            if (patch.outsource) next.outsource = Object.assign({}, cur.outsource || {}, patch.outsource);
+            next.savedAt = new Date().toISOString();
+            store[ym] = next;
+            const localOk = persistLocal();
+
+            if (SETTINGS_API_URL) {
+                try {
+                    const flat = {};
+                    Object.entries(patch).forEach(([k, v]) => {
+                        if (k === 'outsource') Object.entries(v).forEach(([vk, vv]) => flat['outsource.' + vk] = vv);
+                        else flat[k] = v;
+                    });
+                    const res = await fetch(SETTINGS_API_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'text/plain;charset=utf-8' },   // CORS 사전요청 없이 전송
+                        body: JSON.stringify({ action: 'save', month: ym, values: flat })
+                    });
+                    const json = await res.json();
+                    if (!json || !json.ok) throw new Error(json && json.error || 'save failed');
+                    settingsRemoteState = 'ok';
+                    return 'remote';
+                } catch (e) {
+                    console.error('설정 시트 저장 실패', e);
+                    settingsRemoteState = 'failed';
+                    return localOk ? 'local-fallback' : 'none';
+                }
+            }
+            return localOk ? 'local' : 'none';
+        }
+        function saveResultToast(ym, what, result) {
+            if (result === 'remote') showToast(`${ym} ${what} 저장 완료 (공유 시트)`);
+            else if (result === 'local') showToast(`${ym} ${what} 저장 완료 (이 브라우저에만 저장)`);
+            else if (result === 'local-fallback') showToast(`공유 시트 저장 실패 — ${ym} ${what}을 이 브라우저에만 저장했습니다.`, 'danger');
+            else showToast('이 환경에서는 저장할 수 없습니다. 화면에만 반영됩니다.', 'danger');
+        }
+
         function targetMonthKey() {
             return (typeof selectedMonth === 'string' && /^\d{4}-\d{2}$/.test(selectedMonth)) ? selectedMonth : getCurrentMonthKey();
         }
@@ -2271,9 +2511,10 @@
         // 해당 월 목표 불러오기: 저장값 → 없으면 그 이전 달 중 가장 최근 저장값 → 없으면 기본값
         function loadTargetsForMonth(ym) {
             const store = readTargetStore();
-            let t = store[ym], from = ym, inherited = false;
+            const hasT = k => store[k] && store[k].monthly !== undefined;
+            let t = hasT(ym) ? store[ym] : null, from = ym, inherited = false;
             if (!t) {
-                const prev = Object.keys(store).filter(k => k < ym).sort().pop();
+                const prev = Object.keys(store).filter(k => k < ym && hasT(k)).sort().pop();
                 if (prev) { t = store[prev]; from = prev; inherited = true; }
             }
             t = t || DEFAULT_TARGETS;
@@ -2283,7 +2524,8 @@
             const set = (id, v) => { const el = document.getElementById(id); if (el) el.value = v; };
             set('inp-monthly', monthlyTarget); set('inp-pack-monthly', packMonthlyTarget); set('inp-daily', dailyTarget);
             const mm = parseInt(ym.substring(5, 7), 10);
-            setTargetStatus(store[ym] ? `${mm}월 목표 · 저장됨` : inherited ? `${mm}월 · ${parseInt(from.substring(5, 7), 10)}월 값 사용 중` : `${mm}월 · 기본값`);
+            const where = settingsRemoteState === 'loading' ? '시트 확인 중' : storageWhere();
+            setTargetStatus(hasT(ym) ? `${mm}월 목표 · 저장됨 (${where})` : inherited ? `${mm}월 · ${parseInt(from.substring(5, 7), 10)}월 값 사용 중` : `${mm}월 · 기본값`);
             targetsLoadedFor = ym;
         }
         function ensureTargetsForSelectedMonth() {
@@ -2291,23 +2533,28 @@
             if (ym !== targetsLoadedFor) loadTargetsForMonth(ym);
         }
 
-        function updateTargets() { 
+        async function updateTargets() { 
             monthlyTarget = parseFloat(document.getElementById('inp-monthly').value)||0; 
             packMonthlyTarget = parseFloat(document.getElementById('inp-pack-monthly').value)||0; 
             dailyTarget = parseFloat(document.getElementById('inp-daily').value)||0; 
             const ym = targetMonthKey();
-            const store = readTargetStore();
-            store[ym] = { monthly: monthlyTarget, pack: packMonthlyTarget, daily: dailyTarget, savedAt: new Date().toISOString() };
             const mm = parseInt(ym.substring(5, 7), 10);
-            if (writeTargetStore(store)) {
-                targetsLoadedFor = ym;
-                setTargetStatus(`${mm}월 목표 · 저장됨`);
-                showToast(`${ym} 목표가 저장되었습니다.`);
-            } else {
-                setTargetStatus('저장 불가 (브라우저 저장소 차단)');
-                showToast('이 환경에서는 목표를 저장할 수 없습니다. 화면에만 반영됩니다.', 'danger');
-            }
+            targetsLoadedFor = ym;
+            setTargetStatus(`${mm}월 목표 · 저장 중…`);
             updateDashboard(); 
+            const result = await saveMonthSettings(ym, { monthly: monthlyTarget, pack: packMonthlyTarget, daily: dailyTarget });
+            setTargetStatus(result === 'none' ? '저장 불가 (화면에만 반영)' : `${mm}월 목표 · 저장됨 (${result === 'remote' ? '공유 시트' : '이 브라우저'})`);
+            saveResultToast(ym, '목표', result);
+        }
+
+        // 외주 업체별 월 운영계획 저장
+        async function saveOutsourcePlan(vendorId, inputEl) {
+            const ym = targetMonthKey();
+            const val = Math.max(0, parseFloat(inputEl.value) || 0);
+            const vendor = OUTSOURCE_VENDORS.find(v => v.id === vendorId);
+            const result = await saveMonthSettings(ym, { outsource: { [vendorId]: val } });
+            saveResultToast(ym, `${vendor ? vendor.name : ''} 운영계획`, result);
+            renderOutsourceProgress();
         }
         function onMonthChange() { selectedMonth = document.getElementById('month-select').value; selectedDate = 'ALL'; updateDashboard(); }
         function onDateChange() { selectedDate = document.getElementById('date-select').value; document.getElementById('view-mode-container').style.display = selectedDate === 'ALL' ? 'flex' : 'none'; updateDashboard(); }
@@ -2539,6 +2786,7 @@
                 </tr>`;
             });
             if(document.getElementById('registry-body')) document.getElementById('registry-body').innerHTML = tHtml;
+            try { renderOutsourceProgress(); } catch (e) { console.error('outsource render error', e); }
 
             renderDowntimeHeatmap();
             renderMainChart(cProd, cDown, cPack);
