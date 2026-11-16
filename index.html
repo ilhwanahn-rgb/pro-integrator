@@ -68,6 +68,20 @@
         Chart.defaults.elements.point.radius = 3;
     })();
     </script>
+    <!-- 모션: 차트 진입 애니메이션 (막대·점이 왼쪽부터 차례로) -->
+    <script>
+    (function () {
+        if (!window.Chart) return;
+        var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        if (reduce) { Chart.defaults.animation = false; return; }
+        Chart.defaults.animation.duration = 900;
+        Chart.defaults.animation.easing = 'easeOutQuart';
+        Chart.defaults.animation.delay = function (ctx) {
+            return (ctx.type === 'data' && ctx.mode === 'default') ? Math.min(ctx.dataIndex * 16, 480) : 0;
+        };
+        Chart.defaults.transitions.active.animation.duration = 180;
+    })();
+    </script>
     <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/gridstack@9.2.2/dist/gridstack-all.js"></script>
@@ -331,6 +345,82 @@
         @media (prefers-reduced-motion: reduce) {
             *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
         }
+
+        /* =========================================================
+           모션 — 화면 진입·데이터 갱신 때만 짧게 재생 (동작 줄이기 설정 시 자동으로 꺼짐)
+           ========================================================= */
+        @keyframes mPanelIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+        @keyframes mGrowX   { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+        @keyframes mCellIn  { from { opacity: 0; transform: scale(0.82); } to { opacity: 1; transform: none; } }
+        @keyframes mRowIn   { from { opacity: 0; transform: translateX(-8px); } to { opacity: 1; transform: none; } }
+        @keyframes mModalIn { from { opacity: 0; transform: translateY(10px) scale(0.975); } to { opacity: 1; transform: none; } }
+        @keyframes mTick    { 0% { opacity: 0.45; } 100% { opacity: 1; } }
+
+        /* 패널: 탭에 들어올 때 아래에서 차례로 떠오름 */
+        .tab-content.active .glass-panel { animation: mPanelIn 480ms cubic-bezier(0.16, 1, 0.3, 1) both; }
+        .grid-stack > .grid-stack-item:nth-child(1) .glass-panel { animation-delay: 45ms; }
+        .grid-stack > .grid-stack-item:nth-child(2) .glass-panel { animation-delay: 90ms; }
+        .grid-stack > .grid-stack-item:nth-child(3) .glass-panel { animation-delay: 135ms; }
+        .grid-stack > .grid-stack-item:nth-child(4) .glass-panel { animation-delay: 180ms; }
+        .grid-stack > .grid-stack-item:nth-child(5) .glass-panel { animation-delay: 225ms; }
+        .grid-stack > .grid-stack-item:nth-child(6) .glass-panel { animation-delay: 270ms; }
+        .grid-stack > .grid-stack-item:nth-child(7) .glass-panel { animation-delay: 315ms; }
+        .grid-stack > .grid-stack-item:nth-child(8) .glass-panel { animation-delay: 360ms; }
+        .grid-stack > .grid-stack-item:nth-child(9) .glass-panel { animation-delay: 405ms; }
+        .grid-stack > .grid-stack-item:nth-child(10) .glass-panel { animation-delay: 450ms; }
+        .tab-content.active > .glass-panel:nth-child(2), .tab-content.active > :nth-child(2) > .glass-panel { animation-delay: 55ms; }
+        .tab-content.active > .glass-panel:nth-child(3), .tab-content.active > :nth-child(3) > .glass-panel { animation-delay: 110ms; }
+        .tab-content.active > .glass-panel:nth-child(4), .tab-content.active > :nth-child(4) > .glass-panel { animation-delay: 165ms; }
+        .tab-content.active > .glass-panel:nth-child(5), .tab-content.active > :nth-child(5) > .glass-panel { animation-delay: 220ms; }
+        .tab-content.active > .glass-panel:nth-child(6), .tab-content.active > :nth-child(6) > .glass-panel { animation-delay: 275ms; }
+        .tab-content.active > .glass-panel:nth-child(7), .tab-content.active > :nth-child(7) > .glass-panel { animation-delay: 330ms; }
+        .tab-content.active > .glass-panel:nth-child(8), .tab-content.active > :nth-child(8) > .glass-panel { animation-delay: 385ms; }
+        .glass-panel .glass-panel { animation: none; }
+        .edit-mode-active .glass-panel, .grid-stack-item.ui-draggable-dragging .glass-panel, .grid-stack-item.ui-resizable-resizing .glass-panel { animation: none !important; }
+
+        /* 진행 막대: 왼쪽에서 차오름 */
+        #registry-body div[style*="width"], #outsource-body .relative.h-2 > div.h-2, .m-grow {
+            transform-origin: left center; animation: mGrowX 850ms cubic-bezier(0.16, 1, 0.3, 1) 180ms both;
+        }
+        /* 히트맵 칸: 하나씩 켜짐 */
+        #downtime-heatmap-grid > div { animation: mCellIn 340ms cubic-bezier(0.16, 1, 0.3, 1) both; }
+        #downtime-heatmap-grid > div:nth-child(1) { animation-delay: 28ms; }
+        #downtime-heatmap-grid > div:nth-child(2) { animation-delay: 56ms; }
+        #downtime-heatmap-grid > div:nth-child(3) { animation-delay: 84ms; }
+        #downtime-heatmap-grid > div:nth-child(4) { animation-delay: 112ms; }
+        #downtime-heatmap-grid > div:nth-child(5) { animation-delay: 140ms; }
+        #downtime-heatmap-grid > div:nth-child(6) { animation-delay: 168ms; }
+        #downtime-heatmap-grid > div:nth-child(7) { animation-delay: 196ms; }
+        #downtime-heatmap-grid > div:nth-child(8) { animation-delay: 224ms; }
+        #downtime-heatmap-grid > div:nth-child(9) { animation-delay: 252ms; }
+        #downtime-heatmap-grid > div:nth-child(10) { animation-delay: 280ms; }
+        #downtime-heatmap-grid > div:nth-child(11) { animation-delay: 308ms; }
+        #downtime-heatmap-grid > div:nth-child(12) { animation-delay: 336ms; }
+        /* 목록 행: 왼쪽에서 밀려 들어옴 */
+        #kpi-down-top3 > *, #registry-body > tr, #insp-top3 > *, #insp-lot-body > tr, #outsource-body > div { animation: mRowIn 380ms cubic-bezier(0.16, 1, 0.3, 1) both; }
+        #kpi-down-top3 > :nth-child(1), #registry-body > tr:nth-child(1), #insp-top3 > :nth-child(1), #insp-lot-body > tr:nth-child(1), #outsource-body > div:nth-child(1) { animation-delay: 45ms; }
+        #kpi-down-top3 > :nth-child(2), #registry-body > tr:nth-child(2), #insp-top3 > :nth-child(2), #insp-lot-body > tr:nth-child(2), #outsource-body > div:nth-child(2) { animation-delay: 90ms; }
+        #kpi-down-top3 > :nth-child(3), #registry-body > tr:nth-child(3), #insp-top3 > :nth-child(3), #insp-lot-body > tr:nth-child(3), #outsource-body > div:nth-child(3) { animation-delay: 135ms; }
+        #kpi-down-top3 > :nth-child(4), #registry-body > tr:nth-child(4), #insp-top3 > :nth-child(4), #insp-lot-body > tr:nth-child(4), #outsource-body > div:nth-child(4) { animation-delay: 180ms; }
+        #kpi-down-top3 > :nth-child(5), #registry-body > tr:nth-child(5), #insp-top3 > :nth-child(5), #insp-lot-body > tr:nth-child(5), #outsource-body > div:nth-child(5) { animation-delay: 225ms; }
+        #kpi-down-top3 > :nth-child(6), #registry-body > tr:nth-child(6), #insp-top3 > :nth-child(6), #insp-lot-body > tr:nth-child(6), #outsource-body > div:nth-child(6) { animation-delay: 270ms; }
+        #kpi-down-top3 > :nth-child(7), #registry-body > tr:nth-child(7), #insp-top3 > :nth-child(7), #insp-lot-body > tr:nth-child(7), #outsource-body > div:nth-child(7) { animation-delay: 315ms; }
+        #kpi-down-top3 > :nth-child(8), #registry-body > tr:nth-child(8), #insp-top3 > :nth-child(8), #insp-lot-body > tr:nth-child(8), #outsource-body > div:nth-child(8) { animation-delay: 360ms; }
+        #kpi-down-top3 > :nth-child(9), #registry-body > tr:nth-child(9), #insp-top3 > :nth-child(9), #insp-lot-body > tr:nth-child(9), #outsource-body > div:nth-child(9) { animation-delay: 405ms; }
+        #kpi-down-top3 > :nth-child(10), #registry-body > tr:nth-child(10), #insp-top3 > :nth-child(10), #insp-lot-body > tr:nth-child(10), #outsource-body > div:nth-child(10) { animation-delay: 450ms; }
+        /* 숫자 카운트업 중 살짝 흐리게 → 또렷하게 */
+        .m-counting { animation: mTick 700ms ease-out; }
+        /* 누름·호버 반응 */
+        button, .nav-icon, .weather-btn { transition: transform 90ms ease, background-color 150ms ease, color 150ms ease, border-color 150ms ease; }
+        button:active, .nav-icon:active, .weather-btn:active { transform: scale(0.96); }
+        .nav-icon i { transition: transform 180ms cubic-bezier(0.16, 1, 0.3, 1); }
+        .nav-icon:hover i { transform: scale(1.14); }
+        tbody tr td { transition: background-color 140ms ease; }
+        /* 모달: 살짝 떠오르며 열림 */
+        .modal-bg > div { animation: mModalIn 240ms cubic-bezier(0.16, 1, 0.3, 1); }
+        /* 차트: 다시 그릴 때 부드럽게 나타남 */
+        @keyframes mFade { from { opacity: 0; } to { opacity: 1; } }
+        canvas.m-fade { animation: mFade 420ms ease-out; }
     </style>
 </head>
 <body id="app-body" class="split-mode-auto">
@@ -1032,6 +1122,53 @@
                 </div>
             </div>
 
+            <!-- ④-2 제조번호별 부적합률 -->
+            <div class="glass-panel overflow-hidden mb-2.5">
+                <div class="p-2.5 border-b border-slate-200 bg-slate-50 flex flex-wrap justify-between items-center gap-2">
+                    <div class="flex flex-wrap items-center gap-2">
+                        <h3 class="text-xs font-black text-slate-900 flex items-center gap-1.5"><i class="fa-solid fa-barcode text-violet-700 text-xs"></i> 제조번호별 부적합률</h3>
+                        <span id="insp-lot-summary" class="text-[10px] text-slate-600">-</span>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-2 text-[10px] text-slate-600">
+                        <label class="flex items-center gap-1 cursor-pointer whitespace-nowrap"><input type="checkbox" id="insp-lot-onlyng" checked onchange="inspLotOnlyNg = this.checked; renderInspLots()"> 부적합 발생만</label>
+                        <label class="flex items-center gap-1 whitespace-nowrap">정렬
+                            <select id="insp-lot-sort" class="gs-input h-7 px-1.5 text-[10.5px] w-[150px]" style="width:150px;padding:2px 6px;font-family:inherit;font-size:11px" onchange="inspLotSort = this.value; renderInspLots()">
+                                <option value="rate">부적합률 높은 순</option>
+                                <option value="ng">부적합량 많은 순</option>
+                                <option value="ins">작업량 많은 순</option>
+                                <option value="date">최근 작업일 순</option>
+                                <option value="lot">제조번호 순</option>
+                            </select>
+                        </label>
+                        <label class="flex items-center gap-1 whitespace-nowrap">검색
+                            <input type="search" id="insp-lot-search" placeholder="제조번호 · 아이템 · 강종" class="gs-input h-7 px-2 text-[10.5px] w-[190px]" style="width:190px;padding:2px 8px;font-family:inherit;font-size:11px" oninput="inspLotQuery = this.value; renderInspLots()">
+                        </label>
+                    </div>
+                </div>
+                <div class="overflow-x-auto p-1.5 max-h-[420px] overflow-y-auto">
+                    <table class="w-full text-xs">
+                        <thead>
+                            <tr class="bg-slate-100/80">
+                                <th class="py-1 px-2 text-center text-[10px]">#</th>
+                                <th class="py-1 px-2 text-left text-[10px]">제조번호</th>
+                                <th class="py-1 px-2 text-left text-[10px]">작업일</th>
+                                <th class="py-1 px-2 text-center text-[10px]">다기능</th>
+                                <th class="py-1 px-2 text-center text-[10px]">PCD 호기</th>
+                                <th class="py-1 px-2 text-left text-[10px]">아이템</th>
+                                <th class="py-1 px-2 text-left text-[10px]">강종</th>
+                                <th class="py-1 px-2 text-left text-[10px]">제강사</th>
+                                <th class="py-1 px-2 text-right text-[10px]">작업량(T)</th>
+                                <th class="py-1 px-2 text-right text-[10px] text-red-600">부적합(T)</th>
+                                <th class="py-1 px-2 text-left text-[10px] text-red-700" style="min-width:150px">부적합률</th>
+                                <th class="py-1 px-2 text-left text-[10px]">주요 부적합</th>
+                            </tr>
+                        </thead>
+                        <tbody id="insp-lot-body"></tbody>
+                    </table>
+                </div>
+                <div id="insp-lot-note" class="px-3 py-1.5 text-[9.5px] text-slate-500 border-t border-slate-200"></div>
+            </div>
+
             <!-- ⑤ 부적합 유형 파레토 + 교차 분석 -->
             <div class="grid grid-cols-1 xl:grid-cols-12 gap-2.5 mb-2.5">
                 <div class="glass-panel p-3 xl:col-span-5">
@@ -1420,7 +1557,7 @@
                 const planOverBudget = plan > mB;
                 const remain = yB - y;
                 const perMonth = monthsLeft > 0 ? remain / monthsLeft : null;
-                html += `<div class="py-1.5 border-b border-slate-200 last:border-b-0">
+                html += `<div class="py-1 border-b border-slate-200 last:border-b-0">
                     <div class="flex items-center justify-between gap-2">
                         <div class="min-w-0"><span class="text-[12px] font-semibold text-slate-900">${v.name}</span> <span class="text-[10px] text-slate-500">${v.sub}</span></div>
                         <div class="flex items-center gap-2 shrink-0">
@@ -1438,14 +1575,14 @@
                         <span class="font-mono-num text-slate-900 whitespace-nowrap text-right"><b class="text-[12px]">${fmt(a)}</b> / 계획 ${fmt(plan)}T · ${plan > 0 ? Math.round(a / plan * 100) : 0}%</span>
                         <span class="text-slate-600">연 누계</span>
                         ${bar(y, yB, Math.min(1, planCum / yB))}
-                        <span class="font-mono-num text-slate-700 whitespace-nowrap text-right">${fmt(y)} / 예산 ${yB.toLocaleString()}T${y > planCum ? ` <span style="color:#A2191F">(계획누계 +${fmt(y - planCum)})</span>` : ''}</span>
+                        <span class="font-mono-num text-slate-700 whitespace-nowrap text-right" title="연간 예산 잔여 ${fmt(yB - y)}T">${fmt(y)} / 예산 ${yB.toLocaleString()}T${y > planCum ? ` <span style="color:#A2191F">(계획누계 +${fmt(y - planCum)})</span>` : ''}</span>
                     </div>
                     ${planOverBudget ? `<div class="text-[9.5px] mt-0.5" style="color:#684E00">${mon}월 운영계획 ${fmt(plan)}T가 월 예산 ${mB}T를 ${fmt(plan - mB)}T 초과합니다.</div>` : ''}
                     ${remain < 0
                         ? `<div class="text-[9.5px] mt-0.5" style="color:#A2191F">연간 예산 ${fmt(-remain)}T 초과 — 외주 중단 검토</div>`
                         : (perMonth !== null && perMonth < v.monthly)
                             ? `<div class="text-[9.5px] mt-0.5" style="color:#684E00">연간 잔여 ${fmt(remain)}T — 남은 ${monthsLeft}개월은 월 ${fmt(perMonth)}T 이하로 운영해야 연간 예산 내</div>`
-                            : `<div class="text-[9.5px] mt-0.5 text-slate-500">연간 예산 잔여 ${fmt(remain)}T</div>`}
+                            : ''}
                 </div>`;
             });
 
@@ -2323,6 +2460,14 @@
         const SYNC_TIMEOUT_MS = 15000;
         let isSyncing = false;
 
+        // 월별 설정 저장용 전역값 — 첫 화면 그리기(safeRenderAll)보다 먼저 선언되어야 저장값을 제대로 읽음
+        var SETTINGS_API_URL = 'https://script.google.com/macros/s/AKfycbweBF-2lTcgmSxhGzZn8PkA8JIcfKKHKITmXj16ydNAr9xvEBvAnpWKaRVf2uKKMxk/exec';
+        var TARGET_STORE_KEY = 'DASHBOARD_MONTHLY_TARGETS_V1';
+        var DEFAULT_TARGETS = { monthly: 3330, pack: 3700, daily: 129 };
+        var targetsLoadedFor = null;
+        var settingsCache = null;          // { 'YYYY-MM': { monthly, pack, daily, outsource: { NAMBU, SW_SEOMAN, SW_HQ } } }
+        var settingsRemoteState = SETTINGS_API_URL ? 'loading' : 'none';   // none | loading | ok | failed
+
         function safeRenderAll() {
             try { updateDashboard(); } catch (e) { console.error('updateDashboard error', e); }
             try {
@@ -2419,13 +2564,7 @@
         // ===== 월별 설정 저장 (목표 · 외주 운영계획) =====
         //  · SETTINGS_API_URL 이 있으면 구글 시트(Apps Script)에 저장 → 모든 PC·TV가 같은 값을 봄
         //  · 없거나 실패하면 이 브라우저(localStorage)에만 저장
-        //  ※ 아래 주소에 Apps Script 웹앱 배포 URL을 붙여 넣으세요 (예: https://script.google.com/macros/s/XXXX/exec)
-        const SETTINGS_API_URL = 'https://script.google.com/macros/s/AKfycbweBF-2lTcgmSxhGzZn8PkA8JIcfKKHKITmXj16ydNAr9xvEBvAnpWKaRVf2uKKMxk/exec';
-        const TARGET_STORE_KEY = 'DASHBOARD_MONTHLY_TARGETS_V1';
-        const DEFAULT_TARGETS = { monthly: 3330, pack: 3700, daily: 129 };
-        let targetsLoadedFor = null;
-        let settingsCache = null;          // { 'YYYY-MM': { monthly, pack, daily, outsource: { NAMBU, SW_SEOMAN, SW_HQ } } }
-        let settingsRemoteState = SETTINGS_API_URL ? 'loading' : 'none';   // none | loading | ok | failed
+        //  ※ Apps Script 웹앱 주소(SETTINGS_API_URL)는 위쪽 SYNC_TIMEOUT_MS 바로 아래에 있습니다
 
         function readTargetStore() {
             if (settingsCache) return settingsCache;
@@ -2791,6 +2930,32 @@
             renderDowntimeHeatmap();
             renderMainChart(cProd, cDown, cPack);
             renderRatioDoughnuts(fProd);
+            runKpiCountUp(['kpi-tons', 'kpi-pack-tons', 'kpi-down']);
+        }
+
+        // 모션: KPI 숫자를 이전 값에서 새 값까지 굴려 올림 (값이 바뀔 때만)
+        function runKpiCountUp(ids) {
+            const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            ids.forEach(id => {
+                const el = document.getElementById(id); if (!el) return;
+                const finalText = el.innerText;
+                const target = parseFloat(finalText.replace(/,/g, ''));
+                if (isNaN(target)) return;
+                const from = (typeof el._mVal === 'number') ? el._mVal : 0;
+                el._mVal = target;
+                if (reduce || from === target) return;
+                const decimals = (finalText.split('.')[1] || '').length;
+                const t0 = performance.now(), dur = 800;
+                if (el._mRaf) cancelAnimationFrame(el._mRaf);
+                el.classList.remove('m-counting'); void el.offsetWidth; el.classList.add('m-counting');
+                const step = now => {
+                    const k = Math.min(1, (now - t0) / dur), e = 1 - Math.pow(1 - k, 3);
+                    const v = from + (target - from) * e;
+                    el.innerText = v.toLocaleString(undefined, { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+                    if (k < 1) el._mRaf = requestAnimationFrame(step); else { el.innerText = finalText; el._mRaf = null; }
+                };
+                el._mRaf = requestAnimationFrame(step);
+            });
         }
 
         function get7DayWeekKey(dateStr) {
@@ -2812,6 +2977,22 @@
 
             const agg = {};
             const badgeEl = document.getElementById('chart-badge');
+
+            // 범례: 월 누계 보기와 일일(설비별) 보기에서 뜻이 달라 바꿔 끼운다
+            const legendEl = canvas.closest('.glass-panel') ? canvas.closest('.glass-panel').querySelector('h3 + div') : null;
+            if (legendEl && legendEl.dataset.monthLegend === undefined) legendEl.dataset.monthLegend = legendEl.innerHTML;
+            canvas.classList.remove('m-fade'); void canvas.offsetWidth; canvas.classList.add('m-fade');
+            if (selectedDate !== 'ALL') {
+                if (badgeEl) badgeEl.innerText = '설비별 · 당월 일평균 대비';
+                if (legendEl) legendEl.innerHTML = `
+                    <span class="flex items-center gap-1"><span class="w-2.5 h-2 bg-[#1f77b4] rounded-xs"></span> 생산 (일평균 대비 %)</span>
+                    <span class="flex items-center gap-1"><span class="w-2.5 h-2 bg-amber-500 rounded-xs"></span> 80% 미만</span>
+                    <span class="flex items-center gap-1 text-red-600">▼ 불가동 (분)</span>
+                    <span class="flex items-center gap-1"><span class="w-2.5 h-[1px] border-b-2 border-dashed border-[#ff7f0e]"></span> 일평균 100%</span>`;
+                renderDailyMachineChart(canvas, cProd, cDown, cPack);
+                return;
+            }
+            if (legendEl) legendEl.innerHTML = legendEl.dataset.monthLegend;
 
             if(selectedDate === 'ALL') {
                 if (viewMode === 'WEEKLY') {
@@ -2880,6 +3061,94 @@
                         y1: { position: 'right', beginAtZero: true, ticks: { color: '#d62728', font: { size: 10 } }, grid: { drawOnChartArea: false } } 
                     },
                     plugins: { legend: { display: false } }
+                }
+            });
+        }
+
+        // 날짜를 고른 경우: 설비마다 규모가 달라 톤(T)으로 그리면 작은 설비가 안 보인다.
+        //  → 각 설비의 '당월 일평균 생산량'을 100%로 놓고 그날 생산을 %로 환산해 같은 눈금에서 비교.
+        //    실제 톤수·불가동 분은 막대 끝 글자로 함께 표시.
+        function renderDailyMachineChart(canvas, cProd, cDown, cPack) {
+            const day = {}, month = {};
+            cProd.forEach(p => {
+                if (!p.equipment) return;
+                const m = month[p.equipment] = month[p.equipment] || { amt: 0, days: new Set() };
+                m.amt += p.amount; m.days.add(p.date);
+                if (p.date === selectedDate) { const d = day[p.equipment] = day[p.equipment] || { p: 0, d: 0, pk: 0 }; d.p += p.amount; }
+            });
+            cDown.filter(x => x.date === selectedDate).forEach(x => { if (!x.equipment) return; const d = day[x.equipment] = day[x.equipment] || { p: 0, d: 0, pk: 0 }; d.d += x.minutes; });
+            cPack.filter(x => x.date === selectedDate).forEach(x => { if (!x.equipment || !day[x.equipment]) return; day[x.equipment].pk += x.amount; });
+
+            const machines = Object.keys(day).sort((a, b) => { const ia = MACHINE_ORDER.indexOf(a), ib = MACHINE_ORDER.indexOf(b); return (ia === -1 ? 999 : ia) - (ib === -1 ? 999 : ib); });
+            const rows = machines.map(m => {
+                const ton = day[m].p / 1000;
+                const avg = month[m] && month[m].days.size ? (month[m].amt / 1000) / month[m].days.size : 0;
+                const pct = avg > 0 ? ton / avg * 100 : (ton > 0 ? 100 : 0);
+                return { m, ton, avg, pct, down: day[m].d, pack: day[m].pk / 1000 };
+            });
+            const maxPct = Math.max(120, ...rows.map(r => r.pct));
+
+            if (chartInstance) chartInstance.destroy();
+            const labelPlugin = {
+                id: 'dailyValueLabels',
+                afterDatasetsDraw(chart) {
+                    const g = chart.ctx, meta = chart.getDatasetMeta(0);
+                    const css = getComputedStyle(document.documentElement);
+                    const red = (css.getPropertyValue('--tableau-red') || '#d62728').trim();
+                    const ink = (css.getPropertyValue('--tableau-text-dark') || '#111').trim();
+                    g.save();
+                    g.textBaseline = 'middle'; g.textAlign = 'left';
+                    rows.forEach((r, i) => {
+                        const bar = meta.data[i]; if (!bar) return;
+                        const main = `${r.ton.toFixed(1)}T · ${Math.round(r.pct)}%`;
+                        g.font = "600 12px 'IBM Plex Sans KR', sans-serif";
+                        g.fillStyle = ink;
+                        g.fillText(main, bar.x + 8, bar.y);
+                        if (r.down > 0) {
+                            const w = g.measureText(main).width;
+                            g.font = "500 11px 'IBM Plex Sans KR', sans-serif";
+                            g.fillStyle = red;
+                            g.fillText(`▼ 불가동 ${r.down.toLocaleString()}분`, bar.x + 8 + w + 12, bar.y);
+                        }
+                    });
+                    g.restore();
+                }
+            };
+            chartInstance = new Chart(canvas.getContext('2d'), {
+                type: 'bar',
+                plugins: [labelPlugin],
+                data: {
+                    labels: machines,
+                    datasets: [
+                        { label: '생산 (일평균 대비 %)', data: rows.map(r => +r.pct.toFixed(1)), xAxisID: 'x',
+                          backgroundColor: rows.map(r => r.pct >= 100 ? '#1f77b4' : r.pct >= 80 ? 'rgba(31, 119, 180, 0.55)' : '#f59e0b'),
+                          borderRadius: 3, barPercentage: 0.9, categoryPercentage: 0.68, maxBarThickness: 26 },
+                        { type: 'line', label: '일평균 100%', data: rows.map(() => 100), xAxisID: 'x',
+                          borderColor: '#ff7f0e', borderWidth: 2, borderDash: [4, 4], pointRadius: 0, fill: false }
+                    ]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    layout: { padding: { right: 12 } },
+                    scales: {
+                        y: { grid: { display: false }, ticks: { color: '#4b5563', font: { size: 12, weight: 'bold' } } },
+                        x: { beginAtZero: true, max: Math.ceil(maxPct * 1.3 / 20) * 20, ticks: { color: '#4b5563', font: { size: 10 }, callback: v => v + '%' }, grid: { color: 'rgba(0,0,0,0.06)' },
+                             title: { display: true, text: '당일 생산 ÷ 해당 설비 당월 일평균', color: '#4b5563', font: { size: 10 } } }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: c => {
+                                    const r = rows[c.dataIndex];
+                                    if (c.datasetIndex === 0) return [` 당일 생산 ${r.ton.toFixed(1)}T (일평균 ${r.avg.toFixed(1)}T의 ${Math.round(r.pct)}%)`, ` 포장 ${r.pack.toFixed(1)}T · 불가동 ${r.down.toLocaleString()}분`];
+                                    return ' 당월 일평균 = 100%';
+                                }
+                            }
+                        }
+                    }
                 }
             });
         }
@@ -4153,11 +4422,86 @@
             renderInspTop3(dimStats.item, minKg, scopeTxt);
             renderInspTrend(all, ctx);
             renderInspDim(dimStats[inspDim], minKg);
+            renderInspLots();
             renderInspInsights(F, dimStats, minKg, P);
             renderInspPareto(F);
             renderInspCross(F, minKg);
             renderInspWarnings(allRaw);
             renderInspAudit(Paudit, ctx);
+        }
+
+        // ---------- 제조번호(LOT)별 부적합률 : 같은 제조번호의 행을 합산 (부적합 작업량 ÷ 전체 작업량) ----------
+        var inspLotSort = 'rate', inspLotOnlyNg = true, inspLotQuery = '';
+        const INSP_LOT_LIMIT = 100;
+        function renderInspLots() {
+            const body = document.getElementById('insp-lot-body');
+            if (!body || !inspLastCtx) return;
+            const F = inspLastCtx.F;
+            const m = new Map(); let blankRows = 0;
+            F.forEach(r => {
+                if (!r.lot) { blankRows++; return; }
+                let o = m.get(r.lotKey);
+                if (!o) { o = { lot: r.lot, ins: 0, ng: 0, rows: 0, first: '', last: '', pnd: new Set(), pcd: new Set(), item: r.itemName, steel: r.steel, maker: r.maker, types: {} }; m.set(r.lotKey, o); }
+                o.ins += r.insW; o.ng += r.ngW; o.rows++;
+                if (r.date) { if (!o.first || r.date < o.first) o.first = r.date; if (r.date > o.last) o.last = r.date; }
+                if (r.pnd) o.pnd.add(r.pnd);
+                if (r.pcd && r.pcd !== '미기재' && r.pcd !== '미매칭') o.pcd.add(r.pcd);
+                if (r.ngW > 0) o.types[r.ngName || '유형 미기재'] = (o.types[r.ngName || '유형 미기재'] || 0) + r.ngW;
+            });
+            let arr = [...m.values()];
+            arr.forEach(o => { o.rate = o.ins > 0 ? o.ng / o.ins * 100 : 0; });
+            const totalLots = arr.length, ngLots = arr.filter(o => o.ng > 0).length;
+            const totIns = arr.reduce((a, o) => a + o.ins, 0), totNg = arr.reduce((a, o) => a + o.ng, 0);
+
+            const sumEl = document.getElementById('insp-lot-summary');
+            if (sumEl) sumEl.innerHTML = `제조번호 <b>${totalLots.toLocaleString()}</b>개 중 부적합 발생 <b class="text-red-600">${ngLots.toLocaleString()}</b>개 (${totalLots ? (ngLots / totalLots * 100).toFixed(1) : '0.0'}%) · 중량 기준 부적합률 <b>${inspFmtR(totIns > 0 ? totNg / totIns * 100 : 0)}</b>`;
+
+            if (inspLotOnlyNg) arr = arr.filter(o => o.ng > 0);
+            const q = (inspLotQuery || '').trim().toUpperCase();
+            if (q) arr = arr.filter(o => (o.lot + ' ' + o.item + ' ' + o.steel + ' ' + o.maker).toUpperCase().includes(q));
+            const SORT = {
+                rate: (a, b) => b.rate - a.rate || b.ng - a.ng,
+                ng:   (a, b) => b.ng - a.ng || b.rate - a.rate,
+                ins:  (a, b) => b.ins - a.ins,
+                date: (a, b) => (b.last || '').localeCompare(a.last || '') || b.rate - a.rate,
+                lot:  (a, b) => a.lot.localeCompare(b.lot)
+            };
+            arr.sort(SORT[inspLotSort] || SORT.rate);
+            const shown = arr.slice(0, INSP_LOT_LIMIT);
+            const maxRate = Math.max(1, ...shown.map(o => o.rate));
+
+            body.innerHTML = shown.map((o, i) => {
+                const top = Object.entries(o.types).sort((a, b) => b[1] - a[1])[0];
+                const dateTxt = !o.first ? '-' : (o.first === o.last ? o.first.substring(5) : `${o.first.substring(5)} ~ ${o.last.substring(5)}`);
+                const full = o.ng > 0 && o.rate >= 99.95;
+                return `<tr title="행 ${o.rows}개 합산${Object.keys(o.types).length ? ' · 부적합 유형: ' + Object.entries(o.types).map(([k, v]) => `${k} ${inspFmtT(v)}T`).join(', ') : ''}">
+                    <td class="py-1 px-2 text-center text-[10px] text-slate-500">${i + 1}</td>
+                    <td class="py-1 px-2 font-mono-num font-semibold whitespace-nowrap">${escHtml(o.lot)}</td>
+                    <td class="py-1 px-2 text-[10.5px] whitespace-nowrap font-mono-num">${dateTxt}</td>
+                    <td class="py-1 px-2 text-center text-[10.5px] whitespace-nowrap">${[...o.pnd].map(escHtml).join(', ') || '-'}</td>
+                    <td class="py-1 px-2 text-center text-[10.5px] whitespace-nowrap">${[...o.pcd].map(escHtml).join(', ') || '<span class="text-slate-400">-</span>'}</td>
+                    <td class="py-1 px-2 text-[10.5px] max-w-[220px] truncate">${escHtml(o.item)}</td>
+                    <td class="py-1 px-2 text-[10.5px] whitespace-nowrap">${escHtml(o.steel)}</td>
+                    <td class="py-1 px-2 text-[10.5px] whitespace-nowrap">${escHtml(o.maker)}</td>
+                    <td class="py-1 px-2 text-right font-mono-num">${inspFmtT(o.ins)}</td>
+                    <td class="py-1 px-2 text-right font-mono-num ${o.ng > 0 ? 'text-red-600' : 'text-slate-400'}">${o.ng > 0 ? inspFmtT(o.ng) : '-'}</td>
+                    <td class="py-1 px-2">
+                        <div class="flex items-center gap-1.5">
+                            <div class="flex-1 h-2 bg-slate-200 min-w-[60px]"><div class="h-2 m-grow ${full ? 'bg-red-600' : o.ng > 0 ? 'bg-red-500' : 'bg-slate-300'}" style="width:${(o.rate / maxRate * 100).toFixed(1)}%"></div></div>
+                            <span class="font-mono-num w-[52px] text-right ${o.ng > 0 ? 'text-red-600 font-semibold' : 'text-slate-500'}">${inspFmtR(o.rate)}</span>
+                            ${full ? '<span class="text-[9px] px-1 border border-red-300 bg-red-50 text-red-700 whitespace-nowrap">전량</span>' : ''}
+                        </div>
+                    </td>
+                    <td class="py-1 px-2 text-[10.5px] whitespace-nowrap">${top ? `${escHtml(top[0])}${Object.keys(o.types).length > 1 ? ` <span class="text-slate-400">외 ${Object.keys(o.types).length - 1}</span>` : ''}` : '<span class="text-slate-400">-</span>'}</td>
+                </tr>`;
+            }).join('') || `<tr><td colspan="12" class="py-4 text-center text-slate-500">${q ? '검색 조건에 맞는 제조번호가 없습니다.' : inspLotOnlyNg ? '선택한 기간에 부적합이 발생한 제조번호가 없습니다.' : '선택한 기간의 제조번호가 없습니다.'}</td></tr>`;
+
+            const note = document.getElementById('insp-lot-note');
+            if (note) note.innerText = [
+                `부적합률 = 그 제조번호의 부적합 작업량 ÷ 전체 작업량 (같은 제조번호의 여러 행은 합산)`,
+                arr.length > INSP_LOT_LIMIT ? `조건에 맞는 ${arr.length.toLocaleString()}개 중 상위 ${INSP_LOT_LIMIT}개 표시 — 검색으로 좁혀 보세요` : `${arr.length.toLocaleString()}개 표시`,
+                blankRows ? `제조번호 빈칸 ${blankRows}행은 제외` : ''
+            ].filter(Boolean).join(' · ');
         }
 
         function renderInspKpis(P, all, ctx, Paudit) {
