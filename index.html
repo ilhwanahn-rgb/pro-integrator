@@ -181,7 +181,8 @@
 
         .toast { position: fixed; bottom: -100px; right: 30px; padding: 12px 20px; border-radius: 10px; color: white; font-weight: 800; font-size: 13px; z-index: 1000; transition: bottom 0.35s cubic-bezier(0.16, 1, 0.3, 1); box-shadow: 0 15px 25px rgba(0,0,0,0.25); display: flex; align-items: center; gap: 10px; border: 1px solid rgba(255,255,255,0.2); }
         
-        .chat-bot-window { display: none; position: fixed; bottom: 25px; right: 30px; width: 400px; height: 540px; background: #ffffff; border-radius: 1rem; box-shadow: 0 20px 50px rgba(0,0,0,0.25); z-index: 999; flex-direction: column; overflow: hidden; border: 1px solid #d1d5db; }
+        .chat-bot-window { display: none; position: fixed; bottom: 25px; right: 30px; width: 460px; max-width: calc(100vw - 32px); height: 600px; background: #ffffff; border-radius: 1rem; box-shadow: 0 20px 50px rgba(0,0,0,0.25); z-index: 999; flex-direction: column; overflow: hidden; border: 1px solid #d1d5db; }
+        .nlq-ex { color: #0F62FE; cursor: pointer; text-decoration: underline; text-underline-offset: 2px; }
         .chat-header { background: var(--tableau-navy); padding: 12px 18px; color: white; display: flex; justify-content: space-between; align-items: center; }
         .chat-body { flex: 1; padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; background: #f9fafb; }
         .chat-input-area { padding: 12px; background: #ffffff; border-top: 1px solid #e5e7eb; display: flex; gap: 8px; }
@@ -463,6 +464,7 @@
                     <p class="text-slate-500 text-[10px] flex items-center gap-1.5 min-w-0">
                         <span id="status-led" class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0"></span>
                         <span id="status-text" class="truncate max-w-[420px]">Live Sync Active</span>
+                        <span id="sync-time" class="whitespace-nowrap text-slate-600" title="시트에서 데이터를 마지막으로 받아온 시각"></span>
                     </p>
                 </div>
 
@@ -549,7 +551,7 @@
                             </div>
                             <div>
                                 <p class="text-[10px] font-extrabold text-slate-500 uppercase tracking-widest mb-0.5">당월 생산 실적</p>
-                                <div class="flex items-baseline gap-1"><h4 id="kpi-tons" class="text-xl lg:text-2xl font-black text-slate-900 font-mono-num">0</h4><span class="text-[10px] font-bold text-slate-500">TON</span></div>
+                                <div class="flex items-baseline gap-1"><h4 id="kpi-tons" class="text-xl lg:text-2xl font-black text-slate-900 font-mono-num">0</h4><span class="text-[10px] font-bold text-slate-500">TON</span><span id="kpi-tons-delta" class="text-[10px] font-mono-num ml-1"></span></div>
                             </div>
                         </div>
                     </div>
@@ -569,7 +571,7 @@
                             </div>
                             <div>
                                 <p class="text-[10px] font-extrabold text-slate-500 uppercase tracking-widest mb-0.5">CD 포장 실적량</p>
-                                <div class="flex items-baseline gap-1"><h4 id="kpi-pack-tons" class="text-xl lg:text-2xl font-black text-slate-900 font-mono-num">0</h4><span class="text-[10px] font-bold text-slate-500">TON</span></div>
+                                <div class="flex items-baseline gap-1"><h4 id="kpi-pack-tons" class="text-xl lg:text-2xl font-black text-slate-900 font-mono-num">0</h4><span class="text-[10px] font-bold text-slate-500">TON</span><span id="kpi-pack-delta" class="text-[10px] font-mono-num ml-1"></span></div>
                             </div>
                         </div>
                     </div>
@@ -661,17 +663,17 @@
                     </div>
                 </div>
 
-                <!-- Widget 7: 생산 비율 3D 도넛 차트 -->
+                <!-- Widget 7: 생산 비율 도넛 차트 -->
                 <div class="grid-stack-item" gs-id="widget-ratio-charts" gs-x="7" gs-y="2" gs-w="5" gs-h="5">
                     <div class="grid-stack-item-content">
                         <div class="glass-panel p-3.5 h-full">
                             <div class="widget-drag-handle">
-                                <span><i class="fa-solid fa-grip-dots-vertical mr-1"></i> 생산 비율 3D 종합 분석</span>
+                                <span><i class="fa-solid fa-grip-dots-vertical mr-1"></i> 생산 비율 종합 분석</span>
                                 <i class="fa-solid fa-xmark cursor-pointer hover:text-red-500" onclick="removeWidget('widget-ratio-charts')"></i>
                             </div>
                             <div class="flex items-center justify-between mb-1.5 border-b border-slate-200 pb-1.5">
                                 <h3 class="text-xs lg:text-sm font-black text-slate-900 flex items-center gap-1.5">
-                                    <i class="fa-solid fa-pie-chart text-sky-700"></i> 생산 비율 3D 종합 분석
+                                    <i class="fa-solid fa-pie-chart text-sky-700"></i> 생산 비율 종합 분석
                                 </h3>
                                 <span class="text-[9px] font-extrabold text-slate-500 uppercase tracking-widest">Tableau Segment Analytics</span>
                             </div>
@@ -718,6 +720,7 @@
                                             <th>설비 식별</th>
                                             <th class="text-right">누적 실적 (TON)</th>
                                             <th class="text-center">작업선경 범위 (mm)</th>
+                                            <th class="text-center">작업길이 범위 (mm)</th>
                                             <th class="text-right">평균 선속 (m/min)</th>
                                             <th class="text-right text-red-600">불가동 (min)</th>
                                             <th class="w-1/4 uppercase text-emerald-700 text-center">OEE [종합설비효율]</th>
@@ -852,7 +855,10 @@
             <div class="glass-panel overflow-hidden mb-4">
                 <div class="p-2.5 border-b border-slate-200 bg-slate-50 flex justify-between items-center">
                     <h3 class="text-xs font-black text-slate-900 flex items-center gap-1.5"><i class="fa-solid fa-table-list text-sky-700 text-xs"></i> 세부 가동시간 및 UPH 산출 레지스트리</h3>
-                    <span class="text-[8.5px] font-bold text-slate-500">UPH(TON/Hr) = 총생산량(TON) / 순수가동시간(Hr)</span>
+                    <div class="text-right">
+                        <span class="text-[8.5px] font-bold text-slate-500">UPH(TON/Hr) = 총생산량(TON) / 순수가동시간(Hr)</span>
+                        <p id="aly-alloc-note" class="text-[8.5px] text-slate-500"></p>
+                    </div>
                 </div>
                 <div class="overflow-x-auto p-1.5">
                     <table class="w-full text-xs">
@@ -887,7 +893,7 @@
                     <div class="flex items-center gap-1 border-r border-slate-300 pr-2 mr-1">
                         <i class="fa-solid fa-calendar text-sky-700 text-xs"></i>
                         <span class="text-[10px] font-black text-slate-700">조회 월:</span>
-                        <select id="cycle-month-select" class="bg-slate-100 border border-slate-300 text-[11px] font-bold text-slate-800 py-0.5 px-2 rounded-md outline-none cursor-pointer" onchange="renderCycleTable()">
+                        <select id="cycle-month-select" class="bg-slate-100 border border-slate-300 text-[11px] font-bold text-slate-800 py-0.5 px-2 rounded-md outline-none cursor-pointer" onchange="this.dataset.user='1'; renderCycleTable()">
                         </select>
                     </div>
 
@@ -1151,6 +1157,8 @@
                             <tr class="bg-slate-100/80">
                                 <th class="py-1 px-2 text-center text-[10px]">#</th>
                                 <th class="py-1 px-2 text-left text-[10px]">제조번호</th>
+                                <th class="py-1 px-2 text-right text-[10px]">선경(mm)</th>
+                                <th class="py-1 px-2 text-right text-[10px]">길이(mm)</th>
                                 <th class="py-1 px-2 text-left text-[10px]">작업일</th>
                                 <th class="py-1 px-2 text-center text-[10px]">다기능</th>
                                 <th class="py-1 px-2 text-center text-[10px]">PCD 호기</th>
@@ -1230,13 +1238,13 @@
                 <i class="fa-solid fa-robot text-lg text-amber-400 animate-pulse"></i>
                 <div>
                     <h3 class="font-black text-xs text-white">PRO-Bot AI Assistant</h3>
-                    <p class="text-[8.5px] text-slate-300 font-bold">Gemini Powered Manufacturing Intelligence v28.0</p>
+                    <p class="text-[8.5px] text-slate-300 font-bold">대시보드 데이터 질의 · 규칙 기반 (외부 전송 없음)</p>
                 </div>
             </div>
             <i class="fa-solid fa-xmark text-base cursor-pointer hover:text-red-400" onclick="toggleBot()"></i>
         </div>
         <div class="chat-body" id="chat-body">
-            <div class="msg-bot">안녕하세요! PRO-Bot AI입니다.<br>Gemini 인공지능 엔드포인트가 연결되었습니다.<br><br>생산실적, 작업조별 분석, 포장량, 비가동 사유에 대해 구체적으로 질문해주세요.<br><br><span class="text-[9.5px] font-normal text-slate-500">예: 9월 가장 많은 생산량을 보인 조는? / A,B,C조 생산량 보여줘 / PCD-4 비가동 사유 알려줘</span></div>
+            <div class="msg-bot" id="bot-welcome">안녕하세요! PRO-Bot입니다.<br>대시보드와 같은 시트 데이터로 바로 계산해서 답합니다.<br><br><span id="bot-help"></span></div>
         </div>
         <div class="chat-input-area">
             <input type="text" id="chat-input" class="gs-input m-0" placeholder="질문을 입력하세요..." onkeypress="handleChatEnter(event)">
@@ -1472,6 +1480,51 @@
         const MACHINE_ORDER = ['PCD-0-2', 'PCD-0-3', 'PCD-1', 'PCD-5', 'PCD-2-2', 'PCD-3', 'PCD-4'];
         const CHANGEOVER_LOSS_MIN = 30; // 품종 전환(다이스·세팅 교체) 1회당 표준 공정 LOSS 추정치(분)
         const EXCLUDED_EQUIPS = ['미분류', 'PCD-W11', 'PCD-W8'];
+
+        // ===== 불가동 세부 사유 요약 =====
+        //  '기계 고장 / 전기 고장 / 유,공압 Part 고장'처럼 넓은 불가동명은 L열 불가동내역(자유 문장)의 키워드로 고장 부위를 붙인다.
+        //   예) 기계 고장 + "트랜스포터롤 교체" → '기계 고장 · 트랜스포터'
+        //  위에서부터 처음 맞는 규칙 하나만 적용 (순서가 우선순위). 새 부위가 생기면 여기에 한 줄 추가.
+        const GENERIC_DOWN_REASONS = ['기계 고장', '전기 고장', '유,공압 Part 고장'];
+        const DOWN_PART_RULES = [
+            ['포인팅·스웨이징', /포인팅|POINT|스웨이징|SWAG|푸쉬|푸시|푸셔|바이트|죠|JAW|포안탕/],
+            ['면취기', /면취|챔퍼|챔파|쳄퍼|쳄파|CHAMF/],
+            ['인발유 계통', /인발유/],
+            ['트랜스포터', /트랜스|트렌스|TRANSPORT/],
+            ['딜리버리·워킹', /딜리버리|딜레버리|받이|스톱|DELIVER|워킹|위킹|WALKING|구름판|제품포켓|포켓|스크류|인덱스/],
+            ['드로잉(인발기)', /드로잉|악세|ACCEL|드로윙|DRAWING|캐리지|풀링|다이스|악셀/],
+            ['컷팅기·길이', /컷팅|커팅|CUTT|길이/],
+            ['교정기(P/S·롤)', /교정|스트레이트|버티컬|수직|P\/S|PS\b|투롤|2롤|4-?ROLL|2-?ROLL|TWO|PRE|STRAIGHT|롤 ?압|압조정/],
+            ['쇼트기', /쇼트|SHOT/],
+            ['폴리싱', /폴리싱|POLISH/],
+            ['직진도 검사기', /검사기|직진도/],
+            ['급선대·원재 공급', /급선대|페이오프|원재|코일 ?오프너|OPENER|PAY|핀치롤|세파르타|세파레이터/],
+            ['윤활(Lubrication)', /LUBRI|루브|르부|루불|윤활/],
+            ['방청', /방청/],
+            ['가이드 튜브', /튜브|멀티가이드|이너릿지|가이드/],
+            ['용접기', /용접기/],
+            ['집진기', /집진/],
+            ['유압·공압', /유압|공압|에어|AIR|실린더|쏠|솔레노|숄밸브|밸브|누유|호스/],
+            ['센서', /센서|SENSOR/],
+            ['전기 제어(전원·판넬)', /엔코|엠코|통신|서보|원점|차단기|퓨즈|계측기|전원|판넬|패널|꺼짐|릴레이|마그네틱|스위치|모터|과부하|모니터|PLC/],
+            ['호이스트·크레인', /호이스트|크레인/],
+            ['컨베이어', /컨베이어|콘베어|CONVEY/]
+        ];
+        function classifyDownPart(detail) {
+            const u = String(detail || '').toUpperCase();
+            if (!u.trim()) return '내역 미기재';
+            const hit = DOWN_PART_RULES.find(([, re]) => re.test(u));
+            return hit ? hit[0] : '기타';
+        }
+        // 차트용 부위: 넓은 불가동명은 내역 문장에서, 'CD Cutting M/C 고장'처럼 구체적인 이름은 그 이름에서 부위를 읽는다
+        function downPartOf(reasonRaw, detail) {
+            if (GENERIC_DOWN_REASONS.includes(reasonRaw)) return classifyDownPart(detail);
+            const hit = DOWN_PART_RULES.find(([, re]) => re.test(String(reasonRaw || '').toUpperCase()));
+            return hit ? hit[0] : (reasonRaw || '기타');
+        }
+        function summarizeDownReason(reasonRaw, detail) {
+            return GENERIC_DOWN_REASONS.includes(reasonRaw) ? `${reasonRaw} · ${classifyDownPart(detail)}` : reasonRaw;
+        }
 
         // ===== 외주 임가공 (CDM) 예산 설정 — 예산이 바뀌면 monthly 값만 고치면 됩니다 =====
         //  · 남부스틸 : PCD-W11
@@ -1945,9 +1998,9 @@
                     </div>
                 </div>`;
             } else if (widgetId === 'widget-prod') {
-                html = `<div class="grid-stack-item-content"><div class="glass-panel p-3.5 h-full"><div class="widget-drag-handle"><span>생산실적 KPI</span><i class="fa-solid fa-xmark cursor-pointer" onclick="removeWidget('widget-prod')"></i></div><div class="flex justify-between items-start mb-1"><div class="p-2 rounded-lg bg-sky-50 border border-sky-200 text-sky-700"><i class="fa-solid fa-industry text-sm"></i></div><span id="kpi-reach" class="text-[9.5px] font-extrabold px-2 py-0.5 rounded-md border bg-sky-50 text-sky-800 border-sky-200">달성률 0%</span></div><div><p class="text-[10px] font-extrabold text-slate-500 uppercase tracking-widest mb-0.5">당월 생산 실적</p><div class="flex items-baseline gap-1"><h4 id="kpi-tons" class="text-xl lg:text-2xl font-black text-slate-900 font-mono-num">0</h4><span class="text-[10px] font-bold text-slate-500">TON</span></div></div></div></div>`;
+                html = `<div class="grid-stack-item-content"><div class="glass-panel p-3.5 h-full"><div class="widget-drag-handle"><span>생산실적 KPI</span><i class="fa-solid fa-xmark cursor-pointer" onclick="removeWidget('widget-prod')"></i></div><div class="flex justify-between items-start mb-1"><div class="p-2 rounded-lg bg-sky-50 border border-sky-200 text-sky-700"><i class="fa-solid fa-industry text-sm"></i></div><span id="kpi-reach" class="text-[9.5px] font-extrabold px-2 py-0.5 rounded-md border bg-sky-50 text-sky-800 border-sky-200">달성률 0%</span></div><div><p class="text-[10px] font-extrabold text-slate-500 uppercase tracking-widest mb-0.5">당월 생산 실적</p><div class="flex items-baseline gap-1"><h4 id="kpi-tons" class="text-xl lg:text-2xl font-black text-slate-900 font-mono-num">0</h4><span class="text-[10px] font-bold text-slate-500">TON</span><span id="kpi-tons-delta" class="text-[10px] font-mono-num ml-1"></span></div></div></div></div>`;
             } else if (widgetId === 'widget-pack') {
-                html = `<div class="grid-stack-item-content"><div class="glass-panel p-3.5 h-full"><div class="widget-drag-handle"><span>포장실적 KPI</span><i class="fa-solid fa-xmark cursor-pointer" onclick="removeWidget('widget-pack')"></i></div><div class="flex justify-between items-start mb-1"><div class="p-2 rounded-lg bg-teal-50 border border-teal-200 text-teal-700"><i class="fa-solid fa-box-open text-sm"></i></div><span id="kpi-pack-ratio" class="text-[9.5px] font-extrabold px-2 py-0.5 rounded-md border bg-teal-50 text-teal-800 border-teal-200">포장달성률 0%</span></div><div><p class="text-[10px] font-extrabold text-slate-500 uppercase tracking-widest mb-0.5">CD 포장 실적량</p><div class="flex items-baseline gap-1"><h4 id="kpi-pack-tons" class="text-xl lg:text-2xl font-black text-slate-900 font-mono-num">0</h4><span class="text-[10px] font-bold text-slate-500">TON</span></div></div></div></div>`;
+                html = `<div class="grid-stack-item-content"><div class="glass-panel p-3.5 h-full"><div class="widget-drag-handle"><span>포장실적 KPI</span><i class="fa-solid fa-xmark cursor-pointer" onclick="removeWidget('widget-pack')"></i></div><div class="flex justify-between items-start mb-1"><div class="p-2 rounded-lg bg-teal-50 border border-teal-200 text-teal-700"><i class="fa-solid fa-box-open text-sm"></i></div><span id="kpi-pack-ratio" class="text-[9.5px] font-extrabold px-2 py-0.5 rounded-md border bg-teal-50 text-teal-800 border-teal-200">포장달성률 0%</span></div><div><p class="text-[10px] font-extrabold text-slate-500 uppercase tracking-widest mb-0.5">CD 포장 실적량</p><div class="flex items-baseline gap-1"><h4 id="kpi-pack-tons" class="text-xl lg:text-2xl font-black text-slate-900 font-mono-num">0</h4><span class="text-[10px] font-bold text-slate-500">TON</span><span id="kpi-pack-delta" class="text-[10px] font-mono-num ml-1"></span></div></div></div></div>`;
             } else if (widgetId === 'widget-down') {
                 html = `<div class="grid-stack-item-content"><div class="glass-panel p-2.5 flex flex-col justify-between h-full"><div class="widget-drag-handle"><span>불가동 TOP 3</span><i class="fa-solid fa-xmark cursor-pointer hover:text-red-500" onclick="removeWidget('widget-down')"></i></div><div class="flex justify-between items-center mb-1"><div class="flex items-center gap-1.5"><div class="p-1 rounded-lg bg-red-50 border border-red-200 text-red-600"><i class="fa-solid fa-clock text-xs"></i></div><span class="text-[9.5px] font-extrabold text-slate-500 uppercase tracking-widest">총 불가동시간</span></div><div class="flex items-baseline gap-1"><h4 id="kpi-down" class="text-base lg:text-lg font-black text-red-600 font-mono-num">0</h4><span class="text-[8.5px] font-bold text-slate-500">MIN</span></div></div><div id="kpi-down-top3" class="pt-1 border-t border-slate-200 flex flex-col justify-center flex-1 gap-1 overflow-y-auto no-scrollbar"><div class="text-center text-slate-400 text-[9px] font-bold py-0.5">분석 중...</div></div></div></div>`;
             } else {
@@ -2017,6 +2070,15 @@
             bot.style.display = bot.style.display === 'flex' ? 'none' : 'flex';
         }
 
+        // 답변 속 예시 질문(.nlq-ex)을 누르면 그대로 질문한다
+        document.addEventListener('click', e => {
+            const a = e.target.closest && e.target.closest('.nlq-ex');
+            if (!a) return;
+            const input = document.getElementById('chat-input');
+            if (input) { input.value = a.innerText.trim(); sendChat(); }
+        });
+        document.addEventListener('DOMContentLoaded', () => { const h = document.getElementById('bot-help'); if (h) h.innerHTML = NLQ_HELP; });
+
         function handleChatEnter(event) {
             if (event.key === 'Enter') {
                 sendChat();
@@ -2033,8 +2095,10 @@
 
             const loadingId = appendChatMsg("PRO-Bot AI 분석 중...", 'bot-loading');
 
-            setTimeout(async () => {
-                const response = await getBotResponseGemini(text);
+            setTimeout(() => {
+                let response;
+                try { response = nlqAnswer(text); }
+                catch (e) { console.error('PRO-Bot 질의 오류', e); response = '질문을 처리하다 오류가 났습니다. 다른 표현으로 물어봐 주세요.<br><br>' + NLQ_HELP; }
                 const loadingEl = document.getElementById(loadingId);
                 if (loadingEl) loadingEl.remove();
                 appendChatMsg(response, 'bot');
@@ -2045,7 +2109,7 @@
             const body = document.getElementById('chat-body');
             if (!body) return;
             const div = document.createElement('div');
-            const msgId = 'msg-' + Date.now();
+            const msgId = 'msg-' + (appendChatMsg.seq = (appendChatMsg.seq || 0) + 1);
             div.id = msgId;
             if (type === 'user') {
                 div.className = 'msg-user';
@@ -2054,101 +2118,252 @@
             } else {
                 div.className = 'msg-bot';
             }
-            div.innerHTML = text;
+            if (type === 'user') div.textContent = text; else div.innerHTML = text;
             body.appendChild(div);
             body.scrollTop = body.scrollHeight;
             return msgId;
         }
 
-        async function getBotResponseGemini(userQuery) {
-            const safeProd = Array.isArray(prodData) ? prodData : [];
-            const safeDown = Array.isArray(downData) ? downData : [];
-            const safePack = Array.isArray(packData) ? packData : [];
+        // =====================================================================
+        // PRO-Bot : 규칙 기반 데이터 질의 (외부 AI 없음 · 데이터는 브라우저 밖으로 나가지 않음)
+        //  질문에서 [지표 · 기간 · 근무 · 조 · 설비 · 묶음 기준 · 최대/최소 · 원인]을 읽어
+        //  대시보드와 같은 데이터(prodData / packData / downData / inspData)로 계산한다.
+        //  새 표현을 알아듣게 하려면 nlqParse 의 정규식에 단어를 추가하면 된다.
+        // =====================================================================
+        function nlqShiftOk(s, mode) {
+            if (!mode) return true;
+            s = String(s || '');
+            return s.includes(mode) || (mode === '1근' && (s.includes('주간') || s === '1')) || (mode === '2근' && (s.includes('야간') || s === '2'));
+        }
+        function nlqYmd(d) { return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; }
 
-            const totalProdKg = safeProd.reduce((a,c)=>a+c.amount,0);
-            const totalPackKg = safePack.reduce((a,c)=>a+c.amount,0);
-            const totalDownMin = safeDown.reduce((a,c)=>a+c.minutes,0);
+        function nlqParse(q) {
+            const s = String(q || '').replace(/\s+/g, ' ').trim(), u = s.toUpperCase();
+            const now = new Date(), cy = now.getFullYear(), cm = now.getMonth() + 1;
+            const P = { metric: null, from: null, to: null, label: '', shift: null, team: null, equip: null, group: null, order: 'max', why: /왜|이유|원인/.test(s) };
 
-            const teamProd = { 'A': 0, 'B': 0, 'C': 0 };
-            safeProd.forEach(p => {
-                const t = (p.team || '').replace(/조/g, '').trim().toUpperCase();
-                if (teamProd[t] !== undefined) teamProd[t] += p.amount;
-            });
+            // 지표
+            if (/불량|부적합|NG/.test(u)) P.metric = 'insp';
+            else if (/불가동|비가동|정지|고장|다운/.test(u)) P.metric = 'down';
+            else if (/포장/.test(u)) P.metric = 'pack';
+            else if (/생산|작업량|실적|CD|톤|TON|많이 ?한|최대한|일 ?많이/.test(u)) P.metric = 'prod';
 
-            const downReasons = {};
-            safeDown.forEach(d => {
-                const k = `[${d.equipment || ''}] ${(d.reason || '').trim()}`;
-                downReasons[k] = (downReasons[k] || 0) + d.minutes;
-            });
+            // 기간
+            const setDay = (d, label) => { P.from = P.to = nlqYmd(d); P.label = label || P.from; };
+            const setMonth = (y, mo, label) => {
+                const mm = String(mo).padStart(2, '0');
+                P.from = `${y}-${mm}-01`; P.to = `${y}-${mm}-${new Date(y, mo, 0).getDate()}`; P.label = label || `${y}년 ${mo}월`;
+            };
+            const guessY = mo => (mo > cm ? cy - 1 : cy);   // 아직 안 온 달이면 작년
+            const back = n => { const d = new Date(now); d.setDate(d.getDate() - n); return d; };
+            let m;
+            if (/그제|그저께/.test(s)) setDay(back(2), `그저께(${nlqYmd(back(2)).substring(5)})`);
+            else if (/어제|전일/.test(s)) setDay(back(1), `어제(${nlqYmd(back(1)).substring(5)})`);
+            else if (/오늘|금일/.test(s)) setDay(now, `오늘(${nlqYmd(now).substring(5)})`);
+            else if ((m = s.match(/(\d{4})\s*[-./년]\s*(\d{1,2})\s*[-./월]\s*(\d{1,2})/))) setDay(new Date(+m[1], m[2] - 1, +m[3]));
+            else if ((m = s.match(/(\d{1,2})\s*월\s*(\d{1,2})\s*일/)) || (m = s.match(/(?:^|[^\d-])(\d{1,2})[/.](\d{1,2})(?![\d])/))) setDay(new Date(guessY(+m[1]), m[1] - 1, +m[2]));
+            else if ((m = s.match(/(\d{4})\s*년\s*(\d{1,2})\s*월/))) setMonth(+m[1], +m[2]);
+            else if ((m = s.match(/(\d{1,2})\s*월/))) setMonth(guessY(+m[1]), +m[1]);
+            else if (/지난\s*달|전월|저번\s*달/.test(s)) { const d = new Date(cy, cm - 2, 1); setMonth(d.getFullYear(), d.getMonth() + 1, '지난달'); }
+            else if (/이번\s*달|당월|이달/.test(s)) setMonth(cy, cm, '이번 달');
+            else if ((m = s.match(/최근\s*(\d+)\s*일/))) { P.from = nlqYmd(back(+m[1] - 1)); P.to = nlqYmd(now); P.label = `최근 ${m[1]}일`; }
+            else if (/이번\s*주|금주/.test(s)) { P.from = nlqYmd(back((now.getDay() + 6) % 7)); P.to = nlqYmd(now); P.label = '이번 주'; }
+            else if (/올해|금년|연간|전체|누계/.test(s)) { P.from = `${cy}-01-01`; P.to = `${cy}-12-31`; P.label = `${cy}년`; }
 
-            const top3Down = Object.entries(downReasons).sort((a,b)=>b[1]-a[1]).slice(0,3);
+            // 묶음 기준 (어느 ○○ / ○○별)
+            if (/어느\s*조|무슨\s*조|몇\s*조|조별|(^|\s)조(는|가|은|를)?(\s|\?|$)/.test(s)) P.group = 'team';
+            else if (/어느\s*달|무슨\s*달|어떤\s*달|몇\s*월|월별|달별/.test(s)) P.group = 'month';
+            else if (/어느\s*날|무슨\s*날|며칠|언제|일별|날짜별/.test(s)) P.group = 'day';
+            else if (/(어느|어떤|무슨)\s*(설비|호기)|설비별|호기별|(설비|호기).*(가장|최대|최고|1위|순위)|(가장|최대|최고|1위).*(설비|호기)/.test(s)) P.group = 'equip';
+            else if (/근무별|주야간|주간.{0,3}야간|야간.{0,3}주간/.test(s)) P.group = 'shift';
+            else if (P.metric === 'insp' && /아이템|품목|제품별/.test(s)) P.group = 'item';
+            else if (P.metric === 'insp' && /강종/.test(s)) P.group = 'steel';
+            else if (P.metric === 'insp' && /제강사|메이커|소재/.test(s)) P.group = 'maker';
+            else if (P.metric === 'down' && /사유|원인|부위|왜|이유|뭐/.test(s)) P.group = 'part';
 
-            const contextSummary = `
-[현재 공장 실시간 생산 데이터]
-- 총 생산 실적: ${(totalProdKg/1000).toFixed(1)} TON (${totalProdKg.toLocaleString()} kg)
-- 총 포장 실적: ${(totalPackKg/1000).toFixed(1)} TON
-- 총 불가동 시간: ${totalDownMin.toLocaleString()} 분
-- 작업조별 생산실적: A조 ${(teamProd.A/1000).toFixed(1)}TON, B조 ${(teamProd.B/1000).toFixed(1)}TON, C조 ${(teamProd.C/1000).toFixed(1)}TON
-- 불가동 주요 원인 TOP 3: ${top3Down.map((item,i)=>`${i+1}위 ${item[0]} (${item[1]}분)`).join(', ')}
-`;
+            // 필터
+            if (P.group !== 'shift') { if (/야간|2근|밤/.test(s)) P.shift = '2근'; else if (/주간|1근|낮/.test(s)) P.shift = '1근'; }
+            if (P.group !== 'team' && (m = u.match(/(?:^|[^A-Z])([ABC])\s*조/))) P.team = m[1];
+            if ((m = u.match(/P([CN])D[-\s]?(W?\d+(?:-\d+)?)/))) P.equip = `P${m[1]}D-${m[2]}`;
+            if (/최소|가장\s*적|제일\s*적|최저|적은/.test(s)) P.order = 'min';
 
-            const systemPrompt = `당신은 대한민국 최고 수준의 철강/선재 생산관리 AI 시스템인 'PRO-Bot Assistant'입니다. 
-제공된 [현재 공장 실시간 생산 데이터]를 토대로 사용자의 질문에 정확하고 명쾌하게 답변하세요. 
-작업조별(A, B, C조) 생산량, 포장량, 비가동 사유 질문 시 정확한 숫자와 결론을 2-3문장 이내로 확실하게 강조하세요.`;
-
-            const apiKey = "";
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
-
-            try {
-                const response = await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        contents: [{ parts: [{ text: userQuery }] }],
-                        systemInstruction: { parts: [{ text: systemPrompt + "\n" + contextSummary }] }
-                    })
-                });
-                const result = await response.json();
-                const aiText = result.candidates?.[0]?.content?.parts?.[0]?.text;
-                if (aiText) return aiText.replace(/\n/g, '<br>');
-            } catch (err) {
-                console.warn("Gemini API call optional fallback executed:", err);
+            // 기간 기본값: '어느 달' 질문은 올해 전체, 나머지는 이번 달
+            if (P.group === 'month' && (!P.from || P.from.substring(0, 7) === P.to.substring(0, 7))) {
+                const y = P.from ? P.from.substring(0, 4) : String(cy);
+                P.from = `${y}-01-01`; P.to = `${y}-12-31`; P.label = `${y}년`;
             }
-
-            return getLocalIntelligentResponse(userQuery, teamProd, totalProdKg, totalPackKg, totalDownMin, top3Down, safeProd, safeDown);
+            if (!P.from) setMonth(cy, cm, '이번 달');
+            return P;
         }
 
-        function getLocalIntelligentResponse(q, teamProd, totalProdKg, totalPackKg, totalDownMin, top3Down, safeProd, safeDown) {
-            const query = q.toLowerCase();
+        const NLQ_NAME = { prod: 'CD 생산량', pack: 'CD 포장량', down: '불가동', insp: '다기능 부적합률' };
+        const NLQ_INSP_MIN_KG = 5000;   // 부적합률 비교 시 검사량 5T 미만 구분은 제외 (소량 1건으로 튀는 값 방지)
 
-            if (query.includes('조') || query.includes('생산량') || query.includes('실적')) {
-                if (query.includes('가장') || query.includes('높은') || query.includes('1위') || query.includes('보인')) {
-                    const maxTeam = Object.entries(teamProd).sort((a,b)=>b[1]-a[1])[0];
-                    return `현재 가장 많은 생산량을 보인 작업조는 <b>${maxTeam[0]}조</b>로 총 <b>${(maxTeam[1]/1000).toFixed(1)} TON</b>을 달성했습니다.<br><br><b>[작업조별 누적 실적]</b><br>• A조: ${(teamProd.A/1000).toFixed(1)} TON<br>• B조: ${(teamProd.B/1000).toFixed(1)} TON<br>• C조: ${(teamProd.C/1000).toFixed(1)} TON`;
-                }
-                return `<b>[작업조별 누적 생산실적]</b><br>• <b>A조:</b> ${(teamProd.A/1000).toFixed(1)} TON<br>• <b>B조:</b> ${(teamProd.B/1000).toFixed(1)} TON<br>• <b>C조:</b> ${(teamProd.C/1000).toFixed(1)} TON<br>• <b>전체 총계:</b> ${(totalProdKg/1000).toFixed(1)} TON`;
+        function nlqTeamOf(r) { return String(r.team || '').replace(/조/g, '').trim().toUpperCase(); }
+        function nlqRows(P, override) {
+            const Q = Object.assign({}, P, override || {});
+            const inRange = d => d && d >= Q.from && d <= Q.to;
+            const ok = r => inRange(r.date) && nlqShiftOk(r.shift, Q.group === 'shift' ? null : Q.shift) && (!Q.team || nlqTeamOf(r) === Q.team);
+            if (Q.metric === 'insp') {
+                if (typeof enrichInspPcd === 'function') enrichInspPcd();
+                return (Array.isArray(inspData) ? inspData : []).filter(r => INSP_EQUIPS.includes(r.pnd) && ok(r) && (!Q.equip || r.pnd === Q.equip || r.pcd === Q.equip));
             }
-
-            if (query.includes('비가동') || query.includes('정지') || query.includes('고장')) {
-                if (top3Down.length > 0) {
-                    let res = `현재 집계된 <b>주요 비가동 원인 TOP 3</b>입니다:<br>`;
-                    top3Down.forEach((item, idx) => {
-                        res += `<br><b>${idx + 1}위:</b> ${item[0]} (<b>${item[1].toLocaleString()}분</b>)`;
-                    });
-                    res += `<br><br>총 누적 비가동시간은 <b>${totalDownMin.toLocaleString()} 분</b>입니다.`;
-                    return res;
-                }
-                return `총 누적 불가동시간은 <b>${totalDownMin.toLocaleString()} 분</b>입니다.`;
-            }
-
-            if (query.includes('포장')) {
-                return `총 CD 포장 실적량은 <b>${(totalPackKg/1000).toFixed(1)} TON</b> (포장률 ${totalProdKg > 0 ? ((totalPackKg/totalProdKg)*100).toFixed(1) : 0}%) 입니다.`;
-            }
-
-            return `<b>[생산 종합 현황]</b><br>• 누적 생산실적: <b>${(totalProdKg/1000).toFixed(1)} TON</b><br>• 누적 포장실적: <b>${(totalPackKg/1000).toFixed(1)} TON</b><br>• 누적 비가동시간: <b>${totalDownMin.toLocaleString()} 분</b><br><br>필요하신 세부 항목(예: A조 생산량, PCD-4 비가동)을 자유롭게 물어보세요!`;
+            const src = Q.metric === 'pack' ? packData : Q.metric === 'down' ? downData : prodData;
+            return (Array.isArray(src) ? src : []).filter(r => ok(r) && (!Q.equip || String(r.equipment || '').toUpperCase() === Q.equip));
+        }
+        function nlqVal(metric, rows) {
+            if (metric === 'insp') { const a = inspAgg(rows); return { v: a.rate, n: a.ins, sub: `검사 ${inspFmtT(a.ins)}T · 부적합 ${inspFmtT(a.ng)}T` }; }
+            if (metric === 'down') { const v = rows.reduce((a, r) => a + (r.minutes || 0), 0); return { v, n: v, sub: `${rows.length}건` }; }
+            const v = rows.reduce((a, r) => a + (r.amount || 0), 0) / 1000, days = new Set(rows.map(r => r.date)).size;
+            return { v, n: v, sub: days ? `${days}일 · 일평균 ${(v / days).toFixed(1)}T` : '' };
+        }
+        function nlqFmt(metric, v) {
+            if (metric === 'insp') return v.toFixed(2) + '%';
+            if (metric === 'down') return Math.round(v).toLocaleString() + '분';
+            return v.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + 'T';
+        }
+        const NLQ_GROUP = {
+            team:  { label: '작업조', key: r => { const t = nlqTeamOf(r); return t ? t + '조' : '미기재'; } },
+            month: { label: '월', key: r => r.date.substring(0, 7) },
+            day:   { label: '일자', key: r => r.date },
+            equip: { label: '설비', key: r => r.pnd ? (r.pcd && !['미기재', '미매칭'].includes(r.pcd) ? r.pcd : '미매칭') : (r.equipment || '미기재') },
+            shift: { label: '근무', key: r => nlqShiftOk(r.shift, '1근') ? '1근(주간)' : nlqShiftOk(r.shift, '2근') ? '2근(야간)' : '미기재' },
+            part:  { label: '부위', key: r => r.part || r.reason || '기타' },
+            item:  { label: '아이템', key: r => inspShortName(r.itemName, 26) },
+            steel: { label: '강종', key: r => r.steel || '미기재' },
+            maker: { label: '제강사', key: r => r.maker || '미기재' }
+        };
+        function nlqScope(P) {
+            return [P.label, P.shift ? (P.shift === '2근' ? '야간(2근)' : '주간(1근)') : '', P.team ? P.team + '조' : '', P.equip || ''].filter(Boolean).join(' · ');
+        }
+        function nlqTable(head, rows) {
+            return `<table class="w-full mt-1.5 text-[10.5px]" style="border-collapse:collapse"><thead><tr>${head.map((h, i) => `<th class="!py-0.5 !px-1 !text-[10px] ${i ? 'text-right' : 'text-left'}">${h}</th>`).join('')}</tr></thead><tbody>` +
+                rows.map(r => `<tr>${r.map((c, i) => `<td class="!py-0.5 !px-1 !text-[10.5px] ${i ? 'text-right font-mono-num' : ''}">${c}</td>`).join('')}</tr>`).join('') + '</tbody></table>';
+        }
+        // 그룹별 집계 → [{k, v, n, sub}] (정렬 전)
+        function nlqGroupList(P, rows, keyFn) {
+            const g = new Map();
+            rows.forEach(r => { const k = keyFn(r); if (!g.has(k)) g.set(k, []); g.get(k).push(r); });
+            let list = [...g].map(([k, L]) => Object.assign({ k }, nlqVal(P.metric, L)));
+            if (P.metric === 'insp') list = list.filter(x => x.n >= NLQ_INSP_MIN_KG);
+            return list;
         }
 
-        function openDownDetailModal(equip, reason) {
+        const NLQ_HELP = `이렇게 물어보세요 (기간·근무·조·설비를 섞어도 됩니다):<br>
+            • <a class="nlq-ex">11월 생산량 가장 많은 조는?</a><br>
+            • <a class="nlq-ex">어느 달이 CD 포장량 최대야?</a><br>
+            • <a class="nlq-ex">어제 야간 불량률 왜 높아?</a><br>
+            • <a class="nlq-ex">이번 달 불가동 원인</a><br>
+            • <a class="nlq-ex">11월 어느 설비가 불가동이 가장 많아?</a><br>
+            • <a class="nlq-ex">11/19 2근 부적합 제조번호</a><br>
+            • <a class="nlq-ex">지난달 PCD-4 생산량</a>`;
+
+        function nlqAnswer(q) {
+            const P = nlqParse(q);
+            if (!P.metric) return `질문에서 <b>생산 / 포장 / 불가동 / 불량</b> 중 무엇을 볼지 찾지 못했습니다.<br><br>${NLQ_HELP}`;
+            const name = NLQ_NAME[P.metric], scope = nlqScope(P);
+            const rows = nlqRows(P);
+            if (P.metric === 'insp' && inspIsDemo) return '다기능 검사실적 시트가 아직 연동되지 않아 (데모 데이터) 부적합률은 답할 수 없습니다.';
+            if (!rows.length) {
+                const known = nlqRows(P, { from: '0000-00-00', to: '9999-99-99' }).map(r => r.date).filter(d => d < P.from).sort().pop();
+                return `<b>${escHtml(scope)}</b> ${name} 데이터가 없습니다.${known ? `<br>같은 조건의 가장 최근 데이터는 <b>${known}</b>입니다.` : ''}`;
+            }
+
+            // ① 묶음 질문: 어느 조 / 어느 달 / 어느 설비 …
+            if (P.group) {
+                const G = NLQ_GROUP[P.group];
+                const list = nlqGroupList(P, rows, G.key).sort((a, b) => (P.order === 'min' ? a.v - b.v : b.v - a.v));
+                if (!list.length) return `<b>${escHtml(scope)}</b> 비교할 만큼 데이터가 없습니다${P.metric === 'insp' ? ` (검사량 ${NLQ_INSP_MIN_KG / 1000}T 이상 구분만 비교)` : ''}.`;
+                const top = list[0], word = P.metric === 'insp' ? (P.order === 'min' ? '가장 낮은' : '가장 높은') : (P.order === 'min' ? '가장 적은' : '가장 많은');
+                let html = `<b>${escHtml(scope)}</b> ${name} ${word} ${G.label}: <b class="text-sky-800">${escHtml(top.k)}</b> ${nlqFmt(P.metric, top.v)}`;
+                if (list[1]) html += ` <span class="text-slate-500">(2위 ${escHtml(list[1].k)} ${nlqFmt(P.metric, list[1].v)})</span>`;
+                html += nlqTable([G.label, name, '참고'], list.slice(0, 10).map((x, i) => [`${i + 1}. ${escHtml(x.k)}`, `<b>${nlqFmt(P.metric, x.v)}</b>`, `<span class="text-slate-500">${x.sub}</span>`]));
+                if (list.length > 10) html += `<div class="text-[10px] text-slate-500">외 ${list.length - 10}개</div>`;
+                if (P.metric === 'insp') html += `<div class="text-[10px] text-slate-500 mt-1">부적합률 = 부적합 작업량 ÷ 검사 작업량 · 검사량 ${NLQ_INSP_MIN_KG / 1000}T 미만 구분 제외</div>`;
+                return html;
+            }
+
+            // ② 합계 질문
+            const val = nlqVal(P.metric, rows);
+            let html = `<b>${escHtml(scope)}</b> ${name}: <b class="text-sky-800">${nlqFmt(P.metric, val.v)}</b> <span class="text-slate-500">(${val.sub})</span>`;
+
+            if (P.metric === 'prod' || P.metric === 'pack') {
+                if (!P.team) {
+                    const t = nlqGroupList(P, rows, NLQ_GROUP.team.key).sort((a, b) => a.k.localeCompare(b.k));
+                    if (t.length > 1) html += `<br><span class="text-slate-600">조별: ${t.map(x => `${escHtml(x.k)} ${nlqFmt(P.metric, x.v)}`).join(' · ')}</span>`;
+                }
+                return html;
+            }
+            if (P.metric === 'down') {
+                const parts = nlqGroupList(P, rows, NLQ_GROUP.part.key).sort((a, b) => b.v - a.v).slice(0, 5);
+                const eq = nlqGroupList(P, rows, NLQ_GROUP.equip.key).sort((a, b) => b.v - a.v).slice(0, 3);
+                html += `<div class="mt-1">부위 TOP5</div>` + nlqTable(['부위', '불가동', '건수'], parts.map(x => [escHtml(x.k), `<b>${nlqFmt('down', x.v)}</b>`, x.sub]));
+                if (!P.equip && eq.length) html += `<div class="mt-1 text-slate-600">설비: ${eq.map(x => `${escHtml(x.k)} ${nlqFmt('down', x.v)}`).join(' · ')}</div>`;
+                return html;
+            }
+            return html + nlqInspWhy(P, rows, val);
+        }
+
+        // 불량률 원인 분석: 그 기간 부적합 제조번호 + 공통점 + 같은 달 평균과 비교
+        function nlqInspWhy(P, rows, val) {
+            const ym = P.to.substring(0, 7);
+            const monthRows = nlqRows(P, { from: ym + '-01', to: ym + '-31', shift: null, team: null, equip: null });
+            const monthRate = inspAgg(monthRows).rate;
+            let html = `<br><span class="text-slate-600">${ym.substring(5)}월 전체 평균 ${monthRate.toFixed(2)}% 대비 ${val.v >= monthRate ? '▲' : '▼'}${Math.abs(val.v - monthRate).toFixed(2)}%p</span>`;
+
+            const lots = new Map();
+            rows.filter(r => r.ngW > 0).forEach(r => {
+                const k = r.lotKey || r.lot;
+                const o = lots.get(k) || { lot: r.lot, date: r.date, shift: r.shift, team: nlqTeamOf(r), pnd: r.pnd, pcd: r.pcd, item: r.itemName, maker: r.maker, dia: r.dia, ng: 0 };
+                o.ng += r.ngW; lots.set(k, o);
+            });
+            const ng = [...lots.values()].sort((a, b) => b.ng - a.ng);
+
+            if (!ng.length) {
+                html += `<br>이 기간에는 <b>부적합이 없습니다</b>.`;
+                if (P.from === P.to) {   // 하루짜리 질문이면 최근 2주 중 같은 조건에서 가장 높았던 날을 알려준다
+                    const d0 = new Date(P.from); d0.setDate(d0.getDate() - 14);
+                    const recent = nlqRows(P, { from: nlqYmd(d0), to: P.from });
+                    const top = nlqGroupList(P, recent, NLQ_GROUP.day.key).filter(x => x.v > 0).sort((a, b) => b.v - a.v)[0];
+                    if (top) html += `<br>최근 2주 같은 조건에서 가장 높았던 날은 <b>${top.k}</b> ${top.v.toFixed(2)}%입니다. <a class="nlq-ex">${top.k.substring(5).replace('-', '/')}${P.shift ? ' ' + P.shift : ''} 불량률 왜 높아?</a>`;
+                }
+                return html;
+            }
+
+            html += `<div class="mt-1">부적합 제조번호 ${ng.length}개</div>` + nlqTable(['제조번호', '부적합', '내용'], ng.slice(0, 8).map(o => [
+                `${escHtml(o.lot)}<div class="text-[9.5px] text-slate-500">${o.date.substring(5)} ${escHtml(o.shift || '')} ${o.team ? o.team + '조' : ''}</div>`,
+                `<b class="text-red-600">${inspFmtT(o.ng)}T</b>`,
+                `<span class="text-[10px]">${escHtml(inspShortName(o.item, 22))} Ø${escHtml(o.dia || '-')}<br><span class="text-slate-500">${escHtml(o.maker)} · ${escHtml(o.pnd)} · ${escHtml(o.pcd || '-')}</span></span>`
+            ]));
+            if (ng.length > 8) html += `<div class="text-[10px] text-slate-500">외 ${ng.length - 8}개</div>`;
+
+            // 공통점: 부적합 중량의 60% 이상이 한 값에 몰려 있으면 짚어 준다 (해당 값의 이번 달 부적합률과 함께)
+            const ngRows = rows.filter(r => r.ngW > 0), ngTot = ngRows.reduce((a, r) => a + r.ngW, 0);
+            const facts = [];
+            [['아이템', r => inspShortName(r.itemName, 22), r => r.itemName], ['제강사', r => r.maker], ['PCD', r => r.pcd], ['다기능 작업조', r => (nlqTeamOf(r) || '?') + '조']].forEach(([lbl, f]) => {
+                const c = {}; ngRows.forEach(r => { const k = f(r); c[k] = (c[k] || 0) + r.ngW; });
+                const [k, w] = Object.entries(c).sort((a, b) => b[1] - a[1])[0] || [];
+                if (!k || w / ngTot < 0.6 || ['미기재', '미매칭', '?조'].includes(k)) return;
+                const mr = inspAgg(monthRows.filter(r => f(r) === k));
+                facts.push(`${lbl} <b>${escHtml(k)}</b> (${ng.length > 1 ? `부적합의 ${Math.round(w / ngTot * 100)}% · ` : ''}${ym.substring(5)}월 부적합률 ${mr.rate.toFixed(2)}%${mr.rate > monthRate * 1.3 ? ' <span class="text-red-600">평균보다 높음</span>' : ''})`);
+            });
+            if (ng.length === 1) html += `<div class="mt-1">➡ 부적합 제조번호 <b>1개</b>가 이 기간 불량률을 만든 경우입니다.</div>`;
+            if (facts.length) html += `<div class="mt-1">${ng.length > 1 ? '공통점' : '이 제조번호의 조건'}: ${facts.join(', ')}</div>`;
+            html += `<div class="text-[10px] text-slate-500 mt-1">시트에 부적합명(불량 유형) 열이 없어 어떤 불량인지는 알 수 없습니다. 공통점은 함께 나타난 것일 뿐 원인 확정은 아닙니다.</div>`;
+            return html;
+        }
+
+        // 근무별 근무시간(분): 1근 480 · 2근 540 → 하루 1,020분 (OEE · CD 생산성 UPH 계산에 사용)
+        const SHIFT_MINUTES = { '1근': 480, '2근': 540 };
+        function shiftKey(s) { return nlqShiftOk(s, '2근') ? '2근' : nlqShiftOk(s, '1근') ? '1근' : '?'; }
+
+        // 근무 필터(전체/1근/2근) 판정 — 대시보드 집계와 상세 창이 같은 기준을 쓴다
+        function shiftMatches(s) {
+            if (shiftMode === 'ALL') return true;
+            return !!s && (s.includes(shiftMode) || (shiftMode === '1근' && (s.includes('주간') || s === '1')) || (shiftMode === '2근' && (s.includes('야간') || s === '2')));
+        }
+
+        function openDownDetailModal(equip, reason, date, ignoreShift) {
             const modal = document.getElementById('down-detail-modal');
             const titleEl = document.getElementById('modal-down-title');
             const equipEl = document.getElementById('modal-down-equip');
@@ -2157,20 +2372,27 @@
             const bodyEl = document.getElementById('modal-down-history-body');
             const aiEl = document.getElementById('modal-down-ai-guide');
 
-            const safeDown = Array.isArray(downData) ? downData : [];
+            // 상단 근무 필터(1근/2근)를 따른다. 월별 히트맵(근무 구분 없음)에서 열 때만 예외
+            const safeDown = (Array.isArray(downData) ? downData : []).filter(d => ignoreShift || shiftMatches(d.shift));
             const totalDownAll = safeDown.reduce((a,c)=>a+c.minutes,0);
 
             const filtered = safeDown.filter(d => {
                 const matchesEquip = equip ? d.equipment === equip : true;
                 const matchesReason = reason ? d.reason === reason : true;
-                return matchesEquip && matchesReason;
+                const matchesDate = date ? d.date === date : true;
+                return matchesEquip && matchesReason && matchesDate;
             });
+            // 타임라인: 최근 일자 먼저, 같은 날은 정지시간 긴 순
+            filtered.sort((a, b) => (b.date || '').localeCompare(a.date || '') || b.minutes - a.minutes);
 
             const itemDownTotal = filtered.reduce((a,c)=>a+c.minutes,0);
-            const pct = totalDownAll > 0 ? ((itemDownTotal / totalDownAll) * 100).toFixed(1) : 0;
+            // 일자 보기: 점유율 분모 = 그달 전체 불가동
+            const denom = date ? safeDown.filter(d => d.date && d.date.startsWith(date.substring(0, 7))).reduce((a,c)=>a+c.minutes,0) : totalDownAll;
+            const pct = denom > 0 ? ((itemDownTotal / denom) * 100).toFixed(1) : 0;
 
-            if (titleEl) titleEl.innerText = `[${equip || '전체'}] ${reason || '비가동 분석'}`;
-            if (equipEl) equipEl.innerText = `${equip || '전체설비'} / ${reason || '종합'}`;
+            const shiftTag = (!ignoreShift && shiftMode !== 'ALL') ? ` · ${shiftMode}` : '';
+            if (titleEl) titleEl.innerText = (date ? `${date} 설비별 불가동 내역` : `[${equip || '전체'}] ${reason || '비가동 분석'}`) + shiftTag;
+            if (equipEl) equipEl.innerText = date ? `${date} / 전체설비` : `${equip || '전체설비'} / ${reason || '종합'}`;
             if (minEl) minEl.innerText = `${itemDownTotal.toLocaleString()} MIN`;
             if (pctEl) pctEl.innerText = `${pct}%`;
 
@@ -2181,7 +2403,7 @@
                         <td class="py-1 px-2 font-mono text-slate-800">${item.date}</td>
                         <td class="py-1 px-2 text-center font-bold text-slate-600">${item.shift || '전체'}</td>
                         <td class="py-1 px-2 text-center font-bold text-sky-700">${item.team ? item.team + '조' : '-'}</td>
-                        <td class="py-1 px-2 font-extrabold text-slate-800">${item.reason}</td>
+                        <td class="py-1 px-2 font-extrabold text-slate-800">${!equip && item.equipment ? `<span class="text-sky-700">[${item.equipment}]</span> ` : ''}${escHtml(item.reason)}${item.detail ? `<div class="text-[10px] font-normal text-slate-600 leading-tight">${escHtml(item.detail)}</div>` : ''}</td>
                         <td class="py-1 px-2 text-right font-mono font-black text-red-600">${item.minutes} 분</td>
                     </tr>`;
                 });
@@ -2190,7 +2412,13 @@
             }
             if (bodyEl) bodyEl.innerHTML = rowsHtml;
 
-            if (aiEl) {
+            if (aiEl && date) {
+                const byEq = {}; filtered.forEach(d => { byEq[d.equipment] = (byEq[d.equipment] || 0) + d.minutes; });
+                const topEq = Object.entries(byEq).sort((a, b) => b[1] - a[1])[0];
+                aiEl.innerHTML = topEq
+                    ? `<b>${date}</b> 불가동 총 <b>${itemDownTotal.toLocaleString()}분</b> (당월 불가동의 ${pct}%). 가장 많이 선 설비는 <b>${topEq[0]}</b> (<b>${topEq[1].toLocaleString()}분</b>)입니다.`
+                    : `${date}에는 불가동 기록이 없습니다.`;
+            } else if (aiEl) {
                 aiEl.innerHTML = `<b>${equip || '설비'} 진단:</b> 해당 비가동 항목은 공정 병목을 유발하여 총 <b>${itemDownTotal}분 (${pct}%)</b>의 손실을 발생시켰습니다. ${reason ? `'${reason}'` : '해당 원인'}에 대한 보전팀 정기점검 가이드 준수 및 예비 부품 선확보를 권장합니다.`;
             }
 
@@ -2299,7 +2527,7 @@
             const item = monthTop5Cache[idx];
             if (!item) return;
             closeMonthDownDetail();
-            openDownDetailModal(item.equip, item.reason);
+            openDownDetailModal(item.equip, item.reason, null, true);
         }
 
         function closeMonthDownDetail() {
@@ -2441,11 +2669,15 @@
                         lotNo: lotNoV,   // ✅ 다기능 검사실적 ↔ PCD 호기 매칭용 
                         amount: amountV, 
                         speed: safeNum(getVal(row, ['선속', '속도', 'RPM', '신선선속'])), 
-                        wire: safeNum(getVal(row, ['작업선경', '선경', '두께', 'WIRE'])) 
+                        wire: safeNum(getVal(row, ['작업선경', '선경', '두께', 'WIRE'])),
+                        length: safeNum(getVal(row, ['길이', 'LENGTH']))
                     });
                 } else if (dataType === 'DOWN') {
                     if (EXCLUDED_EQUIPS.includes(equip.toUpperCase().trim())) continue;
-                    parsed.push({ date, equipment: equip, team, isCircle, shift: shiftVal, minutes: safeNum(getVal(row, ['세부불가동', '불가동시간', '정지시간', '시간'])), reason: String(getVal(row, ['불가동명', '사유', '원인', '내역']) || '기타 고장') });
+                    const reasonRaw = String(getVal(row, ['불가동명', '사유', '원인', '내역']) || '기타 고장').trim();
+                    const detail = String(getVal(row, ['불가동내역', '세부내역', '세부사유']) || '').trim();
+                    parsed.push({ date, equipment: equip, team, isCircle, shift: shiftVal, minutes: safeNum(getVal(row, ['세부불가동', '불가동시간', '정지시간', '시간'])),
+                        reason: summarizeDownReason(reasonRaw, detail), reasonRaw, detail, part: downPartOf(reasonRaw, detail) });
                 } else if (dataType === 'PACK') {
                     parsed.push({ date, equipment: equip, team, shift: shiftVal, amount: safeNum(getVal(row, ['포장량', '포장중량', '실적', '작업량', '수량'])) });
                 }
@@ -2547,6 +2779,8 @@
 
                 if (loadedFlags.length > 0) {
                     updateLed('synced', 'Live Sync (' + loadedFlags.join(' / ') + ')');
+                    const st = document.getElementById('sync-time');
+                    if (st) { const n = new Date(); st.innerText = `· 최종 갱신 ${String(n.getHours()).padStart(2, '0')}:${String(n.getMinutes()).padStart(2, '0')}`; }
                     showToast('클라우드 동기화 완료! (' + loadedFlags.join(', ') + ')' + (failed.length ? ' · 미수신: ' + failed.join(',') : ''));
                 } else {
                     updateLed('offline', '동기화 실패 · 데모 데이터 표시 중');
@@ -2788,6 +3022,36 @@
             return (typeof selectedMonth === 'string' && /^\d{4}-\d{2}$/.test(selectedMonth)) ? selectedMonth.substring(0, 4) : String(new Date().getFullYear());
         }
 
+        // 작업선경이 이 값 이상이면 실제 치수가 아니라 임의 코드값(예: 이형 99.100~99.999)으로 본다
+        const WIRE_CODE_MIN = 99;
+        function shapeKeys(byShape) {
+            const order = ['원형', '정육각', '사각', '이형'];
+            return Object.keys(byShape || {}).sort((a, b) => (order.indexOf(a) + 1 || 99) - (order.indexOf(b) + 1 || 99));
+        }
+        // 설비 표 '작업길이 범위' 칸: 선경 칸과 같은 형상 순서로 한 줄씩
+        function lengthRangeHtml(byShape) {
+            const keys = shapeKeys(byShape);
+            if (!keys.length) return '기록없음';
+            return keys.map(s => {
+                const w = byShape[s];
+                const range = w.lmin === Infinity ? '<span class="text-slate-400 font-normal">-</span>'
+                    : (w.lmin === w.lmax ? w.lmin.toLocaleString() : `${w.lmin.toLocaleString()} - ${w.lmax.toLocaleString()}`);
+                return `<div class="whitespace-nowrap leading-tight"><span class="text-[10px] font-normal text-slate-500 mr-1">${s}</span>${range}</div>`;
+            }).join('');
+        }
+        // 설비 표 '작업선경 범위' 칸: 형상별 한 줄씩 (원형 → 정육각 → 사각 → 이형)
+        function wireRangeHtml(byShape) {
+            const keys = shapeKeys(byShape);
+            if (!keys.length) return '기록없음';
+            return keys.map(s => {
+                const w = byShape[s];
+                const range = w.min === Infinity
+                    ? `<span class="text-slate-400 font-normal" title="선경 칸에 ${WIRE_CODE_MIN} 이상의 임의 코드값만 있어 범위를 표시하지 않습니다 (${w.code}건)">코드값</span>`
+                    : `${w.min} - ${w.max}${w.code ? `<span class="text-slate-400 font-normal text-[10px]" title="${WIRE_CODE_MIN} 이상의 임의 코드값 ${w.code}건은 범위에서 제외"> +코드 ${w.code}</span>` : ''}`;
+                return `<div class="whitespace-nowrap leading-tight"><span class="text-[10px] font-normal text-slate-500 mr-1">${s}</span>${range}</div>`;
+            }).join('');
+        }
+
         function updateDashboard() {
             const safeProd = Array.isArray(prodData) ? prodData : [];
             const safeDown = Array.isArray(downData) ? downData : [];
@@ -2825,8 +3089,11 @@
                 cPack = cPack.filter(d => d.date && d.date.startsWith(selectedMonth));
             }
 
+            const isShiftMatch = shiftMatches;
+            // 전월·전일 비교용: 근무 필터만 적용한 전체 기간 데이터
+            const sProd = shiftMode === 'ALL' ? safeProd : safeProd.filter(d => isShiftMatch(d.shift));
+            const sPack = shiftMode === 'ALL' ? safePack : safePack.filter(d => isShiftMatch(d.shift));
             if (shiftMode !== 'ALL') {
-                const isShiftMatch = (s) => s && (s.includes(shiftMode) || (shiftMode === '1근' && (s.includes('주간') || s === '1')) || (shiftMode === '2근' && (s.includes('야간') || s === '2')));
                 cProd = cProd.filter(d => isShiftMatch(d.shift));
                 cDown = cDown.filter(d => isShiftMatch(d.shift));
                 cPack = cPack.filter(d => isShiftMatch(d.shift));
@@ -2858,6 +3125,62 @@
             if(document.getElementById('kpi-pack-tons')) document.getElementById('kpi-pack-tons').innerText = Math.round(totPackKg/1000).toLocaleString();
             if(document.getElementById('kpi-pack-ratio')) document.getElementById('kpi-pack-ratio').innerText = `포장달성률 ${activePackMonthlyTarget > 0 ? ((totPackKg/1000/activePackMonthlyTarget)*100).toFixed(1) : 0}%`;
 
+            // ── 목표 미달 강조: 경과일 기준 목표 진도 대비 달성률로 색 결정 ──
+            //   당월 누계 = (데이터 마지막 일 ÷ 월 일수)만큼 와 있어야 정상 / 특정 일자 = 1 ÷ 월 일수
+            let expectedShare = null;
+            if (selectedMonth !== 'ALL_PERIOD') {
+                const [yy, mm] = selectedMonth.split('-').map(Number);
+                const dim = new Date(yy, mm, 0).getDate();
+                if (selectedDate !== 'ALL') expectedShare = 1 / dim;
+                else {
+                    const lastDay = cProd.reduce((m, d) => Math.max(m, parseInt(d.date.substring(8, 10), 10) || 0), 0);
+                    expectedShare = selectedMonth < getCurrentMonthKey() ? 1 : (lastDay > 0 ? lastDay / dim : null);
+                }
+            }
+            const paintReach = (id, actualT, target) => {
+                const el = document.getElementById(id); if (!el) return;
+                const base = 'text-[9.5px] font-extrabold px-2 py-0.5 rounded-md border ';
+                if (expectedShare === null || target <= 0) { el.className = base + 'bg-slate-50 text-slate-700 border-slate-200'; el.title = ''; return; }
+                const expT = target * expectedShare;
+                const pace = expT > 0 ? actualT / expT * 100 : 0;
+                el.className = base + (pace >= 100 ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
+                                     : pace >= 90 ? 'bg-orange-50 text-orange-800 border-orange-300'
+                                     : 'bg-red-50 text-red-800 border-red-300');
+                el.title = `경과 기준 목표 ${Math.round(expT).toLocaleString()}T 대비 ${pace.toFixed(1)}% (100% 이상 초록 · 90% 이상 주황 · 미만 빨강)`;
+            };
+            paintReach('kpi-reach', totKg / 1000, activeMonthlyTarget);
+            paintReach('kpi-pack-ratio', totPackKg / 1000, activePackMonthlyTarget);
+
+            // ── 전월(동기간)·전일 대비 증감 ──
+            let prevProdKg = null, prevPackKg = null, prevLabel = '';
+            if (selectedDate !== 'ALL') {
+                const prevDate = [...new Set(sProd.map(d => d.date))].filter(d => d && d < selectedDate).sort().pop();
+                if (prevDate) {
+                    prevProdKg = sProd.filter(d => d.date === prevDate).reduce((a, c) => a + c.amount, 0);
+                    prevPackKg = sPack.filter(d => d.date === prevDate).reduce((a, c) => a + c.amount, 0);
+                    prevLabel = `전일(${prevDate.substring(5)})`;
+                }
+            } else if (selectedMonth !== 'ALL_PERIOD') {
+                const [yy, mm] = selectedMonth.split('-').map(Number);
+                const pd = new Date(yy, mm - 2, 1);
+                const prevYm = `${pd.getFullYear()}-${String(pd.getMonth() + 1).padStart(2, '0')}`;
+                const lastDay = cProd.reduce((m, d) => Math.max(m, parseInt(d.date.substring(8, 10), 10) || 0), 0) || 31;
+                const inPrev = d => d.date && d.date.startsWith(prevYm) && parseInt(d.date.substring(8, 10), 10) <= lastDay;
+                prevProdKg = sProd.filter(inPrev).reduce((a, c) => a + c.amount, 0);
+                prevPackKg = sPack.filter(inPrev).reduce((a, c) => a + c.amount, 0);
+                prevLabel = `전월 동기(1~${lastDay}일)`;
+            }
+            const paintDelta = (id, cur, prev) => {
+                const el = document.getElementById(id); if (!el) return;
+                if (!prev) { el.innerText = ''; el.title = ''; return; }
+                const pct = (cur - prev) / prev * 100;
+                el.innerText = `${pct >= 0 ? '▲' : '▼'}${Math.abs(pct).toFixed(1)}%`;
+                el.className = `text-[10px] font-mono-num ml-1 ${pct >= 0 ? 'text-emerald-700' : 'text-red-600'}`;
+                el.title = `${prevLabel} ${Math.round(prev / 1000).toLocaleString()}T 대비`;
+            };
+            paintDelta('kpi-tons-delta', totKg, prevProdKg);
+            paintDelta('kpi-pack-delta', totPackKg, prevPackKg);
+
             if(document.getElementById('kpi-down')) document.getElementById('kpi-down').innerText = totDown.toLocaleString();
 
             const reasonMap = {};
@@ -2881,7 +3204,7 @@
                             <span class="truncate text-slate-800 font-extrabold text-[9.5px]">${dispText}</span>
                         </div>
                         <div class="flex items-center gap-1 shrink-0">
-                            <span class="font-mono-num font-black text-red-600 text-[10px]">${item.min.toLocaleString()}<span class="text-[8px] font-normal text-slate-500 ml-0.5">분</span></span>
+                            <span class="font-mono-num font-black text-red-600 text-[10px]">${item.min.toLocaleString()}</span><span class="text-[10px] font-normal text-slate-500 font-sans">분</span>
                             <span class="bg-red-100 text-red-700 px-1 py-[0.5px] rounded text-[8px] font-bold hover:bg-red-600 hover:text-white transition-all"><i class="fa-solid fa-magnifying-glass-plus"></i></span>
                         </div>
                     </div>`;
@@ -2892,20 +3215,28 @@
             if(document.getElementById('kpi-down-top3')) document.getElementById('kpi-down-top3').innerHTML = top3Html;
 
             const daysCount = selectedDate === 'ALL' ? Math.max(1, dates.length - 1) : 1;
-            const shiftFactor = (shiftMode === 'ALL') ? 1 : 0.5;
-            const totalMin = 1440 * daysCount * shiftFactor; 
+            // 하루 근무시간: 1근 480분 + 2근 540분 = 1,020분 (근무 필터를 고르면 그 근무 시간만)
+            const dayMin = shiftMode === 'ALL' ? SHIFT_MINUTES['1근'] + SHIFT_MINUTES['2근'] : (SHIFT_MINUTES[shiftMode] || SHIFT_MINUTES['1근']);
+            const totalMin = dayMin * daysCount;
 
             const mMap = {};
             fProd.forEach(d => {
-                if(!mMap[d.equipment]) mMap[d.equipment] = {name: d.equipment, amt:0, down:0, spdSum:0, spdCnt:0, minW:Infinity, maxW:-Infinity};
+                if(!mMap[d.equipment]) mMap[d.equipment] = {name: d.equipment, amt:0, down:0, spdSum:0, spdCnt:0, byShape:{}};
                 mMap[d.equipment].amt += d.amount;
                 if(d.speed > 0) { mMap[d.equipment].spdSum += d.speed; mMap[d.equipment].spdCnt++; }
-                if(d.wire > 0) { mMap[d.equipment].minW = Math.min(mMap[d.equipment].minW, d.wire); mMap[d.equipment].maxW = Math.max(mMap[d.equipment].maxW, d.wire); }
+                // 작업선경 범위는 형상별로 따로 잡는다. 99 이상(이형 99.100~99.999 등)은 실제 선경이 아닌 임의 코드값이라 범위에서 뺀다
+                if(d.wire > 0 || d.length > 0) {
+                    const s = d.shapeRaw || '원형';
+                    const w = mMap[d.equipment].byShape[s] = mMap[d.equipment].byShape[s] || { min: Infinity, max: -Infinity, code: 0, lmin: Infinity, lmax: -Infinity };
+                    if (d.wire >= WIRE_CODE_MIN) w.code++;
+                    else if (d.wire > 0) { w.min = Math.min(w.min, d.wire); w.max = Math.max(w.max, d.wire); }
+                    if (d.length > 0) { w.lmin = Math.min(w.lmin, d.length); w.lmax = Math.max(w.lmax, d.length); }
+                }
             });
             fDown.forEach(d => { if(mMap[d.equipment]) mMap[d.equipment].down += d.minutes; });
 
             let mList = Object.values(mMap).map(m => ({
-                ...m, oee: totalMin > 0 ? Math.max(0, ((totalMin - m.down)/totalMin * 100)).toFixed(1) : "0.0", avgSpd: m.spdCnt > 0 ? (m.spdSum/m.spdCnt).toFixed(1) : "0.0", wr: m.minW === Infinity ? "기록없음" : `${m.minW} - ${m.maxW}`
+                ...m, oee: totalMin > 0 ? Math.max(0, ((totalMin - m.down)/totalMin * 100)).toFixed(1) : "0.0", avgSpd: m.spdCnt > 0 ? (m.spdSum/m.spdCnt).toFixed(1) : "0.0", wr: wireRangeHtml(m.byShape), lr: lengthRangeHtml(m.byShape)
             })).sort((a,b) => { const idxA = MACHINE_ORDER.indexOf(a.name); const idxB = MACHINE_ORDER.indexOf(b.name); return (idxA === -1 ? 999 : idxA) - (idxB === -1 ? 999 : idxB); });
 
             let tHtml = '';
@@ -2914,6 +3245,7 @@
                     <td class="font-black text-slate-900 border-l-2 border-l-transparent group-hover:border-l-sky-700 pl-3 uppercase text-xs lg:text-sm">${m.name}</td>
                     <td class="text-right font-mono-num font-black text-sm lg:text-base text-sky-800">${Math.round(m.amt/1000).toLocaleString()}</td>
                     <td class="text-center font-bold text-amber-700 text-xs lg:text-sm">${m.wr}</td>
+                    <td class="text-center font-bold text-slate-700 text-xs lg:text-sm">${m.lr}</td>
                     <td class="text-right font-bold text-slate-700 text-xs lg:text-sm">${m.avgSpd}</td>
                     <td class="text-right font-bold text-red-600 text-xs lg:text-sm">${m.down.toLocaleString()}</td>
                     <td class="px-2">
@@ -3038,6 +3370,28 @@
             const targetFactor = (selectedDate === 'ALL' && viewMode === 'WEEKLY') ? 7 : 1;
             const tData = chartArr.map(() => activeDailyTarget * targetFactor);
 
+            // 불가동 막대를 부위별로 쌓는다: 이 기간 상위 8개 부위만 색, 나머지는 '기타 부위'(회색)
+            const PART_COLORS = ['#DA1E28', '#FF832B', '#F1C21B', '#EE5396', '#8A3800', '#750E13', '#FFB784', '#8E6A00'];
+            const partTot = {};
+            cDown.forEach(d => { const p = d.part || '기타'; partTot[p] = (partTot[p] || 0) + d.minutes; });
+            const topParts = Object.entries(partTot).filter(x => x[1] > 0).sort((a, b) => b[1] - a[1]).slice(0, PART_COLORS.length).map(x => x[0]);
+            const partKeys = [...topParts, ...(Object.keys(partTot).some(p => !topParts.includes(p) && partTot[p] > 0) ? ['기타 부위'] : [])];
+            const partColor = k => k === '기타 부위' ? '#A8A8A8' : PART_COLORS[topParts.indexOf(k)];
+            const partSeries = {}; partKeys.forEach(k => { partSeries[k] = chartArr.map(() => 0); });
+            const aggIdx = new Map(Object.entries(agg).map(([k, v]) => [k, chartArr.indexOf(v)]));
+            cDown.forEach(d => {
+                const i = aggIdx.get(viewMode === 'WEEKLY' ? get7DayWeekKey(d.date) : d.date);
+                if (i === undefined || i < 0) return;
+                const p = d.part || '기타';
+                partSeries[topParts.includes(p) ? p : '기타 부위'][i] += d.minutes;
+            });
+            if (legendEl) legendEl.innerHTML = `
+                <span class="flex items-center gap-1"><span class="w-2.5 h-1 bg-[#1f77b4] rounded"></span> 생산</span>
+                <span class="flex items-center gap-1"><span class="w-2.5 h-1 bg-[#17becf] rounded"></span> 포장</span>
+                <span class="flex items-center gap-1"><span class="w-2.5 h-[1px] border-b-2 border-dashed border-[#ff7f0e]"></span> 목표</span>
+                ${partKeys.length ? `<span class="text-slate-400">│ 불가동:</span>` : ''}
+                ${partKeys.map(k => `<span class="flex items-center gap-1"><span class="w-2.5 h-2" style="background:${partColor(k)}"></span> ${escHtml(k)}</span>`).join('')}`;
+
             if(chartInstance) chartInstance.destroy();
             const ctx = canvas.getContext('2d');
             
@@ -3048,19 +3402,34 @@
                     datasets: [ 
                         { type: 'line', label: '생산량 (TON)', data: pData, borderColor: '#1f77b4', borderWidth: 3, pointRadius: 4, fill: false, yAxisID: 'y' }, 
                         { type: 'line', label: '포장량 (TON)', data: pkData, borderColor: '#17becf', borderWidth: 2, borderDash: [3, 3], pointRadius: 3, fill: false, yAxisID: 'y' }, 
-                        { type: 'bar', label: '불가동 (MIN)', data: dData, backgroundColor: 'rgba(214, 39, 40, 0.75)', borderRadius: 4, yAxisID: 'y1' }, 
+                        ...partKeys.map(k => ({ type: 'bar', label: `불가동 · ${k} (분)`, data: partSeries[k], backgroundColor: partColor(k), yAxisID: 'y1', stack: 'down' })),
                         { type: 'line', label: '목표 (TON)', data: tData, borderColor: '#ff7f0e', borderWidth: 2, borderDash: [4, 4], pointRadius: 0, fill: false, yAxisID: 'y' } 
                     ] 
                 },
-                options: { 
-                    responsive: true, 
-                    maintainAspectRatio: false, 
-                    scales: { 
-                        x: { grid: { display: false }, ticks: { color: '#4b5563', font: { size: 10, weight: 'bold' } } }, 
-                        y: { beginAtZero: true, ticks: { color: '#4b5563', font: { size: 10 } }, grid: { color: 'rgba(0,0,0,0.06)' } }, 
-                        y1: { position: 'right', beginAtZero: true, ticks: { color: '#d62728', font: { size: 10 } }, grid: { drawOnChartArea: false } } 
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    // 일간 보기: 날짜 클릭 → 그날 설비별 불가동 내역
+                    onClick: (e, els, chart) => {
+                        if (viewMode !== 'DAILY') return;
+                        const hit = chart.getElementsAtEventForMode(e, 'index', { intersect: false }, false);
+                        if (hit.length) openDownDetailModal(null, null, chartArr[hit[0].index].s);
                     },
-                    plugins: { legend: { display: false } }
+                    onHover: (e, els) => { e.native.target.style.cursor = (viewMode === 'DAILY' && els.length) ? 'pointer' : 'default'; },
+                    scales: {
+                        x: { stacked: true, grid: { display: false }, ticks: { color: '#4b5563', font: { size: 10, weight: 'bold' } } },
+                        y: { stacked: false, beginAtZero: true, ticks: { color: '#4b5563', font: { size: 10 } }, grid: { color: 'rgba(0,0,0,0.06)' } },
+                        y1: { stacked: true, position: 'right', beginAtZero: true, ticks: { color: '#d62728', font: { size: 10 } }, grid: { drawOnChartArea: false } }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        // 툴팁: 0분인 부위는 숨기고, 마지막 줄에 그날 불가동 합계
+                        tooltip: {
+                            mode: 'index', intersect: false,
+                            filter: i => !(i.dataset.stack === 'down' && !Number(i.raw)),
+                            callbacks: { footer: items => { const i = items[0] ? items[0].dataIndex : -1; return i >= 0 && dData[i] ? `불가동 합계 ${dData[i].toLocaleString()}분` : ''; } }
+                        }
+                    }
                 }
             });
         }
@@ -3302,34 +3671,49 @@
             const groupKeys = ['A', 'B', 'C'];
             const SHAPES = ['원형', '정육각', '사각', '이형'];
 
-            groupKeys.forEach(k => { 
+            groupKeys.forEach(k => {
                 SHAPES.forEach(sh => {
-                    map[`${k}-${sh}`] = { group: k, shape: sh, amt: 0, down: 0, workDays: new Set() };
+                    map[`${k}-${sh}`] = { group: k, shape: sh, amt: 0, down: 0, gross: 0, workDays: new Set() };
                 });
             });
 
+            // ── 형상별 가동시간·불가동 배분 ──
+            //  불가동 시트에는 형상이 없으므로, '날짜·설비·조'(= 한 조가 그날 한 설비를 맡은 단위)마다
+            //  실제 생산한 형상별 톤수 비율로 ① 근무시간 480분과 ② 그 단위의 불가동 시간을 나눈다.
+            //  → 모든 형상이 '설비 1대·1시간당 톤'이라는 같은 기준이 된다. (비율 배분이므로 추정값)
+            const teamOf = x => (x.team || '').replace(/조/g, '').trim().toUpperCase();
+            const shapeOf = p => { const s = p.shapeRaw || '원형'; return s.includes('육각') ? '정육각' : s.includes('사각') ? '사각' : s.includes('이형') ? '이형' : '원형'; };
+            const slotMix = new Map(), dayMix = new Map();   // 날짜|설비|조 → {형상: kg},  날짜|조 → {형상: kg}
+            const addMix = (M, k, sh, kg) => { const o = M.get(k) || {}; o[sh] = (o[sh] || 0) + kg; M.set(k, o); };
+            const spread = (grp, mix, minutes, field) => {
+                const tot = Object.values(mix).reduce((a, b) => a + b, 0); if (tot <= 0) return false;
+                Object.entries(mix).forEach(([sh, kg]) => { const it = map[`${grp}-${sh}`]; if (it) it[field] += minutes * kg / tot; });
+                return true;
+            };
+
             cProd.forEach(p => {
-                let grp = (p.team || '').replace(/조/g, '').trim().toUpperCase();
+                const grp = teamOf(p);
                 if(!groupKeys.includes(grp)) return;
-
-                let sh = p.shapeRaw || '원형';
-                if (sh.includes('육각')) sh = '정육각';
-                else if (sh.includes('사각')) sh = '사각';
-                else if (sh.includes('이형')) sh = '이형';
-                else sh = '원형';
-
+                const sh = shapeOf(p);
                 const key = `${grp}-${sh}`;
                 if(map[key]) { map[key].amt += p.amount; map[key].workDays.add(p.date); }
+                addMix(slotMix, `${p.date}|${p.equipment}|${grp}|${shiftKey(p.shift)}`, sh, p.amount);
+                addMix(dayMix, `${p.date}|${grp}`, sh, p.amount);
             });
+            // 근무시간: 1근 480분 · 2근 540분 (근무 미기재는 480분)
+            slotMix.forEach((mix, k) => { const [, , grp, sk] = k.split('|'); spread(grp, mix, SHIFT_MINUTES[sk] || SHIFT_MINUTES['1근'], 'gross'); });
 
+            let unassignedDown = 0;
             cDown.forEach(d => {
-                let grp = (d.team || '').replace(/조/g, '').trim().toUpperCase();
+                const grp = teamOf(d);
                 if(!groupKeys.includes(grp)) return;
-
-                let sh = d.isCircle ? '원형' : '정육각';
-                const key = `${grp}-${sh}`;
-                if(map[key]) { map[key].down += d.minutes; }
+                // 같은 날·설비·조의 생산 형상 비율로 → 없으면 그날 그 조 전체의 형상 비율로 → 그래도 없으면 미배분
+                const ok = spread(grp, slotMix.get(`${d.date}|${d.equipment}|${grp}|${shiftKey(d.shift)}`) || {}, d.minutes, 'down')
+                        || spread(grp, dayMix.get(`${d.date}|${grp}`) || {}, d.minutes, 'down');
+                if (!ok) unassignedDown += d.minutes;
             });
+            const noteEl = document.getElementById('aly-alloc-note');
+            if (noteEl) noteEl.innerText = `근무시간(1근 480분·2근 540분)과 불가동을 날짜·설비·조·근무별 생산 형상 비율로 배분한 추정값 (UPH = 설비 1대·1시간당 톤)` + (unassignedDown ? ` · 같은 날 생산 기록이 없어 배분하지 못한 불가동 ${Math.round(unassignedDown).toLocaleString()}분 제외` : '');
 
             const uphTotals = { '원형': { sum: 0, cnt: 0 }, '정육각': { sum: 0, cnt: 0 }, '사각': { sum: 0, cnt: 0 }, '이형': { sum: 0, cnt: 0 } };
             let tBodyHtml = '';
@@ -3360,12 +3744,13 @@
             groupKeys.forEach((k) => {
                 const teamBadge = (k === 'A' ? 'bg-indigo-100 text-indigo-800 border-indigo-300' : k === 'B' ? 'bg-amber-100 text-amber-800 border-amber-300' : 'bg-emerald-100 text-emerald-800 border-emerald-300');
 
-                SHAPES.forEach((sh, sIdx) => {
+                let shown = 0;
+                SHAPES.forEach((sh) => {
                     const item = map[`${k}-${sh}`];
                     if (!item) return;
-                    const activeDays = Math.max(1, item.workDays.size);
-                    const grossMin = activeDays * 480; 
-                    const netMin = Math.max(1, grossMin - item.down); 
+                    if (item.amt <= 0) return;   // 그 조가 이 형상을 생산하지 않았으면 행을 만들지 않는다
+                    const sIdx = shown++;
+                    const netMin = Math.max(1, item.gross - item.down);
                     const netHours = netMin / 60;
                     const tons = item.amt / 1000;
                     const uph = tons / netHours;
@@ -3378,7 +3763,7 @@
                         <td class="font-bold py-1 px-2.5">${sIdx === 0 ? `<span class="px-2 py-0.5 rounded text-[10px] font-black border ${teamBadge}">${k}조</span>` : ''}</td>
                         <td class="text-center font-bold py-1 px-2.5"><span class="px-1.5 py-0.2 rounded text-[9.5px] font-extrabold border ${shapeBadgeStyles[sh]}">${sh}</span></td>
                         <td class="text-right font-mono-num font-black text-slate-900 py-1 px-2.5">${tons.toFixed(1)}</td>
-                        <td class="text-right font-mono-num font-extrabold text-red-600 py-1 px-2.5">${item.down.toLocaleString()}</td>
+                        <td class="text-right font-mono-num font-extrabold text-red-600 py-1 px-2.5">${Math.round(item.down).toLocaleString()}</td>
                         <td class="text-right font-mono-num font-extrabold text-emerald-700 py-1 px-2.5">${Math.round(netMin).toLocaleString()}</td>
                         <td class="text-right font-mono-num font-black text-sky-800 py-1 px-2.5">${uph.toFixed(2)}</td>
                     </tr>`;
@@ -3415,9 +3800,8 @@
             const datasets = SHAPES.map(sh => {
                 const data = groupKeys.map(k => {
                     const item = map[`${k}-${sh}`];
-                    if (!item) return 0;
-                    const activeDays = Math.max(1, item.workDays.size);
-                    const netMin = Math.max(1, (activeDays * 480) - item.down);
+                    if (!item || item.amt <= 0) return 0;
+                    const netMin = Math.max(1, item.gross - item.down);
                     return parseFloat(((item.amt/1000) / (netMin/60)).toFixed(2)) || 0;
                 });
 
@@ -3444,12 +3828,14 @@
                     responsive: true,
                     maintainAspectRatio: false,
                     scales: {
-                        x: { stacked: true, grid: { display: false }, ticks: { font: { size: 11, weight: 'bold' } } },
-                        y: { 
-                            stacked: true, 
-                            beginAtZero: true, 
-                            ticks: { font: { size: 10, weight: 'bold' }, stepSize: 2 }, 
-                            grid: { color: 'rgba(0,0,0,0.06)' } 
+                        // 형상별 UPH를 조마다 나란히 비교 (UPH끼리 더한 값은 의미가 없으므로 쌓지 않는다)
+                        x: { stacked: false, grid: { display: false }, ticks: { font: { size: 11, weight: 'bold' } } },
+                        y: {
+                            stacked: false,
+                            beginAtZero: true,
+                            title: { display: true, text: 'UPH (TON/Hr · 설비 1대 기준)', font: { size: 10 } },
+                            ticks: { font: { size: 10, weight: 'bold' } },
+                            grid: { color: 'rgba(0,0,0,0.06)' }
                         }
                     },
                     plugins: { 
@@ -3603,15 +3989,18 @@
 
             // 사용 가능한 전체 월 목록 추출
             const allMonths = [...new Set(safeProd.map(d => d.date ? d.date.substring(0,7) : null).filter(m => m && m.includes('-')))].sort().reverse();
-            if (allMonths.length === 0) allMonths.push('2026-09');
+            if (allMonths.length === 0) allMonths.push(getCurrentMonthKey());
 
-            let targetYM = monthSelect ? monthSelect.value : '2026-09';
-            if (!targetYM || !allMonths.includes(targetYM)) {
-                targetYM = allMonths.includes('2026-09') ? '2026-09' : allMonths[0];
-            }
+            // 기본 = 실적이 있는 최신 달. 사용자가 직접 고른 달만 유지 (시트 동기화로 월 목록이 바뀌면 다시 그림)
+            const userPicked = monthSelect && monthSelect.dataset.user === '1' ? monthSelect.value : '';
+            const targetYM = (userPicked && allMonths.includes(userPicked)) ? userPicked : allMonths[0];
 
-            if (monthSelect && monthSelect.options.length === 0) {
-                monthSelect.innerHTML = allMonths.map(m => `<option value="${m}">${m} 분석</option>`).join('');
+            if (monthSelect) {
+                const sig = allMonths.join(',');
+                if (monthSelect.dataset.sig !== sig) {
+                    monthSelect.innerHTML = allMonths.map(m => `<option value="${m}">${m} 분석</option>`).join('');
+                    monthSelect.dataset.sig = sig;
+                }
                 monthSelect.value = targetYM;
             }
 
@@ -3924,11 +4313,20 @@
                 const overallRatio = Math.round((grandMonthTotal / grandPlanTotal) * 100);
                 const wasteHours = ((totalOverSwitches * CHANGEOVER_LOSS_MIN) / 60).toFixed(1);
                 const avgOrderRate = orderRateCnt > 0 ? Math.round(orderRateSum / orderRateCnt) : 0;
-                const cycleRef = MACHINE_ORDER.map(m => `<code>${m}</code> ${(IDEAL_CYCLE[m] || []).join('→')}↺`).join(' &nbsp;·&nbsp; ');
-                aiGuideEl.innerHTML = `선택하신 <b>[${targetYM}]</b> CDM 전 설비 <b>실제 공정교체 ${totalSwitches}회</b> / <b>관리 기준선(26.1~8월 월평균) ${totalBaseSwitches.toFixed(1)}회</b> → <b class="${totalOverSwitches > 0 ? 'text-red-600' : 'text-emerald-700'}">기준 초과 ${totalOverSwitches.toFixed(1)}회</b>. 기존 실적 패턴과의 유사도 <b>${avgOrderRate}%</b>(참고), 사이클 내 분할 없이 생산한 품종 비율 <b>${stabilityRatio}%</b>, 평균 작업 주기 <b>약 ${avgIntervalAll}일</b>.<br>
-                📋 <b>설비별 실적 패턴(참고, 지정 순서 아님):</b> <span class="text-[10px]">${cycleRef}</span><br>
-                ⚠️ <b>판정 기준:</b> 한 달에 사이클을 2~3회 도는 것은 정상입니다. 문제는 <b class="text-red-600">같은 품종이 사이클 수보다 여러 번 쪼개지는 것</b>이며, 이때만 불필요한 공정교체(원형↔원형外 / 일반강↔STS)가 늘어납니다. 따라서 절대 횟수가 아니라 <b>설비별 26.1~8월 월평균 대비 초과분</b>을 관리 대상으로 봅니다.<br>
-                💡 <b>진단:</b> 기준 초과가 가장 큰 설비는 <code>${worstSwitchMachine.name}</code> (실적 <b>${worstSwitchMachine.cnt}회</b> / 기준 <b>${(worstSwitchMachine.base || 0).toFixed(1)}회</b> → 초과 <b>${worstSwitchMachine.over > 0 ? '+' + worstSwitchMachine.over.toFixed(1) : '0'}회</b>, 실적 패턴 유사도 ${worstSwitchMachine.orderRate}%)입니다. 전환 1회당 ${CHANGEOVER_LOSS_MIN}분 기준, 초과분만 해소해도 당월 <b>약 ${wasteHours}시간</b>을 회수할 수 있습니다. 진도율 기준 월 계획 대비 달성률은 <b>${overallRatio}%</b> 입니다.`;            }
+                const cycleRef = MACHINE_ORDER.map(m => `${m}: ${(IDEAL_CYCLE[m] || []).join('→')}↺`).join('\n');
+                const over = totalOverSwitches > 0;
+                const helpTxt = `판정 기준\n· 한 달에 사이클을 2~3회 도는 것은 정상\n· 같은 품종이 사이클 수보다 더 쪼개지면 불필요한 공정교체(원형↔원형外, 일반강↔STS)\n· 설비별 26.1~8월 월평균 교체 횟수를 기준선으로, 초과분만 관리\n· 손실 시간 = 초과 교체 × ${CHANGEOVER_LOSS_MIN}분\n\n설비별 실적 패턴(참고, 지정 순서 아님)\n${cycleRef}\n\n참고값: 실적 패턴 유사도 ${avgOrderRate}% · 분할 없이 생산한 품종 ${stabilityRatio}%`;
+                const line = (icon, html) => `<div class="flex gap-2 items-baseline"><span class="shrink-0 w-4 text-center">${icon}</span><span>${html}</span></div>`;
+                aiGuideEl.innerHTML = [
+                    line(over ? '⚠️' : '✅', `<b>${targetYM}</b> 공정교체 전체 <b>${totalSwitches}회</b> (설비별 기준 합계 ${totalBaseSwitches.toFixed(1)}회) — ` + (over
+                        ? `기준을 넘은 설비의 초과분 <b class="text-red-600">+${totalOverSwitches.toFixed(1)}회</b> (약 <b>${wasteHours}시간</b> 손실)`
+                        : `모든 설비가 기준 이내로 <b class="text-emerald-700">양호</b>`)),
+                    over && worstSwitchMachine.over > 0
+                        ? line('🔧', `가장 많이 초과한 설비: <b>${worstSwitchMachine.name}</b> (${worstSwitchMachine.cnt}회 / 기준 ${(worstSwitchMachine.base || 0).toFixed(1)}회, <b class="text-red-600">+${worstSwitchMachine.over.toFixed(1)}회</b>) → 같은 품종을 몰아서 생산하면 줄일 수 있습니다`)
+                        : '',
+                    line('📊', `계획 대비 달성률 <b>${overallRatio}%</b> · 같은 품종 평균 작업 간격 <b>${avgIntervalAll}일</b> <i class="fa-solid fa-circle-info text-slate-400 cursor-help ml-1" title="${escHtml(helpTxt)}"></i>`)
+                ].join('');
+            }
         }
 
 
@@ -4062,6 +4460,9 @@
                 steel:  find(['원자재강종', '강종', '재질', 'STEEL', 'GRADE']),
                 maker:  find(['제강사', '메이커', 'MAKER', '제조사', '공급사']),
                 dia:    find(['선경', '치수', 'DIA', 'SIZE'], ['원자재']),
+                len:    find(['길이', 'LENGTH']),
+                shift:  find(['근무조', '근무구분', '주야간', '주야']),
+                team:   find(['작업조']),
                 insW:   find(['작업량', '검사중량', '검사량', '투입중량', '제품중량', '생산량', '중량', 'WEIGHT'], NG_WORDS),
                 ngW:    find(['부적합중량', '불량중량', '부적합량', '불량량', 'NG중량']),
                 ngName: find(['부적합명', '불량명', '부적합유형', '불량유형', '부적합사유', '불량사유', '결함명', '부적합내용', '불량내용', 'DEFECT'], ['중량', '부적합량', '불량량', 'KG']),
@@ -4176,7 +4577,7 @@
                     itemKey: code || name || '미기재', itemName: name || code || '미기재',
                     steel, steelClass: classifySteel(steel),
                     maker: g(C.maker) || '미기재',
-                    dia: g(C.dia), lot, lotKey: lot ? lot.normalize('NFKC').replace(/\s/g, '').toUpperCase() : `ROW${i + 1}`,
+                    dia: g(C.dia), len: g(C.len), shift: g(C.shift), team: g(C.team).replace(/조/g, '').trim().toUpperCase(), lot, lotKey: lot ? lot.normalize('NFKC').replace(/\s/g, '').toUpperCase() : `ROW${i + 1}`,
                     sheetRow: i + 1, resRaw, judge,
                     insW, ngW, ngName: ngW > 0 ? ngName : '', ngFull: ngW > 0 ? (ngFull || ngName) : ''
                 });
@@ -4432,6 +4833,15 @@
 
         // ---------- 제조번호(LOT)별 부적합률 : 같은 제조번호의 행을 합산 (부적합 작업량 ÷ 전체 작업량) ----------
         var inspLotSort = 'rate', inspLotOnlyNg = true, inspLotQuery = '';
+        // 제조번호의 선경·길이 표시: 값이 여러 개면 '최소~최대'. 선경 99 이상은 이형 등의 임의 코드값이라 '코드값'으로 표시
+        function inspSizeTxt(set, isDia) {
+            const vals = [...set].map(v => safeNum(v)).filter(v => v > 0);
+            if (!vals.length) return '<span class="text-slate-400">-</span>';
+            const real = isDia ? vals.filter(v => v < WIRE_CODE_MIN) : vals;
+            if (!real.length) return `<span class="text-slate-400" title="선경 칸에 임의 코드값(${[...new Set(vals)].join(', ')})이 들어 있습니다">코드값</span>`;
+            const lo = Math.min(...real), hi = Math.max(...real), f = v => isDia ? String(v) : v.toLocaleString();
+            return lo === hi ? f(lo) : `${f(lo)}~${f(hi)}`;
+        }
         const INSP_LOT_LIMIT = 100;
         function renderInspLots() {
             const body = document.getElementById('insp-lot-body');
@@ -4441,8 +4851,10 @@
             F.forEach(r => {
                 if (!r.lot) { blankRows++; return; }
                 let o = m.get(r.lotKey);
-                if (!o) { o = { lot: r.lot, ins: 0, ng: 0, rows: 0, first: '', last: '', pnd: new Set(), pcd: new Set(), item: r.itemName, steel: r.steel, maker: r.maker, types: {} }; m.set(r.lotKey, o); }
+                if (!o) { o = { lot: r.lot, ins: 0, ng: 0, rows: 0, first: '', last: '', pnd: new Set(), pcd: new Set(), dia: new Set(), len: new Set(), item: r.itemName, steel: r.steel, maker: r.maker, types: {} }; m.set(r.lotKey, o); }
                 o.ins += r.insW; o.ng += r.ngW; o.rows++;
+                if (r.dia) o.dia.add(r.dia);
+                if (r.len) o.len.add(r.len);
                 if (r.date) { if (!o.first || r.date < o.first) o.first = r.date; if (r.date > o.last) o.last = r.date; }
                 if (r.pnd) o.pnd.add(r.pnd);
                 if (r.pcd && r.pcd !== '미기재' && r.pcd !== '미매칭') o.pcd.add(r.pcd);
@@ -4477,6 +4889,8 @@
                 return `<tr title="행 ${o.rows}개 합산${Object.keys(o.types).length ? ' · 부적합 유형: ' + Object.entries(o.types).map(([k, v]) => `${k} ${inspFmtT(v)}T`).join(', ') : ''}">
                     <td class="py-1 px-2 text-center text-[10px] text-slate-500">${i + 1}</td>
                     <td class="py-1 px-2 font-mono-num font-semibold whitespace-nowrap">${escHtml(o.lot)}</td>
+                    <td class="py-1 px-2 text-right font-mono-num text-[10.5px] whitespace-nowrap">${inspSizeTxt(o.dia, true)}</td>
+                    <td class="py-1 px-2 text-right font-mono-num text-[10.5px] whitespace-nowrap">${inspSizeTxt(o.len, false)}</td>
                     <td class="py-1 px-2 text-[10.5px] whitespace-nowrap font-mono-num">${dateTxt}</td>
                     <td class="py-1 px-2 text-center text-[10.5px] whitespace-nowrap">${[...o.pnd].map(escHtml).join(', ') || '-'}</td>
                     <td class="py-1 px-2 text-center text-[10.5px] whitespace-nowrap">${[...o.pcd].map(escHtml).join(', ') || '<span class="text-slate-400">-</span>'}</td>
@@ -4494,7 +4908,7 @@
                     </td>
                     <td class="py-1 px-2 text-[10.5px] whitespace-nowrap">${top ? `${escHtml(top[0])}${Object.keys(o.types).length > 1 ? ` <span class="text-slate-400">외 ${Object.keys(o.types).length - 1}</span>` : ''}` : '<span class="text-slate-400">-</span>'}</td>
                 </tr>`;
-            }).join('') || `<tr><td colspan="12" class="py-4 text-center text-slate-500">${q ? '검색 조건에 맞는 제조번호가 없습니다.' : inspLotOnlyNg ? '선택한 기간에 부적합이 발생한 제조번호가 없습니다.' : '선택한 기간의 제조번호가 없습니다.'}</td></tr>`;
+            }).join('') || `<tr><td colspan="14" class="py-4 text-center text-slate-500">${q ? '검색 조건에 맞는 제조번호가 없습니다.' : inspLotOnlyNg ? '선택한 기간에 부적합이 발생한 제조번호가 없습니다.' : '선택한 기간의 제조번호가 없습니다.'}</td></tr>`;
 
             const note = document.getElementById('insp-lot-note');
             if (note) note.innerText = [
