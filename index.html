@@ -1846,7 +1846,8 @@
 
         function saveLayout() {
             if (!grid) return;
-            const layout = grid.save();
+            // 위치·크기만 저장한다. 위젯 HTML까지 저장하면 다음에 열 때 옛 화면이 새 코드 위에 덮어씌워진다.
+            const layout = grid.save(false);
             localStorage.setItem('PRO_DASHBOARD_GRID_LAYOUT_V37', JSON.stringify(layout));
         }
 
@@ -1863,7 +1864,8 @@
             const saved = localStorage.getItem('PRO_DASHBOARD_GRID_LAYOUT_V37');
             if (saved && grid) {
                 try {
-                    const parsed = JSON.parse(saved);
+                    // 예전 저장값에 들어 있는 위젯 HTML(content)은 버리고 위치·크기만 쓴다 (화면은 항상 최신 코드로)
+                    const parsed = (JSON.parse(saved) || []).map(({ content, ...pos }) => pos);
                     if (sanitizeLayout(parsed)) {
                         grid.load(parsed);
                         setTimeout(resizeAllCharts, 100);
@@ -3040,15 +3042,13 @@
             }).join('');
         }
         // 설비 표 '작업선경 범위' 칸: 형상별 한 줄씩 (원형 → 정육각 → 사각 → 이형)
+        //  99 이상 임의 코드값(이형 99.x)은 완전히 제외 — 실제 선경이 하나도 없는 형상은 줄 자체를 표시하지 않는다
         function wireRangeHtml(byShape) {
-            const keys = shapeKeys(byShape);
+            const keys = shapeKeys(byShape).filter(s => byShape[s].min !== Infinity);
             if (!keys.length) return '기록없음';
             return keys.map(s => {
                 const w = byShape[s];
-                const range = w.min === Infinity
-                    ? `<span class="text-slate-400 font-normal" title="선경 칸에 ${WIRE_CODE_MIN} 이상의 임의 코드값만 있어 범위를 표시하지 않습니다 (${w.code}건)">코드값</span>`
-                    : `${w.min} - ${w.max}${w.code ? `<span class="text-slate-400 font-normal text-[10px]" title="${WIRE_CODE_MIN} 이상의 임의 코드값 ${w.code}건은 범위에서 제외"> +코드 ${w.code}</span>` : ''}`;
-                return `<div class="whitespace-nowrap leading-tight"><span class="text-[10px] font-normal text-slate-500 mr-1">${s}</span>${range}</div>`;
+                return `<div class="whitespace-nowrap leading-tight"><span class="text-[10px] font-normal text-slate-500 mr-1">${s}</span>${w.min === w.max ? w.min : `${w.min} - ${w.max}`}</div>`;
             }).join('');
         }
 
@@ -3242,7 +3242,7 @@
             let tHtml = '';
             mList.forEach(m => {
                 tHtml += `<tr class="group hover:bg-slate-100 transition-all">
-                    <td class="font-black text-slate-900 border-l-2 border-l-transparent group-hover:border-l-sky-700 pl-3 uppercase text-xs lg:text-sm">${m.name}</td>
+                    <td class="font-black text-slate-900 border-l-2 border-l-transparent group-hover:border-l-sky-700 pl-3 uppercase text-xs lg:text-sm whitespace-nowrap">${m.name}</td>
                     <td class="text-right font-mono-num font-black text-sm lg:text-base text-sky-800">${Math.round(m.amt/1000).toLocaleString()}</td>
                     <td class="text-center font-bold text-amber-700 text-xs lg:text-sm">${m.wr}</td>
                     <td class="text-center font-bold text-slate-700 text-xs lg:text-sm">${m.lr}</td>
@@ -3250,7 +3250,7 @@
                     <td class="text-right font-bold text-red-600 text-xs lg:text-sm">${m.down.toLocaleString()}</td>
                     <td class="px-2">
                         <div class="flex items-center gap-1.5 justify-end">
-                            <div class="flex-1 bg-slate-200 h-2.5 rounded-full overflow-hidden border border-slate-300"><div class="h-full rounded-full ${parseFloat(m.oee) < 85 ? 'bg-red-600' : 'bg-emerald-600'}" style="width: ${m.oee}%"></div></div>
+                            <div class="flex-1 min-w-[90px] bg-slate-200 h-2.5 rounded-full overflow-hidden border border-slate-300"><div class="h-full rounded-full ${parseFloat(m.oee) < 85 ? 'bg-red-600' : 'bg-emerald-600'}" style="width: ${m.oee}%"></div></div>
                             <span class="font-mono-num font-extrabold text-xs lg:text-sm w-12 text-right ${parseFloat(m.oee) < 85 ? 'text-red-600' : 'text-emerald-600'}">${m.oee}%</span>
                         </div>
                     </td>
@@ -4838,7 +4838,7 @@
             const vals = [...set].map(v => safeNum(v)).filter(v => v > 0);
             if (!vals.length) return '<span class="text-slate-400">-</span>';
             const real = isDia ? vals.filter(v => v < WIRE_CODE_MIN) : vals;
-            if (!real.length) return `<span class="text-slate-400" title="선경 칸에 임의 코드값(${[...new Set(vals)].join(', ')})이 들어 있습니다">코드값</span>`;
+            if (!real.length) return '<span class="text-slate-400">-</span>';   // 99.x 이형 코드값은 표시하지 않음
             const lo = Math.min(...real), hi = Math.max(...real), f = v => isDia ? String(v) : v.toLocaleString();
             return lo === hi ? f(lo) : `${f(lo)}~${f(hi)}`;
         }
