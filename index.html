@@ -3025,7 +3025,7 @@
         }
 
         // 작업선경이 이 값 이상이면 실제 치수가 아니라 임의 코드값(예: 이형 99.100~99.999)으로 본다
-        const WIRE_CODE_MIN = 99;
+        var WIRE_CODE_MIN = 99;   // var: 첫 그리기보다 아래에 선언되어 있어 const 면 초기화 전 접근 오류
         function shapeKeys(byShape) {
             const order = ['원형', '정육각', '사각', '이형'];
             return Object.keys(byShape || {}).sort((a, b) => (order.indexOf(a) + 1 || 99) - (order.indexOf(b) + 1 || 99));
@@ -3050,6 +3050,21 @@
                 const w = byShape[s];
                 return `<div class="whitespace-nowrap leading-tight"><span class="text-[10px] font-normal text-slate-500 mr-1">${s}</span>${w.min === w.max ? w.min : `${w.min} - ${w.max}`}</div>`;
             }).join('');
+        }
+
+        // OEE 게이지: 0~100% 막대에 OEE만큼 색을 채우고, 막대 안에 %를 쓰고, 기준선(OEE_TARGET)을 세로선으로 표시
+        var OEE_TARGET = 85;   // var: 페이지 첫 그리기(safeRenderAll)가 이 줄보다 먼저 실행되므로 const 를 쓰면 초기화 전 접근 오류
+        function oeeGaugeHtml(v) {
+            v = Math.max(0, Math.min(100, v || 0));
+            const ok = v >= OEE_TARGET;
+            const fill = ok ? '#198038' : '#DA1E28';
+            const label = `<span class="font-mono-num text-[11px] font-semibold">${v.toFixed(1)}%</span>`;
+            return `<div class="relative h-5 bg-slate-200 overflow-hidden" title="OEE ${v.toFixed(1)}% · 기준 ${OEE_TARGET}% ${ok ? '이상' : '미달'} · 불가동 비율 ${(100 - v).toFixed(1)}%">
+                <div class="absolute inset-y-0 left-0 flex items-center justify-end pr-1.5 text-white" style="width:${v}%;background:${fill}">${v >= 25 ? label : ''}</div>
+                ${v < 25 ? `<div class="absolute inset-y-0 flex items-center pl-1" style="left:${v}%;color:${fill}">${label}</div>` : ''}
+                <div class="absolute top-0 w-0.5 h-1.5 bg-slate-900" style="left:${OEE_TARGET}%"></div>
+                <div class="absolute bottom-0 w-0.5 h-1.5 bg-slate-900" style="left:${OEE_TARGET}%"></div>
+            </div>`;
         }
 
         function updateDashboard() {
@@ -3248,15 +3263,24 @@
                     <td class="text-center font-bold text-slate-700 text-xs lg:text-sm">${m.lr}</td>
                     <td class="text-right font-bold text-slate-700 text-xs lg:text-sm">${m.avgSpd}</td>
                     <td class="text-right font-bold text-red-600 text-xs lg:text-sm">${m.down.toLocaleString()}</td>
-                    <td class="px-2">
-                        <div class="flex items-center gap-1.5 justify-end">
-                            <div class="flex-1 min-w-[90px] bg-slate-200 h-2.5 rounded-full overflow-hidden border border-slate-300"><div class="h-full rounded-full ${parseFloat(m.oee) < 85 ? 'bg-red-600' : 'bg-emerald-600'}" style="width: ${m.oee}%"></div></div>
-                            <span class="font-mono-num font-extrabold text-xs lg:text-sm w-12 text-right ${parseFloat(m.oee) < 85 ? 'text-red-600' : 'text-emerald-600'}">${m.oee}%</span>
-                        </div>
-                    </td>
+                    <td class="px-2" style="min-width:180px">${oeeGaugeHtml(parseFloat(m.oee))}</td>
                 </tr>`;
             });
-            if(document.getElementById('registry-body')) document.getElementById('registry-body').innerHTML = tHtml;
+            const regBody = document.getElementById('registry-body');
+            if (regBody) {
+                regBody.innerHTML = tHtml;
+                // 머리글도 행과 같은 곳에서 그린다 → 저장된 옛 화면이 남아 있어도 칸 수가 항상 맞는다
+                const thead = regBody.closest('table') && regBody.closest('table').tHead;
+                if (thead) thead.innerHTML = `<tr>
+                    <th>설비 식별</th>
+                    <th class="text-right">누적 실적 (TON)</th>
+                    <th class="text-center">작업선경 범위 (mm)</th>
+                    <th class="text-center">작업길이 범위 (mm)</th>
+                    <th class="text-right">평균 선속 (m/min)</th>
+                    <th class="text-right text-red-600">불가동 (min)</th>
+                    <th class="text-center text-emerald-700">OEE [종합설비효율] <span class="font-normal text-slate-500 text-[10px]">· 기준 ${OEE_TARGET}%</span></th>
+                </tr>`;
+            }
             try { renderOutsourceProgress(); } catch (e) { console.error('outsource render error', e); }
 
             renderDowntimeHeatmap();
