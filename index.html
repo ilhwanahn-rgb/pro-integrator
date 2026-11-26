@@ -295,6 +295,14 @@
         .nav-icon { border-radius: 0; color: #C6C6C6; position: relative; transition: background-color 110ms; }
         .nav-icon:hover { background: #333333; color: #F4F4F4; }
         .nav-icon.active { background: #393939; color: #FFFFFF; box-shadow: inset 3px 0 0 #0F62FE; }
+        /* 사이드바: 메인(화면 이동)은 밝게, 도구(배치·위젯·초기화·동기화·연동)는 어둡게 묶어서 구분 */
+        aside nav > .nav-icon[id^="nav-"]:not(.nav-util) { color: #F4F4F4; }   /* 화면 이동 아이콘만 (PRO-Bot 노란색은 유지) */
+        .nav-util-group { display: flex; flex-direction: column; align-items: center; gap: 2px; width: 100%; margin-top: 6px; padding: 6px 0;
+                          background: #0B0B0B; border-top: 1px solid #333333; border-bottom: 1px solid #333333; }
+        .nav-util-label { font-size: 9px; letter-spacing: 0.1em; color: #6F6F6F; margin-bottom: 2px; }
+        .nav-icon.nav-util { color: #6F6F6F; font-size: 0.85rem; padding: 7px; }
+        .nav-icon.nav-util:hover { color: #C6C6C6; background: #262626; }
+        .nav-icon.nav-util.active { color: #F4F4F4; background: #262626; box-shadow: inset 3px 0 0 #6F6F6F; }
         aside i { filter: none !important; }
         .animate-bounce { animation: none !important; }
 
@@ -438,14 +446,18 @@
                 <div class="nav-icon" onclick="switchTab('analytics')" id="nav-analytics" title="CD 생산성 분석"><i class="fa-solid fa-chart-pie"></i></div>
                 <div class="nav-icon" onclick="switchTab('cycle')" id="nav-cycle" title="CDM CYCLE TIME 분석"><i class="fa-solid fa-arrows-spin"></i></div>
                 <div class="nav-icon" onclick="switchTab('insp')" id="nav-insp" title="다기능 부적합 현황 (PND-3 · PND-4)"><i class="fa-solid fa-microscope"></i></div>
+                <div class="nav-icon" onclick="switchTab('wip')" id="nav-wip" title="재공 체류 현황"><i class="fa-solid fa-hourglass-half"></i></div>
 
-                <div class="w-6 h-[1px] bg-slate-600 my-1"></div>
-                <div class="nav-icon hover:text-sky-400" onclick="toggleEditMode()" id="nav-edit-mode" title="대시보드 배치/크기 자유 편집"><i class="fa-solid fa-up-down-left-right"></i></div>
-                <div class="nav-icon hover:text-emerald-400" onclick="openWidgetManager()" title="위젯 추가/숨김 관리"><i class="fa-solid fa-cubes"></i></div>
-                <div class="nav-icon" onclick="resetLayout()" title="기본 배치로 초기화"><i class="fa-solid fa-rotate-left"></i></div>
-                <div class="w-6 h-[1px] bg-slate-600 my-1"></div>
-                <div class="nav-icon hover:text-emerald-400" onclick="fetchGoogleSheetsData()" title="데이터 강제 동기화"><i class="fa-solid fa-arrows-rotate"></i></div>
-                <div class="nav-icon hover:text-amber-400" onclick="openModal()" title="구글 시트 연동 설정"><i class="fa-solid fa-sliders"></i></div>
+                <!-- 도구 묶음: 화면 이동(메인)과 구분되도록 어두운 바탕 · 흐린 색 · 작은 아이콘 -->
+                <div class="nav-util-group">
+                    <span class="nav-util-label">도구</span>
+                    <div class="nav-icon nav-util" onclick="toggleEditMode()" id="nav-edit-mode" title="대시보드 배치/크기 자유 편집"><i class="fa-solid fa-up-down-left-right"></i></div>
+                    <div class="nav-icon nav-util" onclick="openWidgetManager()" title="위젯 추가/숨김 관리"><i class="fa-solid fa-cubes"></i></div>
+                    <div class="nav-icon nav-util" onclick="resetLayout()" title="기본 배치로 초기화"><i class="fa-solid fa-rotate-left"></i></div>
+                    <div class="w-5 h-[1px] bg-[#393939] my-0.5"></div>
+                    <div class="nav-icon nav-util" onclick="fetchGoogleSheetsData()" title="데이터 강제 동기화"><i class="fa-solid fa-arrows-rotate"></i></div>
+                    <div class="nav-icon nav-util" onclick="openModal()" title="구글 시트 연동 설정"><i class="fa-solid fa-sliders"></i></div>
+                </div>
                 
                 <div class="nav-icon mt-auto mb-2 text-amber-400 hover:text-amber-300 animate-bounce" onclick="toggleBot()" title="PRO-Bot (AI 챗봇)">
                     <i class="fa-solid fa-robot text-2xl lg:text-3xl drop-shadow-[0_0_12px_rgba(251,191,36,0.8)]"></i>
@@ -507,6 +519,10 @@
                 </div>
             </header>
 
+            <!-- 데이터 상태 경고 띠: 예시(데모) 숫자가 보이거나 갱신에 실패했을 때만 나타남 -->
+            <div id="data-warning" class="hidden mb-2 px-3 py-1.5 text-[11.5px] border-l-4"></div>
+            <div id="ops-alert" class="hidden mb-2 px-3 py-1.5 text-[11.5px] border-l-4 flex flex-wrap items-center gap-x-2 gap-y-1" style="background:#FFFFFF;border-color:#DA1E28;color:#161616"></div>
+
             <!-- GridStack 자유 드래그 & 리사이즈 대시보드 영역 -->
             <div class="grid-stack mb-6">
                 <!-- Widget 1: 날씨 & 시계 위젯 -->
@@ -540,18 +556,18 @@
                 <!-- Widget 2: 당월 생산 실적 -->
                 <div class="grid-stack-item" gs-id="widget-prod" gs-x="3" gs-y="0" gs-w="2" gs-h="2">
                     <div class="grid-stack-item-content">
-                        <div class="glass-panel p-3.5 h-full">
+                        <div class="glass-panel p-3 h-full">
                             <div class="widget-drag-handle">
                                 <span><i class="fa-solid fa-grip-dots-vertical mr-1"></i> 생산실적 KPI</span>
                                 <i class="fa-solid fa-xmark cursor-pointer hover:text-red-500" onclick="removeWidget('widget-prod')"></i>
                             </div>
                             <div class="flex justify-between items-start mb-1">
-                                <div class="p-2 rounded-lg bg-sky-50 border border-sky-200 text-sky-700"><i class="fa-solid fa-industry text-sm"></i></div>
+                                <div class="p-1.5 rounded-lg bg-sky-50 border border-sky-200 text-sky-700"><i class="fa-solid fa-industry text-xs"></i></div>
                                 <span id="kpi-reach" class="text-[9.5px] font-extrabold px-2 py-0.5 rounded-md border bg-sky-50 text-sky-800 border-sky-200">달성률 0%</span>
                             </div>
                             <div>
                                 <p class="text-[10px] font-extrabold text-slate-500 uppercase tracking-widest mb-0.5">당월 생산 실적</p>
-                                <div class="flex items-baseline gap-1"><h4 id="kpi-tons" class="text-xl lg:text-2xl font-black text-slate-900 font-mono-num">0</h4><span class="text-[10px] font-bold text-slate-500">TON</span><span id="kpi-tons-delta" class="text-[10px] font-mono-num ml-1"></span></div>
+                                <div class="flex items-baseline gap-1"><h4 id="kpi-tons" class="text-xl lg:text-2xl font-black text-slate-900 font-mono-num">0</h4><span class="text-[10px] font-bold text-slate-500">TON</span><span id="kpi-tons-delta" class="text-[10px] font-mono-num ml-1"></span></div><p id="kpi-tons-forecast" class="text-[10px] text-slate-600 leading-tight mt-0.5 truncate"></p>
                             </div>
                         </div>
                     </div>
@@ -560,18 +576,18 @@
                 <!-- Widget 3: CD 포장 실적량 -->
                 <div class="grid-stack-item" gs-id="widget-pack" gs-x="5" gs-y="0" gs-w="2" gs-h="2">
                     <div class="grid-stack-item-content">
-                        <div class="glass-panel p-3.5 h-full">
+                        <div class="glass-panel p-3 h-full">
                             <div class="widget-drag-handle">
                                 <span><i class="fa-solid fa-grip-dots-vertical mr-1"></i> 포장실적 KPI</span>
                                 <i class="fa-solid fa-xmark cursor-pointer hover:text-red-500" onclick="removeWidget('widget-pack')"></i>
                             </div>
                             <div class="flex justify-between items-start mb-1">
-                                <div class="p-2 rounded-lg bg-teal-50 border border-teal-200 text-teal-700"><i class="fa-solid fa-box-open text-sm"></i></div>
+                                <div class="p-1.5 rounded-lg bg-teal-50 border border-teal-200 text-teal-700"><i class="fa-solid fa-box-open text-xs"></i></div>
                                 <span id="kpi-pack-ratio" class="text-[9.5px] font-extrabold px-2 py-0.5 rounded-md border bg-teal-50 text-teal-800 border-teal-200">포장달성률 0%</span>
                             </div>
                             <div>
                                 <p class="text-[10px] font-extrabold text-slate-500 uppercase tracking-widest mb-0.5">CD 포장 실적량</p>
-                                <div class="flex items-baseline gap-1"><h4 id="kpi-pack-tons" class="text-xl lg:text-2xl font-black text-slate-900 font-mono-num">0</h4><span class="text-[10px] font-bold text-slate-500">TON</span><span id="kpi-pack-delta" class="text-[10px] font-mono-num ml-1"></span></div>
+                                <div class="flex items-baseline gap-1"><h4 id="kpi-pack-tons" class="text-xl lg:text-2xl font-black text-slate-900 font-mono-num">0</h4><span class="text-[10px] font-bold text-slate-500">TON</span><span id="kpi-pack-delta" class="text-[10px] font-mono-num ml-1"></span></div><p id="kpi-pack-forecast" class="text-[10px] text-slate-600 leading-tight mt-0.5 truncate"></p>
                             </div>
                         </div>
                     </div>
@@ -719,6 +735,7 @@
                                         <tr>
                                             <th>설비 식별</th>
                                             <th class="text-right">누적 실적 (TON)</th>
+                                            <th class="text-right">실수율</th>
                                             <th class="text-center">작업선경 범위 (mm)</th>
                                             <th class="text-center">작업길이 범위 (mm)</th>
                                             <th class="text-right">평균 선속 (m/min)</th>
@@ -942,19 +959,8 @@
                 </div>
             </div>
 
-            <!-- AI 차기 작업 예측 가이드 브리핑 박스 -->
-            <div class="glass-panel p-3 mb-3 bg-gradient-to-r from-sky-50 via-white to-amber-50 border-l-4 border-l-sky-600">
-                <div class="flex items-center gap-2 mb-1">
-                    <i class="fa-solid fa-wand-magic-sparkles text-amber-500 text-sm"></i>
-                    <h4 class="text-xs font-black text-slate-800">AI CYCLE 패턴 진단 및 작업 시점 예측</h4>
-                </div>
-                <p id="cycle-ai-prediction" class="text-[11px] font-bold text-slate-700 leading-relaxed">
-                    분석 중... 품종별 작업 주기(Interval) 및 품종 전환 횟수(공정 LOSS)를 계산하고 있습니다.
-                </p>
-            </div>
-
             <!-- 엑셀 스타일 고밀도 CDM CYCLE 매트릭스 표 -->
-            <div class="glass-panel overflow-hidden mb-6">
+            <div class="glass-panel overflow-hidden mb-3">
                 <div class="p-2.5 border-b border-slate-200 bg-slate-50 flex justify-between items-center">
                     <h3 class="text-xs font-black text-slate-900 flex items-center gap-1.5">
                         <i class="fa-solid fa-calendar-days text-sky-700 text-xs"></i> CDM 설비별·품종별 일일 생산 스케줄 CYCLE
@@ -976,6 +982,17 @@
                         </tbody>
                     </table>
                 </div>
+            </div>
+
+            <!-- AI 차기 작업 예측 가이드 브리핑 박스 -->
+            <div class="glass-panel p-3 mb-6 bg-gradient-to-r from-sky-50 via-white to-amber-50 border-l-4 border-l-sky-600">
+                <div class="flex items-center gap-2 mb-1">
+                    <i class="fa-solid fa-wand-magic-sparkles text-amber-500 text-sm"></i>
+                    <h4 class="text-xs font-black text-slate-800">AI CYCLE 패턴 진단 및 작업 시점 예측</h4>
+                </div>
+                <p id="cycle-ai-prediction" class="text-[11px] font-bold text-slate-700 leading-relaxed">
+                    분석 중... 품종별 작업 주기(Interval) 및 품종 전환 횟수(공정 LOSS)를 계산하고 있습니다.
+                </p>
             </div>
         </main>
 
@@ -1229,6 +1246,74 @@
                 </div>
             </div>
         </main>
+
+        <!-- TAB 5: 재공 체류 현황 (구글 시트 '재공 기간별 체류 리스트' · 연동 설정 05번) -->
+        <main class="flex-1 p-2.5 lg:p-4 overflow-y-auto h-screen relative z-10 tab-content" id="tab-wip">
+            <header class="flex flex-col xl:flex-row justify-between items-start xl:items-end gap-2 mb-2.5">
+                <div>
+                    <h1 class="text-lg lg:text-xl font-black tracking-tight text-slate-900 flex items-center gap-2">
+                        <span class="w-2 h-5 bg-orange-500 rounded"></span>
+                        재공 체류 현황 <span class="text-orange-700 font-semibold ml-0.5 text-sm lg:text-base">후공정별 · 체류기간별</span>
+                    </h1>
+                    <p class="text-slate-500 font-bold text-[9.5px] mt-0.5 ml-3"><b class="text-red-700">처리 기준: 현 공정 대기 90일 이상</b> (= 마지막 완료공정 이후 90일 넘게 진행 없음) · <b class="text-slate-700">총 체류</b> = 원재불출일 이후 일수(시트 값, 참고) · 후공정 '최종 검사'는 곧 빠지므로 기본 제외</p>
+                </div>
+                <div class="flex flex-wrap items-center gap-2 glass-panel p-1.5 !flex-row !h-auto border border-slate-300 text-[10.5px]">
+                    <span id="wip-source-badge" class="text-[9px] font-black px-1.5 py-0.5 rounded border bg-slate-50 text-slate-500 border-slate-200">불러오는 중</span>
+                    <label class="flex items-center gap-1">후공정
+                        <select id="wip-f-post" class="gs-input" style="width:auto;padding:2px 6px;font-family:inherit;font-size:11px" onchange="renderWip()"></select></label>
+                    <label class="flex items-center gap-1">영업부서
+                        <select id="wip-f-dept" class="gs-input" style="width:auto;padding:2px 6px;font-family:inherit;font-size:11px" onchange="renderWip()"></select></label>
+                    <input type="search" id="wip-f-q" placeholder="제조번호 · 거래처 · 강종" class="gs-input" style="width:170px;padding:2px 8px;font-family:inherit;font-size:11px" oninput="renderWip()">
+                    <label class="flex items-center gap-1 cursor-pointer whitespace-nowrap"><input type="checkbox" id="wip-f-ng" onchange="renderWip()"> 부적합만</label>
+                    <label class="flex items-center gap-1 cursor-pointer whitespace-nowrap"><input type="checkbox" id="wip-f-final" onchange="renderWip()"> 최종 검사 포함</label>
+                </div>
+            </header>
+
+            <div id="wip-empty" class="hidden mb-2.5 px-3 py-2 border-l-4 text-[11px]" style="background:#FCF4D6;border-color:#F1C21B;color:#684E00"></div>
+
+            <!-- KPI -->
+            <div class="grid grid-cols-2 xl:grid-cols-4 gap-2 mb-2.5">
+                <div class="glass-panel p-3 border-l-4 border-l-orange-500"><p class="text-[10px] font-black text-slate-500">관리 대상 재공</p><h4 id="wip-k-total" class="text-xl font-black font-mono-num text-slate-900">-</h4><p id="wip-k-total-sub" class="text-[10px] text-slate-500"></p></div>
+                <div class="glass-panel p-3 border-l-4" style="border-left-color:#FF832B"><p class="text-[10px] font-black text-slate-500">처리 대상 <span class="font-normal">(90일 이상)</span></p><h4 id="wip-k-90" class="text-xl font-black font-mono-num text-slate-900">-</h4><p id="wip-k-90-sub" class="text-[10px] text-slate-500"></p></div>
+                <div class="glass-panel p-3 border-l-4" style="border-left-color:#DA1E28"><p class="text-[10px] font-black text-slate-500">최장 대기 <span class="font-normal">(현 공정)</span></p><h4 id="wip-k-max" class="text-xl font-black font-mono-num text-red-700">-</h4><p id="wip-k-max-sub" class="text-[10px] text-slate-500 truncate"></p></div>
+                <div class="glass-panel p-3 border-l-4" style="border-left-color:#8A3FFC"><p class="text-[10px] font-black text-slate-500">부적합 재공 <span class="font-normal">(처분 대기)</span></p><h4 id="wip-k-ng" class="text-xl font-black font-mono-num text-slate-900">-</h4><p id="wip-k-ng-sub" class="text-[10px] text-slate-500 truncate"></p></div>
+            </div>
+
+            <!-- 후공정 × 체류구간 -->
+            <div class="glass-panel p-3 mb-2.5">
+                <div class="flex justify-between items-center mb-1 border-b border-slate-200 pb-1">
+                    <h3 class="text-xs font-black text-slate-900 flex items-center gap-1.5"><i class="fa-solid fa-chart-bar text-orange-600 text-xs"></i> 후공정별 대기 구간 <span class="font-normal text-slate-500">(현 공정 대기 기준 · 중량 TON)</span></h3>
+                    <span class="text-[9px] text-slate-500">막대 클릭 시 그 후공정만 목록에 표시</span>
+                </div>
+                <div class="h-[170px] w-full relative"><canvas id="wipChart"></canvas></div>
+            </div>
+
+            <!-- 목록 -->
+            <div class="glass-panel overflow-hidden mb-6">
+                <div class="p-2.5 border-b border-slate-200 bg-slate-50 flex justify-between items-center">
+                    <h3 class="text-xs font-black text-slate-900 flex items-center gap-1.5"><i class="fa-solid fa-list text-orange-600 text-xs"></i> 재공 목록 <span id="wip-list-count" class="font-normal text-slate-500 text-[10px]"></span></h3>
+                    <span class="text-[9px] text-slate-500">현 공정 대기 긴 순 · 90일 이상 빨강(처리 대상) · 60~90일 주황(기준 임박)</span>
+                </div>
+                <div class="overflow-x-auto p-1.5 max-h-[520px] overflow-y-auto">
+                    <table class="w-full text-xs">
+                        <thead><tr>
+                            <th class="py-1 px-2 text-left text-[10px]">제조번호</th>
+                            <th class="py-1 px-2 text-left text-[10px]">후공정</th>
+                            <th class="py-1 px-2 text-right text-[10px]">현 공정 대기(일)</th>
+                            <th class="py-1 px-2 text-right text-[10px]">총 체류(일)</th>
+                            <th class="py-1 px-2 text-left text-[10px]">완료공정 (완료일)</th>
+                            <th class="py-1 px-2 text-left text-[10px]">거래처</th>
+                            <th class="py-1 px-2 text-left text-[10px]">영업부서</th>
+                            <th class="py-1 px-2 text-left text-[10px]">강종 · 형상</th>
+                            <th class="py-1 px-2 text-right text-[10px]">선경(원재→제품)</th>
+                            <th class="py-1 px-2 text-right text-[10px]">중량(kg)</th>
+                            <th class="py-1 px-2 text-left text-[10px]">등급</th>
+                        </tr></thead>
+                        <tbody id="wip-body"></tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
     </div>
 
     <!-- PRO-Bot 챗봇 창 -->
@@ -1459,6 +1544,11 @@
                         헤더 이름이 조금 달라도 자동 인식합니다 (PND·PCD 컬럼은 값으로도 찾음). 부적합중량 컬럼이 있으면 그 값을, 없으면 자주검사 '부적합' LOT의 중량 전체를 부적합량으로 집계합니다.
                     </p>
                 </div>
+                <div class="pt-2 border-t border-dashed border-slate-300">
+                    <label class="block text-[10px] font-extrabold text-orange-700 uppercase tracking-widest mb-1"><i class="fa-solid fa-hourglass-half mr-1"></i>05. 재공 기간별 체류 리스트 CSV URL</label>
+                    <input type="text" id="modal-url-wip" class="gs-input" placeholder="https://docs.google.com/.../pub?gid=...&single=true&output=csv">
+                    <p class="text-[9.5px] font-bold text-slate-500 mt-1 leading-relaxed">필수: <b>제조번호 · 중량 · 재공체류기간(또는 원재불출일) · 후공정</b> / 분석용: 완료공정 · 완료공정일 · 거래처 · 영업부서 · 재고등급 · 부적합항목</p>
+                </div>
             </div>
             <div class="p-4 bg-slate-50 border-t border-slate-200 flex justify-end gap-2">
                 <button onclick="closeModal()" class="px-4 py-2 rounded-md text-xs font-bold text-slate-500 hover:bg-slate-200">취소</button>
@@ -1475,6 +1565,8 @@
         let SHARED_DOWN_URL = localStorage.getItem('GS_DOWN_URL') || "https://docs.google.com/spreadsheets/d/e/2PACX-1vQTdp-wPWsANap0UF_ZvT8HzCbnaqxyiL86rxNfZEqA6ir9m5AczfkDYh2LLBVrYuGSxGiS62i51wRh/pub?gid=1618063531&single=true&output=csv";
         let SHARED_PACK_URL = localStorage.getItem('GS_PACK_URL') || "https://docs.google.com/spreadsheets/d/e/2PACX-1vQTdp-wPWsANap0UF_ZvT8HzCbnaqxyiL86rxNfZEqA6ir9m5AczfkDYh2LLBVrYuGSxGiS62i51wRh/pub?gid=433609624&single=true&output=csv";
         // ✅ [NEW] 다기능 검사실적 (PND-3 / PND-4) — 구글 시트 '다기능 검사실적' 탭의 CSV 게시 URL (설정 모달 04번)
+        // 재공 기간별 체류 리스트 (설정 모달 05번)
+        let SHARED_WIP_URL = localStorage.getItem('GS_WIP_URL') || "https://docs.google.com/spreadsheets/d/e/2PACX-1vQTdp-wPWsANap0UF_ZvT8HzCbnaqxyiL86rxNfZEqA6ir9m5AczfkDYh2LLBVrYuGSxGiS62i51wRh/pub?gid=1374737825&single=true&output=csv";
         let SHARED_INSP_URL = localStorage.getItem('GS_INSP_URL') || "https://docs.google.com/spreadsheets/d/e/2PACX-1vQTdp-wPWsANap0UF_ZvT8HzCbnaqxyiL86rxNfZEqA6ir9m5AczfkDYh2LLBVrYuGSxGiS62i51wRh/pub?gid=2067876329&single=true&output=csv";
 
         const MACHINE_ORDER = ['PCD-0-2', 'PCD-0-3', 'PCD-1', 'PCD-5', 'PCD-2-2', 'PCD-3', 'PCD-4'];
@@ -1680,23 +1772,45 @@
             { id: 'widget-outsource', x: 7, y: 7, w: 5, h: 4 }
         ];
 
-        const CITY_WEATHER = {
-            pohang: {
-                name: "포항",
-                today: { temp: "27°C", icon: "fa-sun text-amber-500", cond: "맑음", humidity: "55%" },
-                tomorrow: { temp: "28°C", icon: "fa-cloud-sun text-slate-600", cond: "구름조금", rain: "20%" }
-            },
-            seoul: {
-                name: "서울",
-                today: { temp: "26°C", icon: "fa-cloud-sun text-amber-500", cond: "구름많음", humidity: "60%" },
-                tomorrow: { temp: "27°C", icon: "fa-cloud-rain text-sky-500", cond: "소나기", rain: "60%" }
-            },
-            chungju: {
-                name: "충주",
-                today: { temp: "25°C", icon: "fa-cloud text-slate-500", cond: "흐림", humidity: "65%" },
-                tomorrow: { temp: "26°C", icon: "fa-sun text-amber-500", cond: "맑음", rain: "10%" }
-            }
+        // ===== 실제 날씨 (Open-Meteo 무료 API · 키 불필요 · 도시 좌표만 전송) =====
+        //  30분 동안은 받아 둔 값을 다시 쓴다. 받지 못하면 가짜 값 대신 '불러오지 못함'을 표시한다.
+        const CITY_WEATHER_POS = {
+            pohang:  { name: '포항', lat: 36.019, lon: 129.343 },
+            seoul:   { name: '서울', lat: 37.566, lon: 126.978 },
+            chungju: { name: '충주', lat: 36.991, lon: 127.926 }
         };
+        const WEATHER_CACHE_MS = 30 * 60 * 1000;
+        const weatherCache = {};
+        // WMO 날씨 코드 → [설명, 아이콘]
+        function wmoInfo(code) {
+            if (code === 0) return ['맑음', 'fa-sun text-amber-500'];
+            if (code <= 2) return ['구름조금', 'fa-cloud-sun text-amber-500'];
+            if (code === 3) return ['흐림', 'fa-cloud text-slate-500'];
+            if (code <= 48) return ['안개', 'fa-smog text-slate-500'];
+            if (code <= 57) return ['이슬비', 'fa-cloud-rain text-sky-500'];
+            if (code <= 67) return ['비', 'fa-cloud-showers-heavy text-sky-600'];
+            if (code <= 77) return ['눈', 'fa-snowflake text-sky-400'];
+            if (code <= 82) return ['소나기', 'fa-cloud-showers-heavy text-sky-600'];
+            if (code <= 86) return ['눈', 'fa-snowflake text-sky-400'];
+            return ['뇌우', 'fa-cloud-bolt text-amber-600'];
+        }
+        async function loadWeather(city) {
+            const c = weatherCache[city];
+            if (c && Date.now() - c.t < WEATHER_CACHE_MS) return c.d;
+            const p = CITY_WEATHER_POS[city];
+            const url = `https://api.open-meteo.com/v1/forecast?latitude=${p.lat}&longitude=${p.lon}` +
+                `&current=temperature_2m,relative_humidity_2m,weather_code` +
+                `&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=Asia%2FSeoul&forecast_days=2`;
+            const res = await Promise.race([
+                fetch(url, { cache: 'no-store' }),
+                new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 8000))
+            ]);
+            if (!res.ok) throw new Error('HTTP ' + res.status);
+            const d = await res.json();
+            if (!d.current || !d.daily) throw new Error('bad response');
+            weatherCache[city] = { t: Date.now(), d };
+            return d;
+        }
 
         let selectedCity = 'pohang';
 
@@ -1712,27 +1826,33 @@
             renderWeatherDisplay();
         }
 
-        function renderWeatherDisplay() {
+        async function renderWeatherDisplay() {
             const el = document.getElementById('weather-card-display');
             if (!el) return;
-            const w = CITY_WEATHER[selectedCity] || CITY_WEATHER.pohang;
-            
-            el.innerHTML = `
+            const city = selectedCity, p = CITY_WEATHER_POS[city] || CITY_WEATHER_POS.pohang;
+            const cell = (title, icon, temp, sub) => `
                 <div class="bg-white px-2 py-1 flex flex-col justify-center min-w-0">
                     <div class="flex items-center justify-between gap-1">
-                        <span class="text-slate-600 truncate">오늘 (${w.name})</span>
-                        <span class="flex items-center gap-1 shrink-0"><i class="fa-solid ${w.today.icon} text-xs text-slate-700"></i><span class="font-mono-num text-slate-900 text-sm leading-none">${w.today.temp}</span></span>
+                        <span class="text-slate-600 truncate">${title}</span>
+                        <span class="flex items-center gap-1 shrink-0"><i class="fa-solid ${icon} text-xs"></i><span class="font-mono-num text-slate-900 text-sm leading-none">${temp}</span></span>
                     </div>
-                    <span class="text-[9px] text-slate-600 truncate leading-tight mt-0.5">${w.today.cond} · 습도 ${w.today.humidity}</span>
-                </div>
-                <div class="bg-white px-2 py-1 flex flex-col justify-center min-w-0">
-                    <div class="flex items-center justify-between gap-1">
-                        <span class="text-slate-600 truncate">내일 예보</span>
-                        <span class="flex items-center gap-1 shrink-0"><i class="fa-solid ${w.tomorrow.icon} text-xs text-slate-700"></i><span class="font-mono-num text-slate-900 text-sm leading-none">${w.tomorrow.temp}</span></span>
-                    </div>
-                    <span class="text-[9px] text-slate-600 truncate leading-tight mt-0.5">${w.tomorrow.cond} · 강수 ${w.tomorrow.rain}</span>
-                </div>
-            `;
+                    <span class="text-[9px] text-slate-600 truncate leading-tight mt-0.5">${sub}</span>
+                </div>`;
+            if (!weatherCache[city]) el.innerHTML = `<div class="col-span-2 bg-white px-2 py-1 flex items-center text-slate-500">${p.name} 날씨 불러오는 중…</div>`;
+            try {
+                const d = await loadWeather(city);
+                if (city !== selectedCity) return;   // 받는 사이에 다른 지역을 눌렀으면 그 지역 결과가 그린다
+                const [nowCond, nowIcon] = wmoInfo(d.current.weather_code);
+                const [tmCond, tmIcon] = wmoInfo(d.daily.weather_code[1]);
+                const asOf = String(d.current.time || '').substring(11, 16);
+                el.innerHTML =
+                    cell(`지금 (${p.name})`, nowIcon, `${Math.round(d.current.temperature_2m)}°C`, `${nowCond} · 습도 ${Math.round(d.current.relative_humidity_2m)}%${asOf ? ` · ${asOf} 기준` : ''}`) +
+                    cell('내일 예보', tmIcon, `${Math.round(d.daily.temperature_2m_min[1])}~${Math.round(d.daily.temperature_2m_max[1])}°`, `${tmCond} · 강수 ${d.daily.precipitation_probability_max[1] ?? '-'}%`);
+            } catch (e) {
+                console.warn('날씨 불러오기 실패', e);
+                if (city !== selectedCity) return;
+                el.innerHTML = `<div class="col-span-2 bg-white px-2 py-1 flex items-center text-slate-500" title="${escHtml(String(e && e.message || e))}"><i class="fa-solid fa-triangle-exclamation text-amber-500 mr-1"></i>${p.name} 날씨를 불러오지 못했습니다 (인터넷 연결 확인)</div>`;
+            }
         }
 
         const SAMPLE_PROD_DATA = [
@@ -2000,9 +2120,9 @@
                     </div>
                 </div>`;
             } else if (widgetId === 'widget-prod') {
-                html = `<div class="grid-stack-item-content"><div class="glass-panel p-3.5 h-full"><div class="widget-drag-handle"><span>생산실적 KPI</span><i class="fa-solid fa-xmark cursor-pointer" onclick="removeWidget('widget-prod')"></i></div><div class="flex justify-between items-start mb-1"><div class="p-2 rounded-lg bg-sky-50 border border-sky-200 text-sky-700"><i class="fa-solid fa-industry text-sm"></i></div><span id="kpi-reach" class="text-[9.5px] font-extrabold px-2 py-0.5 rounded-md border bg-sky-50 text-sky-800 border-sky-200">달성률 0%</span></div><div><p class="text-[10px] font-extrabold text-slate-500 uppercase tracking-widest mb-0.5">당월 생산 실적</p><div class="flex items-baseline gap-1"><h4 id="kpi-tons" class="text-xl lg:text-2xl font-black text-slate-900 font-mono-num">0</h4><span class="text-[10px] font-bold text-slate-500">TON</span><span id="kpi-tons-delta" class="text-[10px] font-mono-num ml-1"></span></div></div></div></div>`;
+                html = `<div class="grid-stack-item-content"><div class="glass-panel p-3 h-full"><div class="widget-drag-handle"><span>생산실적 KPI</span><i class="fa-solid fa-xmark cursor-pointer" onclick="removeWidget('widget-prod')"></i></div><div class="flex justify-between items-start mb-1"><div class="p-1.5 rounded-lg bg-sky-50 border border-sky-200 text-sky-700"><i class="fa-solid fa-industry text-xs"></i></div><span id="kpi-reach" class="text-[9.5px] font-extrabold px-2 py-0.5 rounded-md border bg-sky-50 text-sky-800 border-sky-200">달성률 0%</span></div><div><p class="text-[10px] font-extrabold text-slate-500 uppercase tracking-widest mb-0.5">당월 생산 실적</p><div class="flex items-baseline gap-1"><h4 id="kpi-tons" class="text-xl lg:text-2xl font-black text-slate-900 font-mono-num">0</h4><span class="text-[10px] font-bold text-slate-500">TON</span><span id="kpi-tons-delta" class="text-[10px] font-mono-num ml-1"></span></div><p id="kpi-tons-forecast" class="text-[10px] text-slate-600 leading-tight mt-0.5 truncate"></p></div></div></div>`;
             } else if (widgetId === 'widget-pack') {
-                html = `<div class="grid-stack-item-content"><div class="glass-panel p-3.5 h-full"><div class="widget-drag-handle"><span>포장실적 KPI</span><i class="fa-solid fa-xmark cursor-pointer" onclick="removeWidget('widget-pack')"></i></div><div class="flex justify-between items-start mb-1"><div class="p-2 rounded-lg bg-teal-50 border border-teal-200 text-teal-700"><i class="fa-solid fa-box-open text-sm"></i></div><span id="kpi-pack-ratio" class="text-[9.5px] font-extrabold px-2 py-0.5 rounded-md border bg-teal-50 text-teal-800 border-teal-200">포장달성률 0%</span></div><div><p class="text-[10px] font-extrabold text-slate-500 uppercase tracking-widest mb-0.5">CD 포장 실적량</p><div class="flex items-baseline gap-1"><h4 id="kpi-pack-tons" class="text-xl lg:text-2xl font-black text-slate-900 font-mono-num">0</h4><span class="text-[10px] font-bold text-slate-500">TON</span><span id="kpi-pack-delta" class="text-[10px] font-mono-num ml-1"></span></div></div></div></div>`;
+                html = `<div class="grid-stack-item-content"><div class="glass-panel p-3 h-full"><div class="widget-drag-handle"><span>포장실적 KPI</span><i class="fa-solid fa-xmark cursor-pointer" onclick="removeWidget('widget-pack')"></i></div><div class="flex justify-between items-start mb-1"><div class="p-1.5 rounded-lg bg-teal-50 border border-teal-200 text-teal-700"><i class="fa-solid fa-box-open text-xs"></i></div><span id="kpi-pack-ratio" class="text-[9.5px] font-extrabold px-2 py-0.5 rounded-md border bg-teal-50 text-teal-800 border-teal-200">포장달성률 0%</span></div><div><p class="text-[10px] font-extrabold text-slate-500 uppercase tracking-widest mb-0.5">CD 포장 실적량</p><div class="flex items-baseline gap-1"><h4 id="kpi-pack-tons" class="text-xl lg:text-2xl font-black text-slate-900 font-mono-num">0</h4><span class="text-[10px] font-bold text-slate-500">TON</span><span id="kpi-pack-delta" class="text-[10px] font-mono-num ml-1"></span></div><p id="kpi-pack-forecast" class="text-[10px] text-slate-600 leading-tight mt-0.5 truncate"></p></div></div></div>`;
             } else if (widgetId === 'widget-down') {
                 html = `<div class="grid-stack-item-content"><div class="glass-panel p-2.5 flex flex-col justify-between h-full"><div class="widget-drag-handle"><span>불가동 TOP 3</span><i class="fa-solid fa-xmark cursor-pointer hover:text-red-500" onclick="removeWidget('widget-down')"></i></div><div class="flex justify-between items-center mb-1"><div class="flex items-center gap-1.5"><div class="p-1 rounded-lg bg-red-50 border border-red-200 text-red-600"><i class="fa-solid fa-clock text-xs"></i></div><span class="text-[9.5px] font-extrabold text-slate-500 uppercase tracking-widest">총 불가동시간</span></div><div class="flex items-baseline gap-1"><h4 id="kpi-down" class="text-base lg:text-lg font-black text-red-600 font-mono-num">0</h4><span class="text-[8.5px] font-bold text-slate-500">MIN</span></div></div><div id="kpi-down-top3" class="pt-1 border-t border-slate-200 flex flex-col justify-center flex-1 gap-1 overflow-y-auto no-scrollbar"><div class="text-center text-slate-400 text-[9px] font-bold py-0.5">분석 중...</div></div></div></div>`;
             } else {
@@ -2051,7 +2171,7 @@
         }
 
         function switchTab(tabId) {
-            ['main', 'analytics', 'cycle', 'insp'].forEach(id => {
+            ['main', 'analytics', 'cycle', 'insp', 'wip'].forEach(id => {
                 const tabEl = document.getElementById(`tab-${id}`);
                 const navEl = document.getElementById(`nav-${id}`);
                 if (tabEl) tabEl.classList.remove('active');
@@ -2064,6 +2184,7 @@
             if (tabId === 'analytics') updateAnalytics();
             else if (tabId === 'cycle') renderCycleTable();
             else if (tabId === 'insp') renderInsp();
+            else if (tabId === 'wip') renderWip();
             else setTimeout(resizeAllCharts, 100);
         }
 
@@ -2145,7 +2266,8 @@
             const P = { metric: null, from: null, to: null, label: '', shift: null, team: null, equip: null, group: null, order: 'max', why: /왜|이유|원인/.test(s) };
 
             // 지표
-            if (/불량|부적합|NG/.test(u)) P.metric = 'insp';
+            if (/실수율|수율/.test(u)) P.metric = 'yield';
+            else if (/불량|부적합|NG/.test(u)) P.metric = 'insp';
             else if (/불가동|비가동|정지|고장|다운/.test(u)) P.metric = 'down';
             else if (/포장/.test(u)) P.metric = 'pack';
             else if (/생산|작업량|실적|CD|톤|TON|많이 ?한|최대한|일 ?많이/.test(u)) P.metric = 'prod';
@@ -2178,16 +2300,19 @@
             else if (/어느\s*날|무슨\s*날|며칠|언제|일별|날짜별/.test(s)) P.group = 'day';
             else if (/(어느|어떤|무슨)\s*(설비|호기)|설비별|호기별|(설비|호기).*(가장|최대|최고|1위|순위)|(가장|최대|최고|1위).*(설비|호기)/.test(s)) P.group = 'equip';
             else if (/근무별|주야간|주간.{0,3}야간|야간.{0,3}주간/.test(s)) P.group = 'shift';
+            else if (P.metric === 'yield' && /제조번호|LOT|로트/i.test(s)) P.group = 'lot';
+            else if (P.metric === 'yield' && /형상/.test(s)) P.group = 'shape';
             else if (P.metric === 'insp' && /아이템|품목|제품별/.test(s)) P.group = 'item';
             else if (P.metric === 'insp' && /강종/.test(s)) P.group = 'steel';
             else if (P.metric === 'insp' && /제강사|메이커|소재/.test(s)) P.group = 'maker';
             else if (P.metric === 'down' && /사유|원인|부위|왜|이유|뭐/.test(s)) P.group = 'part';
 
             // 필터
-            if (P.group !== 'shift') { if (/야간|2근|밤/.test(s)) P.shift = '2근'; else if (/주간|1근|낮/.test(s)) P.shift = '1근'; }
+            // 근무: '낮'·'밤' 한 글자만으로 찾으면 '낮은' 같은 말에 걸리므로 '낮 근무·낮조·밤 근무·밤조'처럼 붙은 경우만 인정
+            if (P.group !== 'shift') { if (/야간|2근|밤\s*(근무|조)/.test(s)) P.shift = '2근'; else if (/주간|1근|낮\s*(근무|조)/.test(s)) P.shift = '1근'; }
             if (P.group !== 'team' && (m = u.match(/(?:^|[^A-Z])([ABC])\s*조/))) P.team = m[1];
             if ((m = u.match(/P([CN])D[-\s]?(W?\d+(?:-\d+)?)/))) P.equip = `P${m[1]}D-${m[2]}`;
-            if (/최소|가장\s*적|제일\s*적|최저|적은/.test(s)) P.order = 'min';
+            if (/최소|가장\s*적|제일\s*적|최저|적은|낮은|나쁜/.test(s)) P.order = 'min';
 
             // 기간 기본값: '어느 달' 질문은 올해 전체, 나머지는 이번 달
             if (P.group === 'month' && (!P.from || P.from.substring(0, 7) === P.to.substring(0, 7))) {
@@ -2198,7 +2323,12 @@
             return P;
         }
 
-        const NLQ_NAME = { prod: 'CD 생산량', pack: 'CD 포장량', down: '불가동', insp: '다기능 부적합률' };
+        // 제조번호별 실수율은 기간 안에 작업이 있었던 제조번호의 '전체' 행으로 계산 (다른 달에 시작·끝난 작업분 포함)
+        function nlqFullLotRows(rows) {
+            const lots = new Set(rows.map(r => r.lotNo).filter(Boolean));
+            return (Array.isArray(prodData) ? prodData : []).filter(p => lots.has(p.lotNo));
+        }
+        const NLQ_NAME = { prod: 'CD 생산량', pack: 'CD 포장량', down: '불가동', insp: '다기능 부적합률', yield: '실수율' };
         const NLQ_INSP_MIN_KG = 5000;   // 부적합률 비교 시 검사량 5T 미만 구분은 제외 (소량 1건으로 튀는 값 방지)
 
         function nlqTeamOf(r) { return String(r.team || '').replace(/조/g, '').trim().toUpperCase(); }
@@ -2215,12 +2345,14 @@
         }
         function nlqVal(metric, rows) {
             if (metric === 'insp') { const a = inspAgg(rows); return { v: a.rate, n: a.ins, sub: `검사 ${inspFmtT(a.ins)}T · 부적합 ${inspFmtT(a.ng)}T` }; }
+            if (metric === 'yield') { const y = yieldStats(rows); return { v: y.rate === null ? 0 : y.rate, n: y.inp, sub: `작업 ${(y.out / 1000).toFixed(1)}T ÷ 투입 ${(y.inp / 1000).toFixed(1)}T · 제조번호 ${y.lots}개` }; }
             if (metric === 'down') { const v = rows.reduce((a, r) => a + (r.minutes || 0), 0); return { v, n: v, sub: `${rows.length}건` }; }
             const v = rows.reduce((a, r) => a + (r.amount || 0), 0) / 1000, days = new Set(rows.map(r => r.date)).size;
             return { v, n: v, sub: days ? `${days}일 · 일평균 ${(v / days).toFixed(1)}T` : '' };
         }
         function nlqFmt(metric, v) {
             if (metric === 'insp') return v.toFixed(2) + '%';
+            if (metric === 'yield') return v.toFixed(1) + '%';
             if (metric === 'down') return Math.round(v).toLocaleString() + '분';
             return v.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + 'T';
         }
@@ -2233,7 +2365,9 @@
             part:  { label: '부위', key: r => r.part || r.reason || '기타' },
             item:  { label: '아이템', key: r => inspShortName(r.itemName, 26) },
             steel: { label: '강종', key: r => r.steel || '미기재' },
-            maker: { label: '제강사', key: r => r.maker || '미기재' }
+            maker: { label: '제강사', key: r => r.maker || '미기재' },
+            lot:   { label: '제조번호', key: r => r.lotNo || r.lot || '미기재' },
+            shape: { label: '형상', key: r => r.shapeRaw || '원형' }
         };
         function nlqScope(P) {
             return [P.label, P.shift ? (P.shift === '2근' ? '야간(2근)' : '주간(1근)') : '', P.team ? P.team + '조' : '', P.equip || ''].filter(Boolean).join(' · ');
@@ -2248,6 +2382,7 @@
             rows.forEach(r => { const k = keyFn(r); if (!g.has(k)) g.set(k, []); g.get(k).push(r); });
             let list = [...g].map(([k, L]) => Object.assign({ k }, nlqVal(P.metric, L)));
             if (P.metric === 'insp') list = list.filter(x => x.n >= NLQ_INSP_MIN_KG);
+            if (P.metric === 'yield') list = list.filter(x => x.n > 0);   // 투입중량이 없는 구분은 비교에서 제외
             return list;
         }
 
@@ -2258,9 +2393,13 @@
             • <a class="nlq-ex">이번 달 불가동 원인</a><br>
             • <a class="nlq-ex">11월 어느 설비가 불가동이 가장 많아?</a><br>
             • <a class="nlq-ex">11/19 2근 부적합 제조번호</a><br>
-            • <a class="nlq-ex">지난달 PCD-4 생산량</a>`;
+            • <a class="nlq-ex">지난달 PCD-4 생산량</a><br>
+            • <a class="nlq-ex">11월 설비별 실수율</a><br>
+            • <a class="nlq-ex">이번 달 실수율 낮은 제조번호</a><br>
+            • <a class="nlq-ex">처리 대상 재공</a> · <a class="nlq-ex">CD포장 대기 재공</a>`;
 
         function nlqAnswer(q) {
+            if (/재공|체류/.test(String(q || ''))) return nlqWipAnswer(q);
             const P = nlqParse(q);
             if (!P.metric) return `질문에서 <b>생산 / 포장 / 불가동 / 불량</b> 중 무엇을 볼지 찾지 못했습니다.<br><br>${NLQ_HELP}`;
             const name = NLQ_NAME[P.metric], scope = nlqScope(P);
@@ -2274,9 +2413,10 @@
             // ① 묶음 질문: 어느 조 / 어느 달 / 어느 설비 …
             if (P.group) {
                 const G = NLQ_GROUP[P.group];
-                const list = nlqGroupList(P, rows, G.key).sort((a, b) => (P.order === 'min' ? a.v - b.v : b.v - a.v));
+                const src = (P.metric === 'yield' && P.group === 'lot') ? nlqFullLotRows(rows) : rows;
+                const list = nlqGroupList(P, src, G.key).sort((a, b) => (P.order === 'min' ? a.v - b.v : b.v - a.v));
                 if (!list.length) return `<b>${escHtml(scope)}</b> 비교할 만큼 데이터가 없습니다${P.metric === 'insp' ? ` (검사량 ${NLQ_INSP_MIN_KG / 1000}T 이상 구분만 비교)` : ''}.`;
-                const top = list[0], word = P.metric === 'insp' ? (P.order === 'min' ? '가장 낮은' : '가장 높은') : (P.order === 'min' ? '가장 적은' : '가장 많은');
+                const top = list[0], word = (P.metric === 'insp' || P.metric === 'yield') ? (P.order === 'min' ? '가장 낮은' : '가장 높은') : (P.order === 'min' ? '가장 적은' : '가장 많은');
                 let html = `<b>${escHtml(scope)}</b> ${name} ${word} ${G.label}: <b class="text-sky-800">${escHtml(top.k)}</b> ${nlqFmt(P.metric, top.v)}`;
                 if (list[1]) html += ` <span class="text-slate-500">(2위 ${escHtml(list[1].k)} ${nlqFmt(P.metric, list[1].v)})</span>`;
                 html += nlqTable([G.label, name, '참고'], list.slice(0, 10).map((x, i) => [`${i + 1}. ${escHtml(x.k)}`, `<b>${nlqFmt(P.metric, x.v)}</b>`, `<span class="text-slate-500">${x.sub}</span>`]));
@@ -2289,6 +2429,12 @@
             const val = nlqVal(P.metric, rows);
             let html = `<b>${escHtml(scope)}</b> ${name}: <b class="text-sky-800">${nlqFmt(P.metric, val.v)}</b> <span class="text-slate-500">(${val.sub})</span>`;
 
+            if (P.metric === 'yield') {   // 합계 질문: 전체 실수율 + 실수율이 가장 낮은 제조번호 5개
+                const low = nlqGroupList(P, nlqFullLotRows(rows), NLQ_GROUP.lot.key).sort((a, b) => a.v - b.v).slice(0, 5);
+                html += `<div class="mt-1">실수율 낮은 제조번호</div>` + nlqTable(['제조번호', '실수율', '참고'], low.map(x => [escHtml(x.k), `<b>${nlqFmt('yield', x.v)}</b>`, `<span class="text-slate-500">${x.sub.replace(/ · 제조번호 \d+개/, '')}</span>`]));
+                html += `<div class="text-[10px] text-slate-500 mt-1">실수율 = 작업량 ÷ 투입중량 (투입중량은 코일번호마다 한 번만 합산). 제조번호별 값은 다른 달 작업분까지 합친 전체 기준이며, 아직 작업 중인 제조번호는 낮게 보일 수 있습니다.</div>`;
+                return html;
+            }
             if (P.metric === 'prod' || P.metric === 'pack') {
                 if (!P.team) {
                     const t = nlqGroupList(P, rows, NLQ_GROUP.team.key).sort((a, b) => a.k.localeCompare(b.k));
@@ -2542,6 +2688,7 @@
             document.getElementById('modal-url-down').value = SHARED_DOWN_URL;
             document.getElementById('modal-url-pack').value = SHARED_PACK_URL;
             document.getElementById('modal-url-insp').value = SHARED_INSP_URL;
+            document.getElementById('modal-url-wip').value = SHARED_WIP_URL;
             document.getElementById('sync-modal').style.display = 'flex';
         }
 
@@ -2554,11 +2701,13 @@
             SHARED_DOWN_URL = document.getElementById('modal-url-down').value.trim();
             SHARED_PACK_URL = document.getElementById('modal-url-pack').value.trim();
             SHARED_INSP_URL = document.getElementById('modal-url-insp').value.trim();
+            SHARED_WIP_URL = document.getElementById('modal-url-wip').value.trim();
 
             localStorage.setItem('GS_PROD_URL', SHARED_PROD_URL);
             localStorage.setItem('GS_DOWN_URL', SHARED_DOWN_URL);
             localStorage.setItem('GS_PACK_URL', SHARED_PACK_URL);
             localStorage.setItem('GS_INSP_URL', SHARED_INSP_URL);
+            localStorage.setItem('GS_WIP_URL', SHARED_WIP_URL);
 
             closeModal();
             fetchGoogleSheetsData();
@@ -2672,7 +2821,9 @@
                         amount: amountV, 
                         speed: safeNum(getVal(row, ['선속', '속도', 'RPM', '신선선속'])), 
                         wire: safeNum(getVal(row, ['작업선경', '선경', '두께', 'WIRE'])),
-                        length: safeNum(getVal(row, ['길이', 'LENGTH']))
+                        length: safeNum(getVal(row, ['길이', 'LENGTH'])),
+                        coil: String(getVal(row, ['코일번호', 'COIL']) || '').trim(),   // 실수율: 투입중량은 코일 단위 값
+                        inputW: safeNum(getVal(row, ['투입중량']))
                     });
                 } else if (dataType === 'DOWN') {
                     if (EXCLUDED_EQUIPS.includes(equip.toUpperCase().trim())) continue;
@@ -2716,6 +2867,11 @@
                 const iTab = document.getElementById('tab-insp');
                 if (iTab && iTab.classList.contains('active')) renderInsp();
             } catch (e) { console.error('renderInsp error', e); }
+            try {
+                const wTab = document.getElementById('tab-wip');
+                if (wTab && wTab.classList.contains('active')) renderWip();
+                renderOpsAlerts();
+            } catch (e) { console.error('renderWip error', e); }
         }
 
         async function fetchOneSheet(url, dataType) {
@@ -2739,7 +2895,7 @@
                 const text = await res.text();
                 if (typeof Papa === 'undefined') { console.warn('PapaParse 미로딩 - CSV 파싱 생략'); return null; }
                 const aoa = Papa.parse(text, { skipEmptyLines: true }).data;
-                const parsed = dataType === 'INSP' ? extractInspData(aoa) : extractDataFromAOA(aoa, dataType);
+                const parsed = dataType === 'INSP' ? extractInspData(aoa) : dataType === 'WIP' ? extractWipData(aoa) : extractDataFromAOA(aoa, dataType);
                 return (parsed && parsed.length > 0) ? parsed : null;
             } catch (e) {
                 if (e && e.name === 'AbortError') console.warn(dataType + ' 시트 응답 없음 (' + (SYNC_TIMEOUT_MS / 1000) + '초 초과)');
@@ -2750,8 +2906,61 @@
             }
         }
 
-        async function fetchGoogleSheetsData() {
-            if (isSyncing) { showToast('이미 동기화가 진행 중입니다.', 'danger'); return; }
+        // ===== 데이터 상태 (A-3 데모 경고 · A-4 자동 새로고침) =====
+        //  demo = 아직 시트를 한 번도 못 받아서 코드 안의 예시 숫자를 보여주는 중 / live = 시트 실제 데이터
+        var DATA_STATE = { prod: 'demo', down: 'demo', pack: 'demo' };
+        var DATA_LABEL = { prod: '생산실적', down: '불가동', pack: 'CD 포장' };
+        var lastSyncOk = null;          // 마지막으로 시트를 받아온 시각
+        var lastSyncFailed = [];        // 직전 동기화에서 못 받은 시트 (생산·불가동·포장)
+        var syncTried = false;          // 동기화를 한 번이라도 끝냈는지
+        var AUTO_SYNC_MS = 10 * 60 * 1000;   // 10분마다 자동 동기화
+        var STALE_MS = 30 * 60 * 1000;       // 마지막 갱신이 30분 넘으면 빨갛게
+
+        function hhmm(d) { return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`; }
+
+        function renderDataWarning() {
+            const el = document.getElementById('data-warning');
+            if (!el) return;
+            const demo = Object.keys(DATA_STATE).filter(k => DATA_STATE[k] === 'demo').map(k => DATA_LABEL[k]);
+            let msg = '', tone = '';
+            if (demo.length && !syncTried) {
+                msg = `<i class="fa-solid fa-spinner fa-spin mr-1"></i> 시트에서 데이터를 불러오는 중입니다. 지금 보이는 <b>${demo.join('·')}</b> 숫자는 <b>예시 데이터</b>입니다.`;
+                tone = 'background:#FCF4D6;border-color:#F1C21B;color:#684E00';
+            } else if (demo.length) {
+                msg = `<i class="fa-solid fa-triangle-exclamation mr-1"></i> <b>${demo.join('·')}</b> 시트를 불러오지 못해, 해당 숫자는 <b>실제가 아닌 예시 데이터</b>입니다. 왼쪽 <i class="fa-solid fa-arrows-rotate"></i> 버튼으로 다시 시도하거나 연동 설정을 확인하세요.`;
+                tone = 'background:#FFF1F1;border-color:#DA1E28;color:#750E13';
+            } else if (lastSyncFailed.length && lastSyncOk) {
+                msg = `<i class="fa-solid fa-circle-exclamation mr-1"></i> <b>${lastSyncFailed.join('·')}</b> 시트 갱신에 실패해 <b>${hhmm(lastSyncOk)}</b>에 받은 데이터를 표시 중입니다.`;
+                tone = 'background:#FCF4D6;border-color:#F1C21B;color:#684E00';
+            }
+            el.innerHTML = msg;
+            el.style.cssText = tone;
+            el.classList.toggle('hidden', !msg);
+        }
+
+        // '최종 갱신' 시각: 30분이 넘으면 빨간색 + 몇 분 전인지 표시 (1분마다 갱신)
+        function renderSyncAge() {
+            const st = document.getElementById('sync-time');
+            if (!st || !lastSyncOk) return;
+            const ageMin = Math.floor((Date.now() - lastSyncOk.getTime()) / 60000);
+            const stale = Date.now() - lastSyncOk.getTime() > STALE_MS;
+            st.innerText = `· 최종 갱신 ${hhmm(lastSyncOk)}${ageMin >= 1 ? ` (${ageMin}분 전)` : ''}`;
+            st.style.color = stale ? '#DA1E28' : '';
+            st.style.fontWeight = stale ? '600' : '';
+            st.title = stale ? `마지막 갱신이 ${ageMin}분 전입니다. 자동 동기화가 실패하고 있을 수 있습니다.` : `${AUTO_SYNC_MS / 60000}분마다 자동 동기화`;
+        }
+        setInterval(renderSyncAge, 60 * 1000);
+
+        // 자동 동기화: 화면이 보이고 있을 때만 (다른 탭에 가 있으면 건너뜀). 알림 없이 조용히.
+        setInterval(function () {
+            if (document.hidden) return;
+            fetchGoogleSheetsData({ silent: true });
+            if (typeof renderWeatherDisplay === 'function') renderWeatherDisplay();
+        }, AUTO_SYNC_MS);
+
+        async function fetchGoogleSheetsData(opts) {
+            const silent = !!(opts && opts.silent);
+            if (isSyncing) { if (!silent) showToast('이미 동기화가 진행 중입니다.', 'danger'); return; }
             isSyncing = true;
             updateLed('connecting', '동기화 진행 중...');
 
@@ -2759,35 +2968,45 @@
             const failed = [];
 
             try {
-                const [prodRes, downRes, packRes, inspRes] = await Promise.all([
+                const [prodRes, downRes, packRes, inspRes, wipRes] = await Promise.all([
                     fetchOneSheet(SHARED_PROD_URL, 'PROD'),
                     fetchOneSheet(SHARED_DOWN_URL, 'DOWN'),
                     fetchOneSheet(SHARED_PACK_URL, 'PACK'),
-                    fetchOneSheet(SHARED_INSP_URL, 'INSP')
+                    fetchOneSheet(SHARED_INSP_URL, 'INSP'),
+                    fetchOneSheet(SHARED_WIP_URL, 'WIP')
                 ]);
 
-                if (prodRes) { prodData = prodRes; outsourceData = prodRes.outsource || []; loadedFlags.push('생산:' + prodRes.length); } else failed.push('생산');
-                if (downRes) { downData = downRes; loadedFlags.push('불가동:' + downRes.length); } else failed.push('불가동');
-                if (packRes) { packData = packRes; loadedFlags.push('포장:' + packRes.length); } else failed.push('포장');
+                if (prodRes) { prodData = prodRes; outsourceData = prodRes.outsource || []; DATA_STATE.prod = 'live'; loadedFlags.push('생산:' + prodRes.length); } else failed.push('생산');
+                if (downRes) { downData = downRes; DATA_STATE.down = 'live'; loadedFlags.push('불가동:' + downRes.length); } else failed.push('불가동');
+                if (packRes) { packData = packRes; DATA_STATE.pack = 'live'; loadedFlags.push('포장:' + packRes.length); } else failed.push('포장');
                 // 다기능 검사실적: URL 미설정이면 실패로 치지 않고 데모 유지
                 if (inspRes) { inspData = inspRes; inspIsDemo = false; inspSyncState = 'ok'; loadedFlags.push('다기능:' + inspRes.length); }
                 else if (SHARED_INSP_URL && SHARED_INSP_URL.trim()) { failed.push('다기능'); inspSyncState = 'failed'; }
                 else inspSyncState = 'nourl';
+                // 재공 체류: 실패해도 이전에 받은 목록은 유지
+                if (wipRes) { wipData = wipRes; wipSyncState = 'ok'; loadedFlags.push('재공:' + wipRes.length); }
+                else if (SHARED_WIP_URL && SHARED_WIP_URL.trim()) { failed.push('재공'); if (!wipData) wipSyncState = 'failed'; }
+                else wipSyncState = 'nourl';
             } catch (e) {
                 console.error('동기화 처리 오류', e);
             } finally {
                 isSyncing = false;
                 if (inspSyncState === 'loading') inspSyncState = (SHARED_INSP_URL && SHARED_INSP_URL.trim()) ? 'failed' : 'nourl';
 
+                syncTried = true;
+                lastSyncFailed = failed.filter(f => f !== '다기능' && f !== '재공').map(f => f === '생산' ? '생산실적' : f === '포장' ? 'CD 포장' : f);
                 if (loadedFlags.length > 0) {
                     updateLed('synced', 'Live Sync (' + loadedFlags.join(' / ') + ')');
-                    const st = document.getElementById('sync-time');
-                    if (st) { const n = new Date(); st.innerText = `· 최종 갱신 ${String(n.getHours()).padStart(2, '0')}:${String(n.getMinutes()).padStart(2, '0')}`; }
-                    showToast('클라우드 동기화 완료! (' + loadedFlags.join(', ') + ')' + (failed.length ? ' · 미수신: ' + failed.join(',') : ''));
+                    lastSyncOk = new Date();
+                    renderSyncAge();
+                    if (!silent) showToast('클라우드 동기화 완료! (' + loadedFlags.join(', ') + ')' + (failed.length ? ' · 미수신: ' + failed.join(',') : ''));
                 } else {
-                    updateLed('offline', '동기화 실패 · 데모 데이터 표시 중');
-                    showToast('시트 연결 실패 - 데모 데이터로 표시합니다. 상단 동기화 버튼으로 재시도하세요.', 'danger');
+                    const anyLive = Object.values(DATA_STATE).includes('live');
+                    updateLed('offline', anyLive ? '동기화 실패 · 이전 데이터 표시 중' : '동기화 실패 · 데모 데이터 표시 중');
+                    renderSyncAge();
+                    if (!silent) showToast(anyLive ? '시트 갱신 실패 - 이전에 받은 데이터를 계속 표시합니다.' : '시트 연결 실패 - 예시 데이터로 표시합니다. 왼쪽 동기화 버튼으로 재시도하세요.', 'danger');
                 }
+                renderDataWarning();
 
                 safeRenderAll();
             }
@@ -2795,7 +3014,8 @@
 
         // 🚀 시트 응답을 기다리지 않고 먼저 화면을 그린다 (멈춤 현상 원천 차단)
         safeRenderAll();
-        setTimeout(function () { fetchGoogleSheetsData(); }, 60);
+        renderDataWarning();   // 시트를 받기 전: '예시 데이터' 안내 띠
+        setTimeout(function () { fetchGoogleSheetsData({ silent: true }); }, 60);
 
         // ===== 월별 설정 저장 (목표 · 외주 운영계획) =====
         //  · SETTINGS_API_URL 이 있으면 구글 시트(Apps Script)에 저장 → 모든 PC·TV가 같은 값을 봄
@@ -2884,7 +3104,8 @@
             if (el) el.innerText = text;
         }
         // 해당 월 목표 불러오기: 저장값 → 없으면 그 이전 달 중 가장 최근 저장값 → 없으면 기본값
-        function loadTargetsForMonth(ym) {
+        // 해당 월 목표: 저장값 → 없으면 그 이전 달 중 가장 최근 저장값 → 없으면 기본값
+        function targetsFor(ym) {
             const store = readTargetStore();
             const hasT = k => store[k] && store[k].monthly !== undefined;
             let t = hasT(ym) ? store[ym] : null, from = ym, inherited = false;
@@ -2892,7 +3113,11 @@
                 const prev = Object.keys(store).filter(k => k < ym && hasT(k)).sort().pop();
                 if (prev) { t = store[prev]; from = prev; inherited = true; }
             }
-            t = t || DEFAULT_TARGETS;
+            return { t: t || DEFAULT_TARGETS, from, inherited, saved: hasT(ym), isDefault: !t };
+        }
+        function loadTargetsForMonth(ym) {
+            const { t, from, inherited } = targetsFor(ym);
+            const hasT = () => targetsFor(ym).saved;
             monthlyTarget = Number(t.monthly) || 0;
             packMonthlyTarget = Number(t.pack) || 0;
             dailyTarget = Number(t.daily) || 0;
@@ -3052,6 +3277,43 @@
             }).join('');
         }
 
+        // ===== 실수율 = 작업량 ÷ 투입중량 =====
+        //  생산실적 시트의 투입중량은 '코일' 단위 값이라, 한 코일을 여러 묶음으로 나누면 같은 값이 행마다 반복된다.
+        //  → 작업량은 모든 행을 더하고, 투입중량은 (제조번호 + 코일번호)마다 한 번만 더한다.
+        var YIELD_WARN = 95;   // 이 값 미만이면 주황색 표시
+        function yieldStats(rows) {
+            let out = 0, inp = 0; const seen = new Set(), lots = new Set();
+            (rows || []).forEach((r, i) => {
+                if (!(r.inputW > 0)) return;
+                out += r.amount || 0;
+                lots.add(r.lotNo || '');
+                const k = `${r.lotNo || ''}|${r.coil || 'row' + i}`;
+                if (!seen.has(k)) { seen.add(k); inp += r.inputW; }
+            });
+            return { rate: inp > 0 ? out / inp * 100 : null, out, inp, lots: lots.size };
+        }
+
+        // ===== 월말 예상 (B-1) =====
+        //  주말·휴일도 가동 → 남은 작업일 = 남은 달력일. 오늘은 실적이 덜 들어와 제외.
+        //  rows: 이번 달 행(생산 또는 포장), target: 월 목표(T)
+        function monthForecast(rows, target) {
+            if (!(target > 0)) return null;
+            const today = nlqYmd(new Date());
+            const byDay = {};
+            (rows || []).forEach(r => { if (r.date && r.date < today) byDay[r.date] = (byDay[r.date] || 0) + r.amount / 1000; });
+            const lastDate = Object.keys(byDay).sort().pop();
+            if (!lastDate) return null;
+            const [yy, mm, dd] = lastDate.split('-').map(Number);
+            const dim = new Date(yy, mm, 0).getDate();
+            const doneT = Object.values(byDay).reduce((a, b) => a + b, 0);
+            const remain = dim - dd;                                   // 오늘 포함 남은 일수
+            const avg = doneT / dd;                                    // 1일~마지막 완료일 달력일 평균
+            let wk = 0; for (let i = 0; i < 7; i++) { const d = new Date(yy, mm - 1, dd - i); if (d.getMonth() === mm - 1) wk += byDay[nlqYmd(d)] || 0; }
+            const avg7 = wk / Math.min(7, dd);
+            const fc = doneT + avg * remain, fc7 = doneT + avg7 * remain;
+            return { today, lastDate, mm, dd, doneT, remain, avg, avg7, fc, fc7, pct: fc / target * 100, need: remain > 0 ? Math.max(0, (target - doneT) / remain) : 0 };
+        }
+
         // OEE 게이지: 0~100% 막대에 OEE만큼 색을 채우고, 막대 안에 %를 쓰고, 기준선(OEE_TARGET)을 세로선으로 표시
         var OEE_TARGET = 85;   // var: 페이지 첫 그리기(safeRenderAll)가 이 줄보다 먼저 실행되므로 const 를 쓰면 초기화 전 접근 오류
         function oeeGaugeHtml(v) {
@@ -3196,6 +3458,28 @@
             paintDelta('kpi-tons-delta', totKg, prevProdKg);
             paintDelta('kpi-pack-delta', totPackKg, prevPackKg);
 
+            // ── 월말 예상 (B-1): 이번 달 누계 화면에서만 ──
+            //  주말·휴일도 가동 → 남은 작업일 = 남은 달력일.
+            //  기준 일평균 = 마지막 '완료된 날'까지의 이번 달 평균 (오늘은 실적이 덜 들어와 제외)
+            //  월말 예상 = 완료된 날까지 누계 + 일평균 × 남은 일수 / 참고: 최근 7일 평균 기준 예상
+            const paintForecast = (id, rows, target) => {
+                const el = document.getElementById(id); if (!el) return;
+                el.innerHTML = ''; el.title = '';
+                if (selectedMonth !== getCurrentMonthKey() || selectedDate !== 'ALL' || target <= 0) return;
+                const F = monthForecast(rows, target); if (!F) return;
+                const { today, mm, dd, doneT, remain, avg, avg7, fc, fc7, pct, need } = F;
+                const color = pct >= 100 ? '#198038' : pct >= 90 ? '#BA4E00' : '#DA1E28';
+                const f0 = v => Math.round(v).toLocaleString();
+                el.innerHTML = `월말 예상 <b class="font-mono-num" style="color:${color}">${f0(fc)}T</b> <span style="color:${color}">(${pct.toFixed(0)}%)</span>` +
+                    (remain > 0 && doneT < target ? ` · 필요 <b class="font-mono-num">${f0(need)}</b>T/일` : '');
+                el.title = `월말 예상 = ${mm}/${dd}까지 누계 ${f0(doneT)}T + 일평균 ${avg.toFixed(1)}T × 남은 ${remain}일 (오늘 포함, 주말·휴일 가동)\n` +
+                    `목표 ${f0(target)}T 대비 ${pct.toFixed(1)}%\n` +
+                    `참고: 최근 7일 평균 ${avg7.toFixed(1)}T/일 기준이면 ${f0(fc7)}T (${(fc7 / target * 100).toFixed(0)}%)\n` +
+                    `오늘(${today.substring(5)}) 실적은 아직 들어오는 중이라 계산에서 제외`;
+            };
+            paintForecast('kpi-tons-forecast', cProd, activeMonthlyTarget);
+            paintForecast('kpi-pack-forecast', cPack, activePackMonthlyTarget);
+
             if(document.getElementById('kpi-down')) document.getElementById('kpi-down').innerText = totDown.toLocaleString();
 
             const reasonMap = {};
@@ -3236,8 +3520,9 @@
 
             const mMap = {};
             fProd.forEach(d => {
-                if(!mMap[d.equipment]) mMap[d.equipment] = {name: d.equipment, amt:0, down:0, spdSum:0, spdCnt:0, byShape:{}};
+                if(!mMap[d.equipment]) mMap[d.equipment] = {name: d.equipment, amt:0, down:0, spdSum:0, spdCnt:0, byShape:{}, rows: []};
                 mMap[d.equipment].amt += d.amount;
+                mMap[d.equipment].rows.push(d);
                 if(d.speed > 0) { mMap[d.equipment].spdSum += d.speed; mMap[d.equipment].spdCnt++; }
                 // 작업선경 범위는 형상별로 따로 잡는다. 99 이상(이형 99.100~99.999 등)은 실제 선경이 아닌 임의 코드값이라 범위에서 뺀다
                 if(d.wire > 0 || d.length > 0) {
@@ -3251,7 +3536,7 @@
             fDown.forEach(d => { if(mMap[d.equipment]) mMap[d.equipment].down += d.minutes; });
 
             let mList = Object.values(mMap).map(m => ({
-                ...m, oee: totalMin > 0 ? Math.max(0, ((totalMin - m.down)/totalMin * 100)).toFixed(1) : "0.0", avgSpd: m.spdCnt > 0 ? (m.spdSum/m.spdCnt).toFixed(1) : "0.0", wr: wireRangeHtml(m.byShape), lr: lengthRangeHtml(m.byShape)
+                ...m, oee: totalMin > 0 ? Math.max(0, ((totalMin - m.down)/totalMin * 100)).toFixed(1) : "0.0", avgSpd: m.spdCnt > 0 ? (m.spdSum/m.spdCnt).toFixed(1) : "0.0", wr: wireRangeHtml(m.byShape), lr: lengthRangeHtml(m.byShape), yld: yieldStats(m.rows)
             })).sort((a,b) => { const idxA = MACHINE_ORDER.indexOf(a.name); const idxB = MACHINE_ORDER.indexOf(b.name); return (idxA === -1 ? 999 : idxA) - (idxB === -1 ? 999 : idxB); });
 
             let tHtml = '';
@@ -3259,6 +3544,7 @@
                 tHtml += `<tr class="group hover:bg-slate-100 transition-all">
                     <td class="font-black text-slate-900 border-l-2 border-l-transparent group-hover:border-l-sky-700 pl-3 uppercase text-xs lg:text-sm whitespace-nowrap">${m.name}</td>
                     <td class="text-right font-mono-num font-black text-sm lg:text-base text-sky-800">${Math.round(m.amt/1000).toLocaleString()}</td>
+                    <td class="text-right font-mono-num text-xs lg:text-sm whitespace-nowrap" style="color:${m.yld.rate === null ? '#A8A8A8' : m.yld.rate < YIELD_WARN ? '#BA4E00' : '#161616'}" title="${m.yld.rate === null ? '투입중량 없음' : `제조번호 ${m.yld.lots}개 · 작업량 ${(m.yld.out / 1000).toFixed(1)}T ÷ 투입 ${(m.yld.inp / 1000).toFixed(1)}T (투입중량은 코일번호별 1회)`}">${m.yld.rate === null ? '-' : m.yld.rate.toFixed(1) + '%'}</td>
                     <td class="text-center font-bold text-amber-700 text-xs lg:text-sm">${m.wr}</td>
                     <td class="text-center font-bold text-slate-700 text-xs lg:text-sm">${m.lr}</td>
                     <td class="text-right font-bold text-slate-700 text-xs lg:text-sm">${m.avgSpd}</td>
@@ -3274,6 +3560,7 @@
                 if (thead) thead.innerHTML = `<tr>
                     <th>설비 식별</th>
                     <th class="text-right">누적 실적 (TON)</th>
+                    <th class="text-right" title="제조번호별 작업량 합 ÷ 투입중량 합 (투입중량은 코일번호마다 한 번만 합산)">실수율</th>
                     <th class="text-center">작업선경 범위 (mm)</th>
                     <th class="text-center">작업길이 범위 (mm)</th>
                     <th class="text-right">평균 선속 (m/min)</th>
@@ -3394,8 +3681,9 @@
             const targetFactor = (selectedDate === 'ALL' && viewMode === 'WEEKLY') ? 7 : 1;
             const tData = chartArr.map(() => activeDailyTarget * targetFactor);
 
-            // 불가동 막대를 부위별로 쌓는다: 이 기간 상위 8개 부위만 색, 나머지는 '기타 부위'(회색)
-            const PART_COLORS = ['#DA1E28', '#FF832B', '#F1C21B', '#EE5396', '#8A3800', '#750E13', '#FFB784', '#8E6A00'];
+            // 불가동 막대를 부위별로 쌓는다: 이 기간 불가동 TOP3 부위만 색, 나머지는 '기타 부위'(회색)
+            //  색 개수 = 색으로 나누는 부위 개수. 늘리려면 색을 추가하면 된다.
+            const PART_COLORS = ['#DA1E28', '#FF832B', '#F1C21B'];
             const partTot = {};
             cDown.forEach(d => { const p = d.part || '기타'; partTot[p] = (partTot[p] || 0) + d.minutes; });
             const topParts = Object.entries(partTot).filter(x => x[1] > 0).sort((a, b) => b[1] - a[1]).slice(0, PART_COLORS.length).map(x => x[0]);
@@ -3707,7 +3995,7 @@
             //  → 모든 형상이 '설비 1대·1시간당 톤'이라는 같은 기준이 된다. (비율 배분이므로 추정값)
             const teamOf = x => (x.team || '').replace(/조/g, '').trim().toUpperCase();
             const shapeOf = p => { const s = p.shapeRaw || '원형'; return s.includes('육각') ? '정육각' : s.includes('사각') ? '사각' : s.includes('이형') ? '이형' : '원형'; };
-            const slotMix = new Map(), dayMix = new Map();   // 날짜|설비|조 → {형상: kg},  날짜|조 → {형상: kg}
+            const slotMix = new Map();   // 날짜|설비|조|근무 → {형상: kg}
             const addMix = (M, k, sh, kg) => { const o = M.get(k) || {}; o[sh] = (o[sh] || 0) + kg; M.set(k, o); };
             const spread = (grp, mix, minutes, field) => {
                 const tot = Object.values(mix).reduce((a, b) => a + b, 0); if (tot <= 0) return false;
@@ -3722,7 +4010,6 @@
                 const key = `${grp}-${sh}`;
                 if(map[key]) { map[key].amt += p.amount; map[key].workDays.add(p.date); }
                 addMix(slotMix, `${p.date}|${p.equipment}|${grp}|${shiftKey(p.shift)}`, sh, p.amount);
-                addMix(dayMix, `${p.date}|${grp}`, sh, p.amount);
             });
             // 근무시간: 1근 480분 · 2근 540분 (근무 미기재는 480분)
             slotMix.forEach((mix, k) => { const [, , grp, sk] = k.split('|'); spread(grp, mix, SHIFT_MINUTES[sk] || SHIFT_MINUTES['1근'], 'gross'); });
@@ -3731,13 +4018,13 @@
             cDown.forEach(d => {
                 const grp = teamOf(d);
                 if(!groupKeys.includes(grp)) return;
-                // 같은 날·설비·조의 생산 형상 비율로 → 없으면 그날 그 조 전체의 형상 비율로 → 그래도 없으면 미배분
-                const ok = spread(grp, slotMix.get(`${d.date}|${d.equipment}|${grp}|${shiftKey(d.shift)}`) || {}, d.minutes, 'down')
-                        || spread(grp, dayMix.get(`${d.date}|${grp}`) || {}, d.minutes, 'down');
+                // 같은 날·설비·조·근무에 실제 생산한 형상 비율로 나눈다.
+                // 그 설비·근무에 생산 기록이 없으면(근무 내내 정지 등) 형상을 알 수 없으므로 '형상 미상'으로 따로 집계하고 UPH 계산에서 뺀다.
+                const ok = spread(grp, slotMix.get(`${d.date}|${d.equipment}|${grp}|${shiftKey(d.shift)}`) || {}, d.minutes, 'down');
                 if (!ok) unassignedDown += d.minutes;
             });
             const noteEl = document.getElementById('aly-alloc-note');
-            if (noteEl) noteEl.innerText = `근무시간(1근 480분·2근 540분)과 불가동을 날짜·설비·조·근무별 생산 형상 비율로 배분한 추정값 (UPH = 설비 1대·1시간당 톤)` + (unassignedDown ? ` · 같은 날 생산 기록이 없어 배분하지 못한 불가동 ${Math.round(unassignedDown).toLocaleString()}분 제외` : '');
+            if (noteEl) noteEl.innerText = `근무시간(1근 480분·2근 540분)과 불가동을 날짜·설비·조·근무별 생산 형상 비율로 배분한 추정값 (UPH = 설비 1대·1시간당 톤)` + (unassignedDown ? ` · 형상 미상 불가동 ${Math.round(unassignedDown).toLocaleString()}분 (그 설비·근무에 생산 기록 없음) 은 형상별 UPH에서 제외` : '');
 
             const uphTotals = { '원형': { sum: 0, cnt: 0 }, '정육각': { sum: 0, cnt: 0 }, '사각': { sum: 0, cnt: 0 }, '이형': { sum: 0, cnt: 0 } };
             let tBodyHtml = '';
@@ -4047,7 +4334,7 @@
             // 1. 헤더 생성 ([평균주기] 및 [변동성(±σ)] 분석 열 포함)
             let headerHtml = `
                 <th class="border border-slate-200 font-black col-equip">설비 / 전환관리</th>
-                <th class="border border-slate-200 font-black col-num">운영계획</th>
+                <th class="border border-slate-200 font-black col-num" title="상단 CDM 계획 ${Number(targetsFor(targetYM).t.monthly || 0).toLocaleString()}T(${targetYM})를 설비별 기준 비율로 나눈 값. 상단 목표를 바꾸면 함께 바뀝니다.">운영계획</th>
                 <th class="border border-slate-200 font-black col-num">생산량</th>
                 <th class="border border-slate-200 font-black col-num">진도율</th>
                 <th class="border border-slate-200 font-black col-steel">강종</th>
@@ -4063,15 +4350,16 @@
             }
             headerRow.innerHTML = headerHtml;
 
-            const machinePlans = {
-                'PCD-0-2': 40,
-                'PCD-0-3': 160,
-                'PCD-1': 300,
-                'PCD-5': 320,
-                'PCD-2-2': 520,
-                'PCD-3': 850,
-                'PCD-4': 1140
-            };
+            // 설비별 운영계획 = 조회 월의 상단 'CDM 계획' × 설비별 기준 비율 (기존 설비별 계획 40/160/300/320/520/850/1140T의 비율)
+            //  반올림 차이는 비중이 가장 큰 설비(PCD-4)에 넣어 합계가 월 계획과 정확히 같게 한다.
+            const PLAN_SHARE_BASE = { 'PCD-0-2': 40, 'PCD-0-3': 160, 'PCD-1': 300, 'PCD-5': 320, 'PCD-2-2': 520, 'PCD-3': 850, 'PCD-4': 1140 };
+            const planInfo = targetsFor(targetYM);
+            const monthPlan = Number(planInfo.t.monthly) || 0;
+            const baseSum = Object.values(PLAN_SHARE_BASE).reduce((a, b) => a + b, 0);
+            const machinePlans = {};
+            Object.entries(PLAN_SHARE_BASE).forEach(([k, v]) => { machinePlans[k] = Math.round(monthPlan * v / baseSum); });
+            machinePlans['PCD-4'] += monthPlan - Object.values(machinePlans).reduce((a, b) => a + b, 0);
+            const planSrcTxt = planInfo.saved ? `${targetYM} 저장된 CDM 계획` : planInfo.inherited ? `${planInfo.from} CDM 계획을 이어서 사용` : '기본 CDM 계획';
 
             const getCategoriesForMachine = (mName) => {
                 const cats = [
@@ -4093,7 +4381,7 @@
             const fmtT = (v) => (Math.round((v || 0) * 10) / 10).toLocaleString('ko-KR', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
 
             let bodyHtml = '';
-            let grandPlanTotal = 3330;
+            const grandPlanTotal = monthPlan;
             let grandMonthTotal = 0;
 
             let allMeanSums = 0;
@@ -5573,6 +5861,266 @@
         }
         function closeInspDetail() { document.getElementById('insp-detail-modal').style.display = 'none'; }
 
+
+        // =====================================================================
+        // 재공 체류 현황 — 구글 시트 '재공 기간별 체류 리스트' (연동 설정 05번)
+        //  · 재공체류기간(시트) = 오늘 − 원재불출일  → '총 체류'
+        //  · 현 공정 대기 = 오늘 − 완료공정일 (계산)  → 어디서 막혀 있는지
+        //  · 후공정 '최종 검사'는 곧 빠지므로 관리 대상에서 기본 제외
+        //  · 재고등급이 정상품이 아닌 것(특채후 최종부적합 등) = 부적합 재공(처분 대기)으로 따로 표시
+        //  ※ var: 첫 화면 그리기가 이 코드보다 먼저 실행될 수 있어 const 를 쓰지 않음
+        // =====================================================================
+        var wipData = null;              // null = 아직 못 받음
+        var wipSyncState = 'loading';    // loading | ok | failed | nourl
+        var wipPostFilter = '';          // 차트 막대 클릭으로 고른 후공정
+        var WIP_LIMIT = 90;              // 재공 처리 기준: 현 공정 대기(마지막 완료공정 이후) 90일 이상 = 진행이 안 된 문제 재공 (팀 기준)
+        var WIP_BUCKETS = [
+            { key: 'lt60',  label: '60일 미만',            min: 0,   max: 60,       color: '#A8A8A8' },
+            { key: 'b60',   label: '60~90일 (기준 임박)',  min: 60,  max: 90,       color: '#F1C21B' },
+            { key: 'b90',   label: '90~180일 (처리 대상)', min: 90,  max: 180,      color: '#DA1E28' },
+            { key: 'ge180', label: '180일 이상 (처리 대상)', min: 180, max: Infinity, color: '#750E13' }
+        ];
+        var wipChartInstance = null;
+
+        function wipIsFinal(r) { return String(r.post || '').replace(/\s/g, '') === '최종검사'; }
+        function wipIsNg(r) { return !!r.grade && r.grade !== '정상품'; }
+        function wipBucket(days) { return WIP_BUCKETS.find(b => days >= b.min && days < b.max) || WIP_BUCKETS[0]; }
+        // 판정·정렬에 쓰는 일수 = 현 공정 대기 (완료공정일이 없으면 총 체류로 대신)
+        function wipDays(r) { return r.wait != null ? r.wait : r.dwell; }
+        function wipDaysSince(ymd) {
+            const d = inspParseDate(ymd); if (!d) return null;
+            const t = new Date(); t.setHours(0, 0, 0, 0);
+            return Math.round((t - new Date(d + 'T00:00:00')) / 86400000);
+        }
+
+        function extractWipData(aoa) {
+            if (!Array.isArray(aoa) || aoa.length < 2) return [];
+            const norm = h => String(h == null ? '' : h).normalize('NFKC').replace(/\s/g, '');
+            const hIdx = aoa.slice(0, 10).findIndex(r => r && r.map(norm).includes('제조번호'));
+            if (hIdx < 0) return [];
+            const H = aoa[hIdx].map(norm);
+            const col = (...names) => { for (const n of names) { const i = H.indexOf(n); if (i >= 0) return i; } return -1; };
+            const C = {
+                lot: col('제조번호'), dept: col('영업부서'), cust: col('거래처'), steel: col('실강종', '강종'), proc: col('실공정'),
+                shape: col('형상'), rawDia: col('원재선경'), dia: col('제품선경', '최종공정선경'), w: col('중량'), maker: col('메이커'),
+                order: col('작지일'), issue: col('원재불출일'), dwell: col('재공체류기간'), done: col('완료공정'), doneDate: col('완료공정일'),
+                grade: col('재고등급'), ng: col('부적합항목'), post: col('후공정')
+            };
+            const g = (row, i) => (i >= 0 && row[i] != null) ? String(row[i]).trim() : '';
+            const out = [];
+            for (let i = hIdx + 1; i < aoa.length; i++) {
+                const row = aoa[i]; if (!row || !g(row, C.lot)) continue;
+                let dwell = safeNum(g(row, C.dwell));
+                if (!(dwell > 0)) dwell = wipDaysSince(g(row, C.issue)) || 0;   // 시트 값이 비면 원재불출일로 계산
+                out.push({
+                    lot: g(row, C.lot), dept: g(row, C.dept), cust: g(row, C.cust), steel: g(row, C.steel), proc: g(row, C.proc),
+                    shape: g(row, C.shape), rawDia: g(row, C.rawDia), dia: g(row, C.dia), w: safeNum(g(row, C.w)), maker: g(row, C.maker),
+                    order: g(row, C.order), issue: g(row, C.issue), dwell, done: g(row, C.done), doneDate: g(row, C.doneDate),
+                    wait: wipDaysSince(g(row, C.doneDate)), grade: g(row, C.grade), ng: g(row, C.ng), post: g(row, C.post) || '미기재'
+                });
+            }
+            return out;
+        }
+
+        // 관리 대상 = 최종 검사 제외 (옵션으로 포함)
+        function wipManaged(includeFinal) { return (wipData || []).filter(r => includeFinal || !wipIsFinal(r)); }
+
+        function renderWip() {
+            const badge = document.getElementById('wip-source-badge');
+            const empty = document.getElementById('wip-empty');
+            if (!wipData) {
+                const msg = wipSyncState === 'nourl' ? '연동 설정 05번(재공 체류 리스트 CSV) 주소가 비어 있습니다.'
+                    : wipSyncState === 'failed' ? '재공 체류 리스트 시트를 불러오지 못했습니다. 왼쪽 ⟳ 버튼으로 다시 시도하거나 연동 설정을 확인하세요.'
+                    : '재공 체류 리스트 시트를 불러오는 중입니다…';
+                if (empty) { empty.innerHTML = msg; empty.classList.remove('hidden'); }
+                if (badge) badge.innerText = wipSyncState === 'loading' ? '불러오는 중' : '연동 안 됨';
+                return;
+            }
+            if (empty) empty.classList.add('hidden');
+            if (badge) { badge.innerText = `시트 연동 · ${wipData.length}건`; badge.className = 'text-[9px] font-black px-1.5 py-0.5 rounded border bg-emerald-50 text-emerald-700 border-emerald-300'; }
+
+            const inclFinal = document.getElementById('wip-f-final').checked;
+            const base = wipManaged(inclFinal);
+            const fT = v => (v / 1000).toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+
+            // 필터 목록 채우기 (선택값 유지)
+            const fill = (id, vals, allTxt) => {
+                const el = document.getElementById(id); const cur = el.value;
+                el.innerHTML = `<option value="">${allTxt}</option>` + vals.map(v => `<option value="${escHtml(v)}">${escHtml(v)}</option>`).join('');
+                el.value = vals.includes(cur) ? cur : '';
+            };
+            const postSel = document.getElementById('wip-f-post');
+            if (wipPostFilter) { postSel.dataset.pending = wipPostFilter; wipPostFilter = ''; }
+            fill('wip-f-post', [...new Set(base.map(r => r.post))].sort(), '전체');
+            if (postSel.dataset.pending) { postSel.value = postSel.dataset.pending; delete postSel.dataset.pending; }
+            fill('wip-f-dept', [...new Set(base.map(r => r.dept))].filter(Boolean).sort(), '전체');
+
+            // KPI (필터와 관계없이 관리 대상 전체)
+            const sumW = L => L.reduce((a, r) => a + r.w, 0);
+            const ge90 = base.filter(r => wipDays(r) >= WIP_LIMIT), ng = base.filter(wipIsNg);
+            const top = base.slice().sort((a, b) => wipDays(b) - wipDays(a))[0];
+            const set = (id, v) => { const el = document.getElementById(id); if (el) el.innerHTML = v; };
+            set('wip-k-total', `${base.length}건 <span class="text-sm font-normal">· ${fT(sumW(base))}T</span>`);
+            set('wip-k-total-sub', inclFinal ? '최종 검사 포함' : `최종 검사 ${(wipData || []).filter(wipIsFinal).length}건 제외`);
+            set('wip-k-90', `${ge90.length}건 <span class="text-sm font-normal">· ${fT(sumW(ge90))}T</span>`);
+            set('wip-k-90-sub', `180일 이상 ${base.filter(r => wipDays(r) >= 180).length}건 · 60~90일 기준 임박 ${base.filter(r => wipDays(r) >= 60 && wipDays(r) < WIP_LIMIT).length}건`);
+            set('wip-k-max', top ? `${wipDays(top)}일` : '-');
+            set('wip-k-max-sub', top ? `${escHtml(top.lot)} · ${escHtml(top.post)} 대기 · ${escHtml(top.cust)}` : '');
+            set('wip-k-ng', `${ng.length}건 <span class="text-sm font-normal">· ${fT(sumW(ng))}T</span>`);
+            set('wip-k-ng-sub', ng.length ? [...new Set(ng.map(r => r.ng || r.grade))].map(escHtml).join(' · ') : '없음');
+
+            // 목록 필터
+            const fPost = postSel.value, fDept = document.getElementById('wip-f-dept').value;
+            const q = (document.getElementById('wip-f-q').value || '').trim().toUpperCase();
+            const onlyNg = document.getElementById('wip-f-ng').checked;
+            const list = base.filter(r => (!fPost || r.post === fPost) && (!fDept || r.dept === fDept) && (!onlyNg || wipIsNg(r))
+                && (!q || `${r.lot} ${r.cust} ${r.steel} ${r.proc}`.toUpperCase().includes(q))).sort((a, b) => wipDays(b) - wipDays(a) || b.dwell - a.dwell || b.w - a.w);
+
+            set('wip-list-count', `${list.length}건 · ${fT(sumW(list))}T`);
+            const dayCls = d => d >= WIP_LIMIT ? 'text-red-700 font-black' : d >= 60 ? 'font-black' : '';
+            const dayStyle = d => d >= 60 && d < WIP_LIMIT ? 'color:#BA4E00' : '';
+            document.getElementById('wip-body').innerHTML = list.map(r => `<tr>
+                <td class="py-1 px-2 font-mono-num whitespace-nowrap">${escHtml(r.lot)}</td>
+                <td class="py-1 px-2 whitespace-nowrap">${escHtml(r.post)}</td>
+                <td class="py-1 px-2 text-right font-mono-num ${dayCls(wipDays(r))}" style="${dayStyle(wipDays(r))}" title="완료공정일 ${escHtml(r.doneDate)} 이후">${r.wait == null ? '-' : r.wait}</td>
+                <td class="py-1 px-2 text-right font-mono-num text-slate-600" title="원재불출일 ${escHtml(r.issue)} 이후">${r.dwell}</td>
+                <td class="py-1 px-2 whitespace-nowrap">${escHtml(r.done)} <span class="text-slate-500">(${escHtml((r.doneDate || '').substring(5))})</span></td>
+                <td class="py-1 px-2 max-w-[180px] truncate" title="${escHtml(r.cust)}">${escHtml(r.cust)}</td>
+                <td class="py-1 px-2 whitespace-nowrap">${escHtml(r.dept)}</td>
+                <td class="py-1 px-2 whitespace-nowrap">${escHtml(r.steel)} · ${escHtml(r.shape)}</td>
+                <td class="py-1 px-2 text-right font-mono-num whitespace-nowrap">${escHtml(r.rawDia)}→${escHtml(r.dia)}</td>
+                <td class="py-1 px-2 text-right font-mono-num">${Math.round(r.w).toLocaleString()}</td>
+                <td class="py-1 px-2 whitespace-nowrap">${wipIsNg(r) ? `<span class="px-1.5 py-0.5 text-[9.5px] font-black border" style="background:#F6F2FF;color:#6929C4;border-color:#BE95FF" title="${escHtml(r.grade)}">부적합${r.ng ? ' · ' + escHtml(r.ng) : ''}</span>` : '<span class="text-slate-500">정상품</span>'}</td>
+            </tr>`).join('') || '<tr><td colspan="11" class="py-4 text-center text-slate-500">조건에 맞는 재공이 없습니다.</td></tr>';
+
+            // 차트: 후공정 × 체류구간 (중량 T), 관리 대상 전체 기준
+            const canvas = document.getElementById('wipChart');
+            if (canvas && window.Chart) {
+                if (wipChartInstance) wipChartInstance.destroy();
+                const posts = [...new Set(base.map(r => r.post))].sort((a, b) => sumW(base.filter(r => r.post === b)) - sumW(base.filter(r => r.post === a)));
+                const cell = (p, b) => base.filter(r => r.post === p && wipBucket(wipDays(r)) === b);
+                wipChartInstance = new Chart(canvas.getContext('2d'), {
+                    type: 'bar',
+                    data: { labels: posts, datasets: WIP_BUCKETS.map(b => ({ label: b.label, data: posts.map(p => +(sumW(cell(p, b)) / 1000).toFixed(1)), backgroundColor: b.color, cnt: posts.map(p => cell(p, b).length), maxBarThickness: 26 })) },
+                    options: {
+                        indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+                        scales: { x: { stacked: true, beginAtZero: true, title: { display: true, text: '중량 (TON)', font: { size: 10 } } }, y: { stacked: true, grid: { display: false }, ticks: { font: { size: 11, weight: 'bold' } } } },
+                        plugins: {
+                            legend: { position: 'top', labels: { font: { size: 10 }, boxWidth: 10 } },
+                            tooltip: { filter: i => i.raw > 0, callbacks: { label: c => ` ${c.dataset.label}: ${c.raw}T (${c.dataset.cnt[c.dataIndex]}건)` } }
+                        },
+                        onClick: (e, els) => { if (els.length) { postSel.value = posts[els[0].index]; renderWip(); } },
+                        onHover: (e, els) => { e.native.target.style.cursor = els.length ? 'pointer' : 'default'; }
+                    }
+                });
+            }
+        }
+
+        // 메인 화면 한 줄 경보: 180일 이상 재공 · 부적합 재공이 있을 때만
+        // ===== 이상 알림 띠 (B-5) =====
+        //  문제가 있을 때만 항목이 나타난다. 화면 필터와 관계없이 '이번 달 · 전체 근무' 기준.
+        //  기준값은 아래 상수로 조정.
+        var ALERT_DOWN_RATIO = 1.5;    // 마지막 완료일 불가동이 이번 달 일평균의 1.5배 이상
+        var ALERT_DOWN_MIN = 120;      //   그리고 120분 이상일 때
+        var ALERT_NG_RATIO = 2;        // 마지막 완료일 다기능 부적합률이 월 평균의 2배 이상
+        var ALERT_NG_MIN_KG = 500;     //   그리고 부적합 0.5T 이상일 때
+        function renderOpsAlerts() {
+            const el = document.getElementById('ops-alert');
+            if (!el) return;
+            const ym = getCurrentMonthKey(), today = nlqYmd(new Date());
+            const chip = (sev, icon, html, onclick, title) =>
+                `<span class="inline-flex items-center gap-1 px-2 py-0.5 border ${onclick ? 'cursor-pointer hover:underline' : ''}" style="${sev === 'red' ? 'background:#FFF1F1;border-color:#FFB3B8;color:#750E13' : 'background:#FCF4D6;border-color:#F1C21B;color:#684E00'}"` +
+                `${onclick ? ` onclick="${onclick}"` : ''}${title ? ` title="${escHtml(title)}"` : ''}><i class="fa-solid ${icon}"></i>${html}</span>`;
+            const items = [];
+            const f0 = v => Math.round(v).toLocaleString();
+
+            // ① 생산·포장 목표 진도 (월말 예상 < 100%)
+            const T = targetsFor(ym).t;
+            [['생산', prodData, Number(T.monthly)], ['포장', packData, Number(T.pack)]].forEach(([nm, src, target]) => {
+                if (DATA_STATE[nm === '생산' ? 'prod' : 'pack'] !== 'live') return;
+                const F = monthForecast((src || []).filter(r => r.date && r.date.startsWith(ym)), target);
+                if (!F || F.pct >= 100) return;
+                items.push(chip(F.pct < 90 ? 'red' : 'amber', 'fa-bullseye', `${nm} 월말 예상 <b>${F.pct.toFixed(0)}%</b> · 필요 <b>${f0(F.need)}T/일</b>`, '',
+                    `월말 예상 ${f0(F.fc)}T / 목표 ${f0(target)}T · ${F.mm}/${F.dd}까지 일평균 ${F.avg.toFixed(1)}T → 남은 ${F.remain}일 동안 하루 ${f0(F.need)}T 필요`));
+            });
+
+            // ② 불가동 급증: 마지막 완료일 vs 이번 달 나머지 날의 일평균
+            if (DATA_STATE.down === 'live') {
+                const byDay = {}; const rows = (downData || []).filter(d => d.date && d.date.startsWith(ym) && d.date < today);
+                rows.forEach(d => { byDay[d.date] = (byDay[d.date] || 0) + d.minutes; });
+                const days = Object.keys(byDay).sort(), last = days[days.length - 1];
+                const prodDays = new Set((prodData || []).filter(p => p.date && p.date.startsWith(ym) && p.date < today).map(p => p.date));
+                const lastDay = [...prodDays].sort().pop();
+                if (lastDay) {
+                    const v = byDay[lastDay] || 0;
+                    const others = [...prodDays].filter(d => d !== lastDay);
+                    const avg = others.length ? others.reduce((a, d) => a + (byDay[d] || 0), 0) / others.length : 0;
+                    if (v >= ALERT_DOWN_MIN && avg > 0 && v >= avg * ALERT_DOWN_RATIO) {
+                        const parts = {}; rows.filter(d => d.date === lastDay).forEach(d => { const k = d.part || d.reason; parts[k] = (parts[k] || 0) + d.minutes; });
+                        const top = Object.entries(parts).sort((a, b) => b[1] - a[1])[0];
+                        items.push(chip(v >= avg * 2 ? 'red' : 'amber', 'fa-triangle-exclamation', `${lastDay.substring(5)} 불가동 <b>${f0(v)}분</b> (월 일평균의 ${(v / avg).toFixed(1)}배)${top ? ` · ${escHtml(top[0])}` : ''}`,
+                            `openDownDetailModal(null, null, '${lastDay}', true)`, `이번 달 일평균 ${f0(avg)}분 · 눌러서 그날 설비별 내역 보기`));
+                    }
+                }
+            }
+
+            // ③ 다기능 부적합률 급증: 마지막 완료일 vs 이번 달 평균
+            if (!inspIsDemo && Array.isArray(inspData)) {
+                const L = inspData.filter(r => INSP_EQUIPS.includes(r.pnd) && r.date && r.date.startsWith(ym) && r.date < today);
+                const last = L.map(r => r.date).sort().pop();
+                if (last) {
+                    const d = inspAgg(L.filter(r => r.date === last)), m = inspAgg(L);
+                    if (d.ng >= ALERT_NG_MIN_KG && m.rate > 0 && d.rate >= m.rate * ALERT_NG_RATIO) {
+                        const q = `${last.substring(5).replace('-', '/')} 불량률 왜 높아?`;
+                        items.push(chip('red', 'fa-microscope', `${last.substring(5)} 다기능 부적합률 <b>${d.rate.toFixed(2)}%</b> (월 평균 ${m.rate.toFixed(2)}%)`,
+                            `toggleBot(); document.getElementById('chat-input').value = '${q}'; sendChat();`, `부적합 ${inspFmtT(d.ng)}T · 눌러서 PRO-Bot 원인 분석`));
+                    }
+                }
+            }
+
+            // ④ 재공 체류 (처리 기준 · 부적합 재공)
+            if (wipData) {
+                const base = wipManaged(false);
+                const long = base.filter(r => wipDays(r) >= WIP_LIMIT), ng = base.filter(wipIsNg);
+                const fT = L => (L.reduce((a, r) => a + r.w, 0) / 1000).toFixed(1);
+                if (long.length) items.push(chip('red', 'fa-hourglass-half', `재공 처리 기준(${WIP_LIMIT}일) 이상 <b>${long.length}건(${fT(long)}T)</b>`, "switchTab('wip')", '현 공정 대기 기준 · 눌러서 재공 체류 현황 보기'));
+                if (ng.length) items.push(chip('amber', 'fa-ban', `부적합 재공 <b>${ng.length}건(${fT(ng)}T)</b>`, "switchTab('wip')", '처분 대기 · 눌러서 재공 체류 현황 보기'));
+            }
+
+            el.innerHTML = items.length ? `<span class="font-black text-[11px] mr-1" style="color:#DA1E28"><i class="fa-solid fa-bell mr-1"></i>이상 알림</span>` + items.join('') : '';
+            el.classList.toggle('hidden', !items.length);
+        }
+
+        // PRO-Bot: "CD포장 대기 재공", "90일 넘은 재공", "FASTENAL 재공", "부적합 재공"
+        function nlqWipAnswer(q) {
+            if (!wipData) return '재공 체류 리스트 시트를 아직 불러오지 못했습니다.';
+            const s = String(q || ''), u = s.toUpperCase().replace(/\s/g, '');
+            let L = wipManaged(/최종\s*검사/.test(s));
+            const cond = [];
+            if (/CD포장/.test(u)) { L = L.filter(r => r.post === 'CD포장'); cond.push('후공정 CD포장'); }
+            else if (/산세/.test(u)) { L = L.filter(r => r.post.includes('산세')); cond.push('후공정 산세외주'); }
+            else if (/(^|[^A-Z])CD(?!포장)/.test(u)) { L = L.filter(r => r.post === 'CD'); cond.push('후공정 CD'); }
+            let m = s.match(/(\d+)\s*일\s*(이상|넘|초과|이 ?넘)/);
+            if (m) { L = L.filter(r => wipDays(r) >= +m[1]); cond.push(`현 공정 대기 ${m[1]}일 이상`); }
+            else if (/처리\s*(대상|기준)|문제|장기/.test(s)) { L = L.filter(r => wipDays(r) >= WIP_LIMIT); cond.push(`처리 기준: 현 공정 대기 ${WIP_LIMIT}일 이상`); }
+            if (/부적합|특채/.test(s)) { L = L.filter(wipIsNg); cond.push('부적합'); }
+            const custs = [...new Set((wipData || []).map(r => r.cust))];
+            const hit = custs.find(c => { const k = c.replace(/\(주\)|㈜|,.*$/g, '').replace(/\s/g, '').toUpperCase(); return k.length >= 2 && u.includes(k.slice(0, Math.min(k.length, 8))); });
+            if (hit) { L = L.filter(r => r.cust === hit); cond.push(hit); }
+            const dept = [...new Set((wipData || []).map(r => r.dept))].find(d => d && u.includes(d.replace(/\s/g, '').toUpperCase()));
+            if (dept) { L = L.filter(r => r.dept === dept); cond.push(dept); }
+            L.sort((a, b) => wipDays(b) - wipDays(a) || b.dwell - a.dwell);
+            const w = (L.reduce((a, r) => a + r.w, 0) / 1000).toFixed(1);
+            let html = `<b>재공${cond.length ? ' (' + cond.map(escHtml).join(' · ') + ')' : ''}</b>: <b class="text-sky-800">${L.length}건 · ${w}T</b>`;
+            if (!L.length) return html + '<br>조건에 맞는 재공이 없습니다.';
+            const byPost = {}; L.forEach(r => { byPost[r.post] = (byPost[r.post] || 0) + 1; });
+            html += `<br><span class="text-slate-600">후공정: ${Object.entries(byPost).map(([k, v]) => `${escHtml(k)} ${v}건`).join(' · ')}</span>`;
+            html += nlqTable(['제조번호', '현 공정 대기', '총 체류'], L.slice(0, 10).map(r => [
+                `${escHtml(r.lot)}<div class="text-[9.5px] text-slate-500">${escHtml(r.post)} 대기 · ${escHtml(r.cust)}${wipIsNg(r) ? ' · <span style="color:#6929C4">부적합</span>' : ''}</div>`,
+                r.wait == null ? '-' : `<b>${r.wait}일</b>`, `${r.dwell}일`]));
+            if (L.length > 10) html += `<div class="text-[10px] text-slate-500">외 ${L.length - 10}건 · 전체는 '재공 체류 현황' 탭에서</div>`;
+            return html;
+        }
     </script>
 </body>
 </html>
